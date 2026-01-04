@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Reference</title>
+  <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
+  <style>
+    :root {
+      --sl-color-primary: #40E0D0;
+      --sl-color-primary-dark: #20B2AA;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: #0A1F3D;
+    }
+
+    elements-api {
+      display: block;
+      height: 100%;
+    }
+
+    /* ABM.dev dark theme overrides */
+    .sl-elements {
+      --color-canvas: #0A1F3D;
+      --color-canvas-50: rgba(10, 31, 61, 0.5);
+      --color-canvas-100: rgba(10, 31, 61, 0.8);
+      --color-canvas-200: #0d2a4d;
+      --color-canvas-300: #0f335e;
+      --color-canvas-pure: #0A1F3D;
+      --color-text: #FAEBD7;
+      --color-text-heading: #FAEBD7;
+      --color-text-paragraph: rgba(250, 235, 215, 0.85);
+      --color-text-muted: rgba(250, 235, 215, 0.6);
+      --color-text-light: rgba(250, 235, 215, 0.5);
+      --color-border: rgba(64, 224, 208, 0.2);
+      --color-border-light: rgba(64, 224, 208, 0.1);
+      --color-border-dark: rgba(64, 224, 208, 0.3);
+      --color-primary: #40E0D0;
+      --color-primary-dark: #20B2AA;
+      --color-primary-light: rgba(64, 224, 208, 0.2);
+      --color-primary-tint: rgba(64, 224, 208, 0.1);
+    }
+
+    /* Additional overrides for better theming */
+    .sl-elements-api,
+    .sl-panel,
+    .sl-inverted,
+    [class*="Panel"],
+    nav,
+    aside {
+      background: #0A1F3D !important;
+    }
+
+    .sl-elements h1,
+    .sl-elements h2,
+    .sl-elements h3,
+    .sl-elements h4 {
+      color: #FAEBD7 !important;
+      font-family: Georgia, "Times New Roman", serif !important;
+    }
+
+    .sl-elements p,
+    .sl-elements span,
+    .sl-elements li,
+    .sl-elements td,
+    .sl-elements th {
+      color: rgba(250, 235, 215, 0.85) !important;
+    }
+
+    .sl-elements a {
+      color: #40E0D0 !important;
+    }
+
+    .sl-elements a:hover {
+      color: #20B2AA !important;
+    }
+
+    /* Sidebar styling */
+    .sl-elements nav a,
+    .sl-elements [class*="TableOfContents"] a {
+      color: #FAEBD7 !important;
+    }
+
+    .sl-elements nav a:hover,
+    .sl-elements [class*="TableOfContents"] a:hover {
+      background: rgba(64, 224, 208, 0.1) !important;
+      color: #40E0D0 !important;
+    }
+
+    /* Code blocks */
+    .sl-elements pre,
+    .sl-elements code {
+      background: rgba(26, 26, 46, 0.8) !important;
+      border-color: rgba(64, 224, 208, 0.2) !important;
+      color: #FAEBD7 !important;
+    }
+
+    /* Buttons */
+    .sl-elements button[class*="primary"],
+    .sl-elements .sl-button {
+      background: #40E0D0 !important;
+      color: #0A1F3D !important;
+      border: none !important;
+    }
+
+    .sl-elements button[class*="primary"]:hover {
+      background: #20B2AA !important;
+    }
+
+    /* Input fields */
+    .sl-elements input,
+    .sl-elements textarea,
+    .sl-elements select {
+      background: rgba(64, 224, 208, 0.05) !important;
+      border: 1px solid rgba(64, 224, 208, 0.2) !important;
+      color: #FAEBD7 !important;
+    }
+
+    .sl-elements input:focus,
+    .sl-elements textarea:focus {
+      border-color: #40E0D0 !important;
+      box-shadow: 0 0 0 2px rgba(64, 224, 208, 0.2) !important;
+    }
+
+    /* HTTP method badges */
+    .sl-elements [class*="get"] {
+      color: #10b981 !important;
+    }
+
+    .sl-elements [class*="post"] {
+      color: #3b82f6 !important;
+    }
+
+    .sl-elements [class*="put"] {
+      color: #f59e0b !important;
+    }
+
+    .sl-elements [class*="delete"] {
+      color: #ef4444 !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0A1F3D;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(64, 224, 208, 0.3);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(64, 224, 208, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <elements-api
+    apiDescriptionUrl="/openapi.json"
+    router="hash"
+    layout="sidebar"
+    hideInternal="true"
+  />
+</body>
+</html>

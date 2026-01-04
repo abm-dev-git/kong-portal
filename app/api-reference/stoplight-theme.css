@@ -1,0 +1,296 @@
+/* =============================================================================
+   ABM.dev Theme for Stoplight Elements
+   ============================================================================= */
+
+/* Container wrapper */
+.stoplight-container {
+  --sl-color-primary: #40E0D0;
+  --sl-color-primary-dark: #20B2AA;
+  --sl-color-primary-light: rgba(64, 224, 208, 0.2);
+
+  background: #0A1F3D;
+  color: #FAEBD7;
+  min-height: 600px;
+}
+
+/* Main panel backgrounds */
+.stoplight-container .sl-elements-api,
+.stoplight-container .sl-elements {
+  background: #0A1F3D !important;
+}
+
+.stoplight-container .sl-panel,
+.stoplight-container [class*="Panel"] {
+  background: #0A1F3D !important;
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+/* Sidebar styling */
+.stoplight-container .sl-sidebar,
+.stoplight-container [class*="TableOfContents"],
+.stoplight-container nav {
+  background: rgba(10, 31, 61, 0.95) !important;
+  border-right-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+.stoplight-container .sl-sidebar-item,
+.stoplight-container [class*="TableOfContents"] a,
+.stoplight-container nav a {
+  color: #FAEBD7 !important;
+}
+
+.stoplight-container .sl-sidebar-item:hover,
+.stoplight-container .sl-sidebar-item.active,
+.stoplight-container [class*="TableOfContents"] a:hover,
+.stoplight-container nav a:hover {
+  background: rgba(64, 224, 208, 0.1) !important;
+  color: #40E0D0 !important;
+}
+
+/* Typography */
+.stoplight-container h1,
+.stoplight-container h2,
+.stoplight-container h3,
+.stoplight-container h4,
+.stoplight-container h5,
+.stoplight-container h6 {
+  color: #FAEBD7 !important;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.stoplight-container p,
+.stoplight-container span,
+.stoplight-container li,
+.stoplight-container div {
+  color: rgba(250, 235, 215, 0.85);
+}
+
+.stoplight-container a {
+  color: #40E0D0 !important;
+}
+
+.stoplight-container a:hover {
+  color: #20B2AA !important;
+}
+
+/* Code blocks */
+.stoplight-container pre,
+.stoplight-container code,
+.stoplight-container [class*="CodeViewer"],
+.stoplight-container [class*="codeBlock"] {
+  background: rgba(26, 26, 46, 0.8) !important;
+  border: 1px solid rgba(64, 224, 208, 0.2) !important;
+  color: #FAEBD7 !important;
+}
+
+/* Try It panel */
+.stoplight-container [class*="TryIt"],
+.stoplight-container [class*="tryIt"],
+.stoplight-container [class*="RequestSamples"] {
+  background: rgba(26, 26, 46, 0.8) !important;
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+/* Buttons */
+.stoplight-container button[class*="primary"],
+.stoplight-container .sl-button,
+.stoplight-container [class*="Button"][class*="primary"] {
+  background: #40E0D0 !important;
+  color: #0A1F3D !important;
+  font-weight: 600;
+  border: none !important;
+}
+
+.stoplight-container button[class*="primary"]:hover,
+.stoplight-container .sl-button:hover {
+  background: #20B2AA !important;
+}
+
+.stoplight-container button[class*="secondary"],
+.stoplight-container [class*="Button"][class*="secondary"] {
+  background: transparent !important;
+  border: 1px solid rgba(64, 224, 208, 0.3) !important;
+  color: #FAEBD7 !important;
+}
+
+.stoplight-container button[class*="secondary"]:hover {
+  background: rgba(64, 224, 208, 0.1) !important;
+  border-color: #40E0D0 !important;
+}
+
+/* Input fields */
+.stoplight-container input,
+.stoplight-container textarea,
+.stoplight-container select,
+.stoplight-container [class*="Input"],
+.stoplight-container [class*="TextArea"] {
+  background: rgba(64, 224, 208, 0.05) !important;
+  border: 1px solid rgba(64, 224, 208, 0.2) !important;
+  color: #FAEBD7 !important;
+}
+
+.stoplight-container input:focus,
+.stoplight-container textarea:focus,
+.stoplight-container select:focus {
+  border-color: #40E0D0 !important;
+  box-shadow: 0 0 0 2px rgba(64, 224, 208, 0.2) !important;
+  outline: none !important;
+}
+
+/* HTTP method badges */
+.stoplight-container [class*="HttpMethod"][class*="get"],
+.stoplight-container [class*="badge"][class*="get"],
+.stoplight-container .sl-badge--get {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+}
+
+.stoplight-container [class*="HttpMethod"][class*="post"],
+.stoplight-container [class*="badge"][class*="post"],
+.stoplight-container .sl-badge--post {
+  background: rgba(37, 99, 235, 0.2) !important;
+  color: #3b82f6 !important;
+}
+
+.stoplight-container [class*="HttpMethod"][class*="put"],
+.stoplight-container [class*="badge"][class*="put"],
+.stoplight-container .sl-badge--put {
+  background: rgba(245, 158, 11, 0.2) !important;
+  color: #f59e0b !important;
+}
+
+.stoplight-container [class*="HttpMethod"][class*="patch"],
+.stoplight-container [class*="badge"][class*="patch"],
+.stoplight-container .sl-badge--patch {
+  background: rgba(168, 85, 247, 0.2) !important;
+  color: #a855f7 !important;
+}
+
+.stoplight-container [class*="HttpMethod"][class*="delete"],
+.stoplight-container [class*="badge"][class*="delete"],
+.stoplight-container .sl-badge--delete {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+}
+
+/* Schema/model cards */
+.stoplight-container [class*="Schema"],
+.stoplight-container [class*="Model"],
+.stoplight-container .sl-card {
+  background: rgba(26, 26, 46, 0.6) !important;
+  border: 1px solid rgba(64, 224, 208, 0.2) !important;
+}
+
+/* Tables */
+.stoplight-container table {
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+.stoplight-container th {
+  background: rgba(64, 224, 208, 0.1) !important;
+  color: #FAEBD7 !important;
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+.stoplight-container td {
+  border-color: rgba(64, 224, 208, 0.1) !important;
+  color: rgba(250, 235, 215, 0.85) !important;
+}
+
+.stoplight-container tr:hover td {
+  background: rgba(64, 224, 208, 0.05) !important;
+}
+
+/* Tabs */
+.stoplight-container [class*="Tab"],
+.stoplight-container [role="tab"] {
+  color: rgba(250, 235, 215, 0.7) !important;
+  border-color: transparent !important;
+}
+
+.stoplight-container [class*="Tab"][class*="selected"],
+.stoplight-container [class*="Tab"][aria-selected="true"],
+.stoplight-container [role="tab"][aria-selected="true"] {
+  color: #40E0D0 !important;
+  border-bottom-color: #40E0D0 !important;
+}
+
+/* Dividers */
+.stoplight-container hr,
+.stoplight-container [class*="Divider"] {
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+/* Scrollbar styling */
+.stoplight-container ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.stoplight-container ::-webkit-scrollbar-track {
+  background: #0A1F3D;
+}
+
+.stoplight-container ::-webkit-scrollbar-thumb {
+  background: rgba(64, 224, 208, 0.3);
+  border-radius: 4px;
+}
+
+.stoplight-container ::-webkit-scrollbar-thumb:hover {
+  background: rgba(64, 224, 208, 0.5);
+}
+
+/* Response status badges */
+.stoplight-container [class*="response"][class*="2"],
+.stoplight-container [class*="status"][class*="2"] {
+  color: #10b981 !important;
+}
+
+.stoplight-container [class*="response"][class*="4"],
+.stoplight-container [class*="status"][class*="4"] {
+  color: #f59e0b !important;
+}
+
+.stoplight-container [class*="response"][class*="5"],
+.stoplight-container [class*="status"][class*="5"] {
+  color: #ef4444 !important;
+}
+
+/* Dropdown menus */
+.stoplight-container [class*="Dropdown"],
+.stoplight-container [class*="Menu"],
+.stoplight-container [class*="Popover"] {
+  background: #1a1a2e !important;
+  border-color: rgba(64, 224, 208, 0.2) !important;
+}
+
+.stoplight-container [class*="MenuItem"]:hover,
+.stoplight-container [class*="Option"]:hover {
+  background: rgba(64, 224, 208, 0.1) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stoplight-container .sl-sidebar,
+  .stoplight-container nav {
+    position: fixed;
+    z-index: 40;
+  }
+}
+
+/* Override any white backgrounds */
+.stoplight-container [style*="background: white"],
+.stoplight-container [style*="background-color: white"],
+.stoplight-container [style*="background: #fff"],
+.stoplight-container [style*="background-color: #fff"],
+.stoplight-container [style*="background: rgb(255"],
+.stoplight-container [style*="background-color: rgb(255"] {
+  background: #0A1F3D !important;
+}
+
+/* Override black text */
+.stoplight-container [style*="color: black"],
+.stoplight-container [style*="color: #000"],
+.stoplight-container [style*="color: rgb(0, 0, 0)"] {
+  color: #FAEBD7 !important;
+}
