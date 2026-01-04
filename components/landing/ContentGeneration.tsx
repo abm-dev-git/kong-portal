@@ -19,10 +19,10 @@ function EditorPreview() {
 
   const drafts = {
     A: {
-      subject: "Congrats on the Series B, Sarah—let's talk about scaling your data stack",
-      body: `Hi Sarah,
+      subject: "Congrats on the Series B—let's talk about scaling your data stack",
+      body: `Hi Varun,
 
-Saw Acme just close a $45M Series B—congrats! With that kind of growth capital, I imagine you're thinking hard about how to scale your data infrastructure without the usual enterprise tax.
+Saw Yoodli just close a $40M Series B led by WestBridge—congrats! With that kind of growth capital, I imagine you're thinking hard about how to scale your data infrastructure without the usual enterprise tax.
 
 We built abm.dev for teams like yours: high-quality account intelligence with confidence scores, deterministic enrichment, and transparent cost-plus pricing. No black-box vendors, no surprise bills.
 
@@ -34,17 +34,17 @@ Best,
 Alex`,
       rationale: ["New Funding", "Tech Fit", "Persona Pain"],
       sources: [
-        { name: "Crunchbase", url: "#" },
-        { name: "LinkedIn", url: "#" },
-        { name: "Company Blog", url: "#" }
+        { name: "Crunchbase", url: "https://www.crunchbase.com/organization/yoodli" },
+        { name: "LinkedIn", url: "https://linkedin.com/company/yoodli" },
+        { name: "TechCrunch", url: "https://techcrunch.com" }
       ],
       validated: true
     },
     B: {
-      subject: "Quick question about Acme's data enrichment strategy",
-      body: `Hi Sarah,
+      subject: "Quick question about Yoodli's data enrichment strategy",
+      body: `Hi Varun,
 
-I noticed Acme recently raised $45M in Series B funding. At that stage, data accuracy and pipeline reliability become critical—especially when you're scaling fast.
+I noticed Yoodli recently raised $40M in Series B funding. At that stage, data accuracy and pipeline reliability become critical—especially when you're scaling fast.
 
 abm.dev provides GTM intelligence with full audit trails, confidence scoring, and cost controls. We've helped similar-stage companies reduce enrichment costs by 40% while improving data quality.
 
@@ -54,16 +54,16 @@ Thanks,
 Alex`,
       rationale: ["New Funding", "Cost Conscious"],
       sources: [
-        { name: "Crunchbase", url: "#" },
-        { name: "LinkedIn", url: "#" }
+        { name: "Crunchbase", url: "https://www.crunchbase.com/organization/yoodli" },
+        { name: "LinkedIn", url: "https://linkedin.com/company/yoodli" }
       ],
       validated: true
     },
     C: {
       subject: "Scaling your GTM stack post-Series B",
-      body: `Sarah,
+      body: `Varun,
 
-$45M is a great milestone. Now comes the hard part: scaling without breaking your pipeline.
+$40M is a great milestone. Now comes the hard part: scaling without breaking your pipeline.
 
 We built abm.dev to solve exactly this—deterministic enrichment, transparent pricing, multi-model support. Teams at Stripe and Plaid use us to get verified account data with full citations and confidence scores.
 
@@ -72,7 +72,7 @@ Let me know if you'd like to see how it works.
 Alex`,
       rationale: ["New Funding", "Direct Approach"],
       sources: [
-        { name: "Crunchbase", url: "#" }
+        { name: "Crunchbase", url: "https://www.crunchbase.com/organization/yoodli" }
       ],
       validated: false
     }
@@ -137,8 +137,8 @@ Alex`,
               Body
             </label>
             <div className="text-[var(--cream)]/90 whitespace-pre-line leading-relaxed">
-              {currentDraft.body.split(/(\$45M|Series B|Acme|Sarah|Stripe|Plaid|abm\.dev)/g).map((part, idx) => {
-                if (["$45M", "Series B", "Acme", "Sarah", "Stripe", "Plaid", "abm.dev"].includes(part)) {
+              {currentDraft.body.split(/(\$40M|Series B|Yoodli|WestBridge|Varun|Stripe|Plaid|abm\.dev)/g).map((part, idx) => {
+                if (["$40M", "Series B", "Yoodli", "WestBridge", "Varun", "Stripe", "Plaid", "abm.dev"].includes(part)) {
                   return (
                     <span key={idx} className="bg-[var(--turquoise)]/20 text-[var(--turquoise)] px-0.5 rounded">
                       {part}
@@ -213,10 +213,10 @@ Alex`,
 // Main Section Component
 export function ContentGeneration() {
   return (
-    <section className="relative bg-[var(--navy)] py-16 lg:py-24 overflow-hidden">
-      {/* Film grain texture */}
+    <section className="relative bg-[#F5F5DC] py-16 lg:py-24 overflow-hidden">
+      {/* Subtle texture overlay */}
       <div
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
+        className="absolute inset-0 opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
         }}
@@ -227,17 +227,17 @@ export function ContentGeneration() {
           {/* Left Column - Content & Process Rail */}
           <div className="lg:col-span-4 space-y-6">
             {/* Eyebrow */}
-            <Badge variant="secondary" className="bg-[var(--electric-blue)]/20 text-[var(--electric-blue)] border border-[var(--electric-blue)]/30">
+            <Badge variant="secondary" className="bg-[#0A1F3D]/10 text-[#0A1F3D] border border-[#0A1F3D]/20">
               From configuration to send-ready drafts
             </Badge>
 
             {/* H2 */}
-            <h2 className="text-white text-4xl lg:text-5xl" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+            <h2 className="text-[#0A1F3D] text-4xl lg:text-5xl" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
               Content generation that adapts to your pipeline
             </h2>
 
             {/* Lead paragraph */}
-            <p className="text-[var(--cream)] text-lg" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+            <p className="text-[#0A1F3D]/80 text-lg" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
               Provide a CRM reference, a prompt, and instructions from any source. The system resolves context, calls multiple models, and returns ranked drafts with rationale, citations, and validation—ready to review and ship.
             </p>
 
@@ -250,32 +250,32 @@ export function ContentGeneration() {
                 "Idempotent requests with request_id and audit logs"
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[var(--electric-blue)]/20 flex items-center justify-center">
-                    <Check className="w-3 h-3 text-[var(--electric-blue)]" />
+                  <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[#40E0D0]/30 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-[#20B2AA]" />
                   </div>
-                  <span className="text-[var(--cream)]">{item}</span>
+                  <span className="text-[#0A1F3D]">{item}</span>
                 </li>
               ))}
             </ul>
 
             {/* Supporting paragraph */}
-            <p className="text-[var(--cream)]/70 text-sm">
+            <p className="text-[#0A1F3D]/60 text-sm">
               The pipeline validates inputs, collects references, assembles prompts, generates drafts across providers, and quality-checks each output for tone, required elements, and personalization before returning results.
             </p>
 
             {/* CTA Row */}
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
-              <Button size="lg" className="bg-[var(--turquoise)] hover:bg-[var(--dark-turquoise)] text-[var(--navy)]">
+              <Button size="lg" className="bg-[#40E0D0] hover:bg-[#20B2AA] text-[#0A1F3D]">
                 Generate a draft
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button size="lg" variant="outline" className="border-[var(--electric-blue)] text-[var(--electric-blue)] hover:bg-[var(--electric-blue)]/10">
+              <Button size="lg" variant="outline" className="border-[#0A1F3D]/30 text-[#0A1F3D] hover:bg-[#0A1F3D]/10">
                 See prompt package
               </Button>
             </div>
           </div>
 
-          {/* Right Column - Editorial Preview */}
+          {/* Right Column - Editorial Preview (stays dark for contrast) */}
           <div className="lg:col-span-8">
             <EditorPreview />
           </div>

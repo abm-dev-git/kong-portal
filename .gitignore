@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# API key metadata (contains user data)
+/data/api-keys-metadata.json
+
+# Playwright
+/test-artifacts/
+/test-results/
+/playwright-report/
