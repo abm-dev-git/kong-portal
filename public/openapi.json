@@ -1,0 +1,2324 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "1.0.1",
+    "title": "ABM.dev API",
+    "description": "GTM Intelligence API - Enrichment, content generation, and integrations"
+  },
+  "tags": [
+    {
+      "name": "Enrichment",
+      "description": "Core enrichment operations - enrich persons and companies with data from multiple sources"
+    },
+    {
+      "name": "Jobs",
+      "description": "Async job management for batch enrichment operations"
+    },
+    {
+      "name": "Configuration",
+      "description": "Enrichment settings and field mappings"
+    },
+    {
+      "name": "LinkedIn",
+      "description": "LinkedIn account connection for profile data enrichment"
+    },
+    {
+      "name": "HubSpot",
+      "description": "HubSpot CRM integration for contact and company sync"
+    },
+    {
+      "name": "Organization",
+      "description": "Account and usage information"
+    },
+    {
+      "name": "Status",
+      "description": "System and integration status monitoring"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Core API",
+      "tags": [
+        "Enrichment",
+        "Jobs"
+      ]
+    },
+    {
+      "name": "Settings",
+      "tags": [
+        "Configuration"
+      ]
+    },
+    {
+      "name": "Integrations",
+      "tags": [
+        "LinkedIn",
+        "HubSpot"
+      ]
+    },
+    {
+      "name": "Account",
+      "tags": [
+        "Organization",
+        "Status"
+      ]
+    }
+  ],
+  "paths": {
+    "/v1/enrichment/entities": {
+      "post": {
+        "summary": "Entity Enrichment",
+        "description": "Enrich person or company entities with data from multiple sources. Provide entity data including optional LinkedIn URL as one of many fields.",
+        "tags": [
+          "Enrichment"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entities": {
+                    "type": "array",
+                    "description": "Array of entities to enrich",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "entity_type": {
+                          "type": "string",
+                          "enum": [
+                            "person",
+                            "company"
+                          ],
+                          "description": "Type of entity to enrich"
+                        },
+                        "data": {
+                          "type": "object",
+                          "description": "Entity data including optional linkedin_url, email, company_name, etc.",
+                          "example": {
+                            "full_name": "Lee Brook",
+                            "email": "lee.brook@bkl.co.uk",
+                            "linkedin_url": "https://linkedin.com/in/leebrook",
+                            "company_name": "BKL",
+                            "company_domain": "bkl.co.uk"
+                          }
+                        }
+                      },
+                      "required": [
+                        "entity_type",
+                        "data"
+                      ]
+                    }
+                  },
+                  "profile_id": {
+                    "type": "string",
+                    "description": "Enrichment profile to use",
+                    "default": "default_person_enrichment"
+                  },
+                  "options": {
+                    "type": "object",
+                    "description": "Optional enrichment options (async, webhook_url, etc.)"
+                  }
+                },
+                "required": [
+                  "entities"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enrichment successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "enrichmentId": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "person": {
+                      "type": "object",
+                      "properties": {
+                        "fullName": {
+                          "type": "string"
+                        },
+                        "firstName": {
+                          "type": "string"
+                        },
+                        "lastName": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "jobTitle": {
+                          "type": "string"
+                        },
+                        "linkedInUrl": {
+                          "type": "string"
+                        },
+                        "biography": {
+                          "type": "string"
+                        },
+                        "location": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "company": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        },
+                        "linkedInUrl": {
+                          "type": "string"
+                        },
+                        "website": {
+                          "type": "string"
+                        },
+                        "industry": {
+                          "type": "string"
+                        },
+                        "size": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "sourcesUsed": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "confidenceScore": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (missing LinkedIn URL)"
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid JWT/org_id)"
+          },
+          "500": {
+            "description": "Internal server error"
+          },
+          "503": {
+            "description": "EntityEnrichment service unavailable"
+          },
+          "504": {
+            "description": "Request timeout (>2 minutes)"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/linkedin-connection/status": {
+      "get": {
+        "summary": "LinkedIn Connection Status",
+        "tags": [
+          "LinkedIn"
+        ],
+        "description": "Get the current LinkedIn connection status for the authenticated user",
+        "responses": {
+          "200": {
+            "description": "LinkedIn connection status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isConnected": {
+                      "type": "boolean"
+                    },
+                    "profileUrl": {
+                      "type": "string"
+                    },
+                    "profileName": {
+                      "type": "string"
+                    },
+                    "connectedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "lastSyncAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/linkedin-connection/initialize": {
+      "post": {
+        "summary": "Initialize LinkedIn Connection",
+        "tags": [
+          "LinkedIn"
+        ],
+        "description": "Start a new LinkedIn OAuth connection flow using Browserbase",
+        "responses": {
+          "200": {
+            "description": "Session initialized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "liveViewUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "expiresAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "503": {
+            "description": "Browserbase service unavailable"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/linkedin-connection/verify": {
+      "post": {
+        "summary": "Verify LinkedIn Connection",
+        "tags": [
+          "LinkedIn"
+        ],
+        "description": "Verify and complete the LinkedIn connection after OAuth",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessionId": {
+                    "type": "string",
+                    "description": "The Browserbase session ID to verify"
+                  }
+                },
+                "required": [
+                  "sessionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connection verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "profileUrl": {
+                      "type": "string"
+                    },
+                    "profileName": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid session or verification failed"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/linkedin-connection": {
+      "delete": {
+        "summary": "Disconnect LinkedIn",
+        "tags": [
+          "LinkedIn"
+        ],
+        "description": "Remove the LinkedIn connection for the authenticated user",
+        "responses": {
+          "204": {
+            "description": "LinkedIn connection removed successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "No LinkedIn connection found"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/linkedin-connection/profile": {
+      "get": {
+        "summary": "Get LinkedIn Profile",
+        "tags": [
+          "LinkedIn"
+        ],
+        "description": "Get the connected LinkedIn profile information",
+        "responses": {
+          "200": {
+            "description": "LinkedIn profile information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "profileUrl": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "headline": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "profileImageUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "No LinkedIn connection found"
+          }
+        },
+        "security": [
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/jobs": {
+      "get": {
+        "summary": "List Enrichment Jobs",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Get all enrichment jobs for the organization with optional filters",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "processing",
+                "completed",
+                "failed"
+              ]
+            },
+            "description": "Filter by job status"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "maximum": 100
+            },
+            "description": "Maximum number of jobs to return"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Number of jobs to skip for pagination"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of enrichment jobs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jobs": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/EnrichmentJob"
+                      }
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "limit": {
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create Enrichment Job",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Create a new async enrichment job for batch processing multiple entities",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Job name for reference"
+                  },
+                  "entities": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EntityInput"
+                    },
+                    "description": "Array of entities to enrich"
+                  },
+                  "profile_id": {
+                    "type": "string",
+                    "default": "default_person_enrichment"
+                  },
+                  "webhook_url": {
+                    "type": "string",
+                    "format": "uri",
+                    "description": "URL to POST results when job completes"
+                  },
+                  "options": {
+                    "type": "object",
+                    "properties": {
+                      "sources": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "exclude_sources": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "entities"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Job created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentJob"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/jobs/{jobId}": {
+      "get": {
+        "summary": "Get Enrichment Job",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Get details and results of a specific enrichment job",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job details with results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentJobWithResults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Cancel Enrichment Job",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Cancel a pending or processing enrichment job",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Job cancelled successfully"
+          },
+          "400": {
+            "description": "Job cannot be cancelled (already completed/failed)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/jobs/{jobId}/stream": {
+      "get": {
+        "summary": "Stream Job Progress",
+        "tags": [
+          "Jobs"
+        ],
+        "description": "Stream real-time progress updates for an enrichment job using Server-Sent Events (SSE)",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SSE stream of job progress",
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string",
+                  "description": "Server-Sent Events stream with progress, entity, and complete events"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Job not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/preflight": {
+      "post": {
+        "summary": "Preflight Analysis",
+        "tags": [
+          "Enrichment"
+        ],
+        "description": "Analyze entities before enrichment to get confidence scores and estimated costs without executing",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "entities": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/EntityInput"
+                    }
+                  },
+                  "profile_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "entities"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preflight analysis results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "entities": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "entity_index": {
+                            "type": "integer"
+                          },
+                          "confidence_score": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "maximum": 100
+                          },
+                          "available_sources": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "estimated_fields": {
+                            "type": "integer"
+                          },
+                          "warnings": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "total_estimated_credits": {
+                      "type": "integer"
+                    },
+                    "approval_required": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/configurations": {
+      "get": {
+        "summary": "List Enrichment Configurations",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Get all enrichment configurations (profiles) for the organization",
+        "responses": {
+          "200": {
+            "description": "List of configurations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EnrichmentConfiguration"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create Enrichment Configuration",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Create a new enrichment configuration profile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrichmentConfigurationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Configuration created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentConfiguration"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/configurations/{configId}": {
+      "get": {
+        "summary": "Get Enrichment Configuration",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Get a specific enrichment configuration by ID",
+        "parameters": [
+          {
+            "name": "configId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Configuration details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentConfiguration"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Configuration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Enrichment Configuration",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Update an existing enrichment configuration",
+        "parameters": [
+          {
+            "name": "configId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnrichmentConfigurationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Configuration updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnrichmentConfiguration"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid configuration"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Configuration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Enrichment Configuration",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Delete an enrichment configuration",
+        "parameters": [
+          {
+            "name": "configId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Configuration deleted"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Configuration not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/field-mappings": {
+      "get": {
+        "summary": "List Field Mappings",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Get all field mappings for CRM integrations",
+        "parameters": [
+          {
+            "name": "integration",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "hubspot",
+                "salesforce"
+              ]
+            },
+            "description": "Filter by integration type"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of field mappings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FieldMapping"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create Field Mapping",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Create a new field mapping for CRM integration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldMappingInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Field mapping created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMapping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid mapping"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/enrichment/field-mappings/{mappingId}": {
+      "get": {
+        "summary": "Get Field Mapping",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Get a specific field mapping by ID",
+        "parameters": [
+          {
+            "name": "mappingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Field mapping details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMapping"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Mapping not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update Field Mapping",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Update an existing field mapping",
+        "parameters": [
+          {
+            "name": "mappingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldMappingInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Field mapping updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldMapping"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid mapping"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Mapping not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "delete": {
+        "summary": "Delete Field Mapping",
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Delete a field mapping",
+        "parameters": [
+          {
+            "name": "mappingId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Mapping deleted"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Mapping not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/status": {
+      "get": {
+        "summary": "System Status",
+        "tags": [
+          "Status"
+        ],
+        "description": "Get overall system status and all data source health",
+        "responses": {
+          "200": {
+            "description": "System status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "operational",
+                        "degraded",
+                        "outage"
+                      ]
+                    },
+                    "sources": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          },
+                          "latency_ms": {
+                            "type": "integer"
+                          }
+                        }
+                      }
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/contacts": {
+      "get": {
+        "summary": "List HubSpot Contacts",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Get contacts from connected HubSpot CRM",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of HubSpot contacts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "contacts": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "paging": {
+                      "type": "object",
+                      "properties": {
+                        "next": {
+                          "type": "object",
+                          "properties": {
+                            "after": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "HubSpot not connected"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create HubSpot Contact",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Create a new contact in HubSpot CRM",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "properties": {
+                    "type": "object",
+                    "description": "HubSpot contact properties"
+                  }
+                },
+                "required": [
+                  "properties"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Contact created"
+          },
+          "400": {
+            "description": "Invalid contact data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Contact already exists"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/contacts/{contactId}": {
+      "get": {
+        "summary": "Get HubSpot Contact",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Get a specific HubSpot contact by ID",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact details"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Contact not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update HubSpot Contact",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Update a HubSpot contact's properties",
+        "parameters": [
+          {
+            "name": "contactId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "properties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contact updated"
+          },
+          "400": {
+            "description": "Invalid update"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Contact not found"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/companies": {
+      "get": {
+        "summary": "List HubSpot Companies",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Get companies from connected HubSpot CRM",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of HubSpot companies"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "HubSpot not connected"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create HubSpot Company",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Create a new company in HubSpot CRM",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "properties": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Company created"
+          },
+          "400": {
+            "description": "Invalid company data"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/properties/contacts": {
+      "get": {
+        "summary": "List Contact Properties",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Get available HubSpot contact properties for field mapping",
+        "responses": {
+          "200": {
+            "description": "List of contact properties",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "fieldType": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "HubSpot not connected"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/sync": {
+      "post": {
+        "summary": "Trigger HubSpot Sync",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Manually trigger a sync with HubSpot CRM",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "object_type": {
+                    "type": "string",
+                    "enum": [
+                      "contacts",
+                      "companies",
+                      "all"
+                    ]
+                  },
+                  "full_sync": {
+                    "type": "boolean",
+                    "default": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Sync initiated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "sync_id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "estimated_records": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "HubSpot not connected"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/hubspot/dedup/check": {
+      "post": {
+        "summary": "Check for Duplicates",
+        "tags": [
+          "HubSpot"
+        ],
+        "description": "Check if a contact already exists using 3-tier deduplication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "linkedin_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "full_name": {
+                    "type": "string"
+                  },
+                  "job_title": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deduplication check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "is_duplicate": {
+                      "type": "boolean"
+                    },
+                    "match_type": {
+                      "type": "string",
+                      "enum": [
+                        "linkedin_url",
+                        "email",
+                        "fuzzy_name"
+                      ]
+                    },
+                    "confidence": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    },
+                    "existing_contact_id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/organizations/current": {
+      "get": {
+        "summary": "Get Current Organization",
+        "tags": [
+          "Organization"
+        ],
+        "description": "Get details of the current organization",
+        "responses": {
+          "200": {
+            "description": "Organization details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "type": "string",
+                      "enum": [
+                        "free",
+                        "starter",
+                        "pro",
+                        "enterprise"
+                      ]
+                    },
+                    "credits_remaining": {
+                      "type": "integer"
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    },
+    "/v1/organizations/current/usage": {
+      "get": {
+        "summary": "Get Usage Statistics",
+        "tags": [
+          "Organization"
+        ],
+        "description": "Get API usage statistics for the current organization",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage statistics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "period": {
+                      "type": "string"
+                    },
+                    "enrichments": {
+                      "type": "integer"
+                    },
+                    "api_calls": {
+                      "type": "integer"
+                    },
+                    "credits_used": {
+                      "type": "integer"
+                    },
+                    "by_source": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "api-key": []
+          },
+          {
+            "clerk-jwt": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "clerk-jwt": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Clerk JWT token with org_id claim"
+      },
+      "api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "API key in format: abmdev_live_xxx or abmdev_test_xxx"
+      }
+    },
+    "schemas": {
+      "EntityInput": {
+        "type": "object",
+        "properties": {
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ],
+            "description": "Type of entity to enrich"
+          },
+          "data": {
+            "type": "object",
+            "description": "Entity data including optional linkedin_url, email, company_name, etc.",
+            "properties": {
+              "full_name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "linkedin_url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "company_name": {
+                "type": "string"
+              },
+              "company_domain": {
+                "type": "string"
+              },
+              "job_title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "entity_type",
+          "data"
+        ]
+      },
+      "EnrichmentJob": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "completed",
+              "failed",
+              "cancelled"
+            ]
+          },
+          "progress": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer"
+              },
+              "completed": {
+                "type": "integer"
+              },
+              "failed": {
+                "type": "integer"
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EnrichmentJobWithResults": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/EnrichmentJob"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "results": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "entity_index": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "failed",
+                        "pending"
+                      ]
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "sources_used": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "confidence_score": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 100
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "EnrichmentConfiguration": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Enabled data sources"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Fields to enrich"
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "EnrichmentConfigurationInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string",
+            "enum": [
+              "person",
+              "company"
+            ]
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "is_default": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "name",
+          "entity_type"
+        ]
+      },
+      "FieldMapping": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "integration": {
+            "type": "string",
+            "enum": [
+              "hubspot",
+              "salesforce"
+            ]
+          },
+          "source_field": {
+            "type": "string",
+            "description": "ABM.dev field name"
+          },
+          "target_field": {
+            "type": "string",
+            "description": "CRM property name"
+          },
+          "transform": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "split",
+              "concat",
+              "custom"
+            ],
+            "description": "Transformation to apply"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "FieldMappingInput": {
+        "type": "object",
+        "properties": {
+          "integration": {
+            "type": "string",
+            "enum": [
+              "hubspot",
+              "salesforce"
+            ]
+          },
+          "source_field": {
+            "type": "string"
+          },
+          "target_field": {
+            "type": "string"
+          },
+          "transform": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "split",
+              "concat",
+              "custom"
+            ]
+          },
+          "transform_config": {
+            "type": "object"
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "integration",
+          "source_field",
+          "target_field"
+        ]
+      }
+    }
+  }
+}
