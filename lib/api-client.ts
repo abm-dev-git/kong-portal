@@ -1,0 +1,214 @@
+/**
+ * Universal API client for portal-to-backend communication
+ * Handles authentication, organization context, and error handling consistently
+ *
+ * Usage:
+ * ```typescript
+ * import { createApiClient } from '@/lib/api-client';
+ *
+ * const api = createApiClient(token, orgId);
+ * const result = await api.get<MyType>('/v1/some-endpoint');
+ * if (result.success) {
+ *   // handle result.data
+ * } else {
+ *   // handle result.error
+ * }
+ * ```
+ */
+
+const API_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:8000/api';
+
+export interface ApiClientConfig {
+  token?: string;
+  orgId?: string;
+}
+
+export interface ApiError {
+  code: string;
+  message: string;
+  details?: unknown;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: ApiError;
+  metadata?: {
+    correlationId?: string;
+    timestamp?: string;
+    apiVersion?: string;
+  };
+}
+
+export class ApiClient {
+  private token?: string;
+  private orgId?: string;
+
+  constructor(config: ApiClientConfig = {}) {
+    this.token = config.token;
+    this.orgId = config.orgId;
+  }
+
+  /**
+   * Update the authentication token
+   */
+  setToken(token: string | undefined): void {
+    this.token = token;
+  }
+
+  /**
+   * Update the organization ID
+   */
+  setOrgId(orgId: string | undefined): void {
+    this.orgId = orgId;
+  }
+
+  private getHeaders(): HeadersInit {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+
+    if (this.orgId) {
+      headers['x-org-id'] = this.orgId;
+    }
+
+    return headers;
+  }
+
+  /**
+   * GET request
+   */
+  async get<T>(endpoint: string): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'GET',
+        headers: this.getHeaders(),
+      });
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      return this.handleNetworkError(error);
+    }
+  }
+
+  /**
+   * POST request
+   */
+  async post<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      return this.handleNetworkError(error);
+    }
+  }
+
+  /**
+   * PUT request
+   */
+  async put<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'PUT',
+        headers: this.getHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      return this.handleNetworkError(error);
+    }
+  }
+
+  /**
+   * PATCH request
+   */
+  async patch<T>(endpoint: string, body?: unknown): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'PATCH',
+        headers: this.getHeaders(),
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      return this.handleNetworkError(error);
+    }
+  }
+
+  /**
+   * DELETE request
+   */
+  async delete<T>(endpoint: string): Promise<ApiResponse<T>> {
+    try {
+      const response = await fetch(`${API_URL}${endpoint}`, {
+        method: 'DELETE',
+        headers: this.getHeaders(),
+      });
+      return this.handleResponse<T>(response);
+    } catch (error) {
+      return this.handleNetworkError(error);
+    }
+  }
+
+  private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+    // Handle empty responses (e.g., 204 No Content)
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || {
+          code: `HTTP_${response.status}`,
+          message: data.message || response.statusText || 'Request failed',
+        },
+        metadata: data.metadata,
+      };
+    }
+
+    // Backend returns { success, data, error, metadata } format
+    if (typeof data.success === 'boolean') {
+      return {
+        success: data.success,
+        data: data.data || data,
+        error: data.error,
+        metadata: data.metadata,
+      };
+    }
+
+    // Direct data response
+    return {
+      success: true,
+      data: data as T,
+    };
+  }
+
+  private handleNetworkError<T>(error: unknown): ApiResponse<T> {
+    return {
+      success: false,
+      error: {
+        code: 'NETWORK_ERROR',
+        message: error instanceof Error ? error.message : 'Network request failed',
+      },
+    };
+  }
+}
+
+/**
+ * Create an API client instance (for use in components)
+ */
+export function createApiClient(token?: string, orgId?: string): ApiClient {
+  return new ApiClient({ token, orgId });
+}
+
+/**
+ * Default API client instance (for use without auth context)
+ */
+export const apiClient = new ApiClient();
