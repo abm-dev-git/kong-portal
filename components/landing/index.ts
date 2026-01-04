@@ -1,2 +1,8 @@
 export { Hero } from './Hero'
 export { Footer } from './Footer'
+export { QuickStart } from './QuickStart'
+export { PricingTeaser } from './PricingTeaser'
+export { EnrichmentFeature } from './EnrichmentFeature'
+export { EnrichmentAgents } from './EnrichmentAgents'
+export { ContentGeneration } from './ContentGeneration'
+export { CtaBand } from './CtaBand'
