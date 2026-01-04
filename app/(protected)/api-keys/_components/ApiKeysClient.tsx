@@ -2,20 +2,26 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, RefreshCw } from 'lucide-react';
+import { Plus, RefreshCw, AlertTriangle } from 'lucide-react';
 import { ApiKeysTable } from './ApiKeysTable';
 import { CreateKeyModal } from './CreateKeyModal';
 import type { ApiKey, ListApiKeysResponse } from '@/lib/api-keys';
+
+interface ApiKeysResponseWithWarning extends ListApiKeysResponse {
+  warning?: string;
+}
 
 export function ApiKeysClient() {
   const [keys, setKeys] = useState<ApiKey[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const fetchKeys = useCallback(async () => {
     setIsLoading(true);
     setError(null);
+    setWarning(null);
 
     try {
       const response = await fetch('/api/api-keys');
@@ -24,8 +30,11 @@ export function ApiKeysClient() {
         throw new Error(data.error || 'Failed to fetch API keys');
       }
 
-      const data: ListApiKeysResponse = await response.json();
+      const data: ApiKeysResponseWithWarning = await response.json();
       setKeys(data.keys);
+      if (data.warning) {
+        setWarning(data.warning);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch API keys');
     } finally {
@@ -60,6 +69,14 @@ export function ApiKeysClient() {
 
   return (
     <>
+      {/* Warning Banner */}
+      {warning && (
+        <div className="flex items-center gap-3 p-4 rounded-lg bg-[var(--warning-yellow)]/10 border border-[var(--warning-yellow)]/30">
+          <AlertTriangle className="w-5 h-5 text-[var(--warning-yellow)] shrink-0" />
+          <p className="text-sm text-[var(--cream)]">{warning}</p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-2">

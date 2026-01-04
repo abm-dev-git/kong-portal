@@ -25,6 +25,17 @@ export async function GET() {
       );
     }
 
+    // Check if Kong is available first
+    const kongAvailable = await kongClient.healthCheck();
+    if (!kongAvailable) {
+      // Kong is not running - return empty list with warning
+      console.warn('Kong Admin API is not available');
+      return NextResponse.json<ListApiKeysResponse & { warning?: string }>({
+        keys: [],
+        warning: 'API key service is temporarily unavailable',
+      });
+    }
+
     // Get consumer for this user (if exists)
     const consumer = await kongClient.getConsumer(userId);
 
@@ -57,6 +68,13 @@ export async function GET() {
     console.error('Error listing API keys:', error);
 
     if (error instanceof KongApiError) {
+      // Connection errors (status 0) mean Kong is not reachable
+      if (error.statusCode === 0) {
+        return NextResponse.json<ListApiKeysResponse & { warning?: string }>({
+          keys: [],
+          warning: 'API key service is temporarily unavailable',
+        });
+      }
       return NextResponse.json(
         { error: error.message },
         { status: error.statusCode || 500 }
@@ -81,6 +99,15 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      );
+    }
+
+    // Check if Kong is available first
+    const kongAvailable = await kongClient.healthCheck();
+    if (!kongAvailable) {
+      return NextResponse.json(
+        { error: 'API key service is temporarily unavailable. Please try again later.' },
+        { status: 503 }
       );
     }
 
