@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Code } from "lucide-react";
+import { ArrowRight, Code, Mail } from "lucide-react";
+import { SiHubspot, SiSalesforce, SiGmail } from "react-icons/si";
 
 export function Hero() {
   return (
@@ -61,18 +62,22 @@ export function Hero() {
       <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[var(--navy)]/95 to-transparent backdrop-blur-sm border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <p className="text-sm text-white/70 mb-4">Built for</p>
-          <div className="flex items-center gap-6 flex-wrap">
-            <div className="px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <SiHubspot className="w-5 h-5 text-[#ff7a59]" />
               <span className="text-sm text-white">HubSpot</span>
             </div>
-            <div className="px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <SiSalesforce className="w-5 h-5 text-[#00a1e0]" />
+              <span className="text-sm text-white">Salesforce</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <SiGmail className="w-5 h-5 text-[#ea4335]" />
               <span className="text-sm text-white">Gmail</span>
             </div>
-            <div className="px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors">
+              <Mail className="w-5 h-5 text-[#0078d4]" />
               <span className="text-sm text-white">Outlook</span>
-            </div>
-            <div className="px-4 py-2 border border-white/20 rounded-md bg-white/5 backdrop-blur-sm">
-              <span className="text-sm text-white">Salesforce</span>
             </div>
           </div>
         </div>

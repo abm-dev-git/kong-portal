@@ -80,29 +80,70 @@
   --top-nav-height: 2.75rem;
 }
 
-/* Light theme variant (for landing page sections) */
+/* Light theme variant */
 .light {
-  --background: #FAEBD7;
+  --background: #f8f7f4;
   --foreground: #1a1a2e;
   --card: #ffffff;
   --card-foreground: #1a1a2e;
   --popover: #ffffff;
   --popover-foreground: #1a1a2e;
-  --primary: #40E0D0;
-  --primary-foreground: #0A1F3D;
+  --primary: #20B2AA;
+  --primary-foreground: #ffffff;
   --secondary: #1a1a2e;
   --secondary-foreground: #FAEBD7;
   --muted: #f5f5f7;
   --muted-foreground: #6b7280;
-  --accent: #40E0D0;
-  --accent-foreground: #0A1F3D;
+  --accent: #20B2AA;
+  --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(64, 224, 208, 0.2);
+  --border: rgba(26, 26, 46, 0.15);
   --input: transparent;
   --input-background: #ffffff;
   --switch-background: #d1d5db;
-  --ring: #40E0D0;
+  --ring: #20B2AA;
+
+  /* Override brand colors for light theme */
+  --navy: #f5f5f7;
+  --dark-blue: #f8f7f4;
+  --cream: #1a1a2e;
+  --turquoise: #20B2AA;
+  --dark-turquoise: #1a8c85;
+
+  /* Sidebar light */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1a2e;
+  --sidebar-primary: #20B2AA;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(32, 178, 170, 0.1);
+  --sidebar-accent-foreground: #1a1a2e;
+  --sidebar-border: rgba(26, 26, 46, 0.1);
+  --sidebar-ring: #20B2AA;
+}
+
+/* Light theme scrollbar */
+.light ::-webkit-scrollbar-track {
+  background: #f5f5f7;
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 46, 0.2);
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 26, 46, 0.3);
+}
+
+/* Light theme selection */
+.light ::selection {
+  background: rgba(32, 178, 170, 0.3);
+  color: #1a1a2e;
+}
+
+/* Light theme focus states */
+.light *:focus-visible {
+  box-shadow: 0 0 0 2px rgba(32, 178, 170, 0.5) !important;
 }
 
 @theme inline {

@@ -8,6 +8,7 @@ import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
+import { ThemeToggle, ThemeToggleSimple } from "./ThemeToggle";
 
 interface NavigationProps {
   className?: string;
@@ -61,6 +62,7 @@ export function Navigation({ className }: NavigationProps) {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex md:items-center md:gap-3">
+            <ThemeToggle size="sm" />
             {isSignedIn ? (
               <>
                 <Button
@@ -100,20 +102,23 @@ export function Navigation({ className }: NavigationProps) {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            type="button"
-            className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-[var(--cream)] hover:text-[var(--turquoise)] hover:bg-[var(--turquoise)]/10 transition-colors"
-            onClick={toggleMobileMenu}
-            aria-expanded={isMobileMenuOpen}
-            aria-label="Toggle navigation menu"
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            )}
-          </button>
+          {/* Mobile Controls */}
+          <div className="md:hidden flex items-center gap-2">
+            <ThemeToggleSimple />
+            <button
+              type="button"
+              className="inline-flex items-center justify-center p-2 rounded-md text-[var(--cream)] hover:text-[var(--turquoise)] hover:bg-[var(--turquoise)]/10 transition-colors"
+              onClick={toggleMobileMenu}
+              aria-expanded={isMobileMenuOpen}
+              aria-label="Toggle navigation menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
