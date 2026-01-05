@@ -226,6 +226,24 @@ function HubSpotIcon({ className }: { className?: string }) {
   );
 }
 
+// Microsoft Dynamics 365 icon component
+function DynamicsIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    </svg>
+  );
+}
+
+// Salesforce Cloud icon component
+function SalesforceIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M10.006 5.415a4.195 4.195 0 0 1 3.045-1.306c1.56 0 2.954.9 3.69 2.205.63-.3 1.35-.45 2.1-.45 2.85 0 5.159 2.34 5.159 5.22s-2.31 5.22-5.16 5.22c-.45 0-.9-.06-1.32-.165a3.87 3.87 0 0 1-3.41 2.07c-.6 0-1.17-.135-1.68-.39a4.65 4.65 0 0 1-4.05 2.37c-2.25 0-4.14-1.605-4.56-3.75A4.7 4.7 0 0 1 0 12.044c0-2.625 2.1-4.755 4.695-4.8a5.49 5.49 0 0 1 5.311-1.83z"/>
+    </svg>
+  );
+}
+
 /**
  * EmptyStateHubSpotNotConnected - for HubSpot CRM integration status
  */
@@ -260,6 +278,76 @@ const EmptyStateHubSpotNotConnected = React.forwardRef<
   );
 });
 EmptyStateHubSpotNotConnected.displayName = "EmptyStateHubSpotNotConnected";
+
+/**
+ * EmptyStateDynamicsNotConnected - for Microsoft Dynamics 365 CRM integration status
+ */
+export interface EmptyStateDynamicsNotConnectedProps {
+  onConnect?: () => void;
+  className?: string;
+}
+
+const EmptyStateDynamicsNotConnected = React.forwardRef<
+  HTMLDivElement,
+  EmptyStateDynamicsNotConnectedProps
+>(({ onConnect, className }, ref) => {
+  return (
+    <EmptyState
+      ref={ref}
+      icon={Inbox}
+      title="Dynamics 365 not connected"
+      description="Connect your Microsoft Dynamics 365 account to automatically sync enriched contacts and accounts to your CRM."
+      action={
+        onConnect && (
+          <button
+            onClick={onConnect}
+            className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-[#002050] text-white hover:bg-[#001840] transition-colors"
+          >
+            <DynamicsIcon className="mr-2 h-4 w-4" />
+            Connect Dynamics 365
+          </button>
+        )
+      }
+      className={className}
+    />
+  );
+});
+EmptyStateDynamicsNotConnected.displayName = "EmptyStateDynamicsNotConnected";
+
+/**
+ * EmptyStateSalesforceNotConnected - for Salesforce CRM integration status
+ */
+export interface EmptyStateSalesforceNotConnectedProps {
+  onConnect?: () => void;
+  className?: string;
+}
+
+const EmptyStateSalesforceNotConnected = React.forwardRef<
+  HTMLDivElement,
+  EmptyStateSalesforceNotConnectedProps
+>(({ onConnect, className }, ref) => {
+  return (
+    <EmptyState
+      ref={ref}
+      icon={Inbox}
+      title="Salesforce not connected"
+      description="Connect your Salesforce account to automatically sync enriched contacts, accounts, and leads to your CRM."
+      action={
+        onConnect && (
+          <button
+            onClick={onConnect}
+            className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-[#00A1E0] text-white hover:bg-[#0088c7] transition-colors"
+          >
+            <SalesforceIcon className="mr-2 h-4 w-4" />
+            Connect Salesforce
+          </button>
+        )
+      }
+      className={className}
+    />
+  );
+});
+EmptyStateSalesforceNotConnected.displayName = "EmptyStateSalesforceNotConnected";
 
 /**
  * EmptyStateError - for error states
@@ -304,6 +392,10 @@ export {
   EmptyStateNoAPIKeys,
   EmptyStateLinkedInNotConnected,
   EmptyStateHubSpotNotConnected,
+  EmptyStateDynamicsNotConnected,
+  EmptyStateSalesforceNotConnected,
   EmptyStateError,
   HubSpotIcon,
+  DynamicsIcon,
+  SalesforceIcon,
 };

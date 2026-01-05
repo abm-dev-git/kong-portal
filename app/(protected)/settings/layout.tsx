@@ -16,6 +16,8 @@ const settingsNav: NavItem[] = [
   { href: '/settings/account', label: 'Account', icon: User },
   { href: '/settings/linkedin', label: 'LinkedIn', icon: Linkedin },
   { href: '/settings/hubspot', label: 'HubSpot', icon: Database },
+  { href: '/settings/dynamics', label: 'Dynamics 365', icon: Database },
+  { href: '/settings/salesforce', label: 'Salesforce', icon: Database },
   { href: '/settings/billing', label: 'Billing', icon: CreditCard },
 ]
 
