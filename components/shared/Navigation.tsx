@@ -82,7 +82,7 @@ export function Navigation({ className }: NavigationProps) {
                   <Button
                     variant="ghost"
                     size="default"
-                    className="text-[var(--cream)] hover:text-[var(--turquoise)] font-medium"
+                    className="text-[var(--cream)] hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/15 font-medium"
                     aria-label="Sign in to your account"
                   >
                     Sign in
@@ -164,7 +164,7 @@ export function Navigation({ className }: NavigationProps) {
                     <Button
                       variant="outline"
                       size="lg"
-                      className="w-full text-[var(--cream)] border-[var(--turquoise)]/30 hover:bg-[var(--turquoise)]/10"
+                      className="w-full text-[var(--cream)] border-[var(--turquoise)]/30 hover:bg-[var(--turquoise)]/15 hover:border-[var(--turquoise)]/50"
                       aria-label="Sign in to your account"
                     >
                       Sign in
