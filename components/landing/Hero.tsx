@@ -9,26 +9,18 @@ import { Mail } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100vh] overflow-hidden bg-gradient-to-b from-[var(--navy)] via-[var(--dark-blue)] to-[var(--navy)]">
-      {/* Animated gradient orbs */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-32 w-96 h-96 bg-[var(--turquoise)]/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute top-1/2 -right-32 w-96 h-96 bg-[var(--electric-blue)]/15 rounded-full blur-[120px] animate-pulse delay-1000" />
-        <div className="absolute bottom-1/4 left-1/3 w-64 h-64 bg-[var(--turquoise)]/10 rounded-full blur-[100px] animate-pulse delay-500" />
-      </div>
-
-      {/* Grid pattern overlay */}
+    <section className="relative min-h-[100vh] overflow-hidden">
+      {/* Hero background image */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(64, 224, 208, 0.3) 1px, transparent 1px),
-                            linear-gradient(90deg, rgba(64, 224, 208, 0.3) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px',
-        }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
       />
 
-      {/* Film grain texture */}
-      <div className="absolute inset-0 film-grain opacity-30" />
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[var(--navy)]/95 via-[var(--navy)]/80 to-transparent" />
+
+      {/* Film grain texture for retro feel */}
+      <div className="absolute inset-0 film-grain opacity-40" />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
