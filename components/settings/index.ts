@@ -3,6 +3,7 @@ export { ConnectLinkedInModal } from './ConnectLinkedInModal';
 export { LinkedInSettingsCard } from './LinkedInSettingsCard';
 export { ConnectHubSpotModal, HubSpotIcon } from './ConnectHubSpotModal';
 export { HubSpotSettingsCard } from './HubSpotSettingsCard';
+export { DisconnectConfirmModal } from './DisconnectConfirmModal';
 export { ConnectDynamicsModal, DynamicsIcon } from './ConnectDynamicsModal';
 export { DynamicsSettingsCard } from './DynamicsSettingsCard';
 export { ConnectSalesforceModal, SalesforceIcon } from './ConnectSalesforceModal';
