@@ -3,24 +3,24 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Code, Sparkles, Zap, Shield, BarChart3 } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { SiHubspot, SiSalesforce, SiGmail } from "react-icons/si";
 import { Mail } from "lucide-react";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100vh] overflow-hidden">
+    <section className="relative min-h-[100vh] overflow-hidden bg-[#0A1628]">
       {/* Hero background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
       />
 
-      {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[var(--navy)]/95 via-[var(--navy)]/80 to-transparent" />
+      {/* Gradient overlay for text readability - using explicit dark colors for theme independence */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/95 via-[#0A1628]/85 to-[#0A1628]/40" />
 
       {/* Film grain texture for retro feel */}
-      <div className="absolute inset-0 film-grain opacity-40" />
+      <div className="absolute inset-0 film-grain opacity-30" />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
@@ -52,124 +52,38 @@ export function Hero() {
               and surface intent signals—all in one API built for GTM teams.
             </p>
 
-            {/* Feature pills */}
-            <div className="flex flex-wrap gap-3 animate-fade-in-up animate-delay-300">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/80 hover:bg-white/10 hover:border-[var(--turquoise)]/30 transition-all duration-300">
-                <Shield className="w-4 h-4 text-[var(--turquoise)]" />
-                Confidence Scores
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/80 hover:bg-white/10 hover:border-[var(--turquoise)]/30 transition-all duration-300">
-                <BarChart3 className="w-4 h-4 text-[var(--turquoise)]" />
-                Full Audit Trails
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-sm text-white/80 hover:bg-white/10 hover:border-[var(--turquoise)]/30 transition-all duration-300">
-                <Zap className="w-4 h-4 text-[var(--turquoise)]" />
-                Sub-200ms Response
-              </div>
-            </div>
-
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4 animate-fade-in-up animate-delay-400">
+            {/* Single Primary CTA */}
+            <div className="flex flex-col sm:flex-row items-start gap-4 pt-2 animate-fade-in-up animate-delay-300">
               <Button
                 size="lg"
-                className="bg-[var(--turquoise)] hover:bg-[var(--dark-turquoise)] text-[var(--dark-blue)] font-semibold text-lg px-8 py-6 shadow-lg shadow-[var(--turquoise)]/25 hover:shadow-xl hover:shadow-[var(--turquoise)]/30 hover:scale-[1.02] transition-all duration-300"
+                className="bg-[var(--turquoise)] hover:bg-[var(--dark-turquoise)] text-[#0A1628] font-bold text-lg px-10 py-7 shadow-lg shadow-[var(--turquoise)]/30 hover:shadow-xl hover:shadow-[var(--turquoise)]/40 hover:scale-[1.02] transition-all duration-300"
                 asChild
               >
                 <Link href="/dashboard">
                   Start Building Free
-                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 text-lg px-8 py-6 backdrop-blur-sm hover:scale-[1.02] transition-all duration-300"
-                asChild
+              <Link
+                href="/api-reference"
+                className="text-white/70 hover:text-white text-sm underline underline-offset-4 py-3 transition-colors"
               >
-                <Link href="/api-reference">
-                  View API Docs
-                  <Code className="w-5 h-5 ml-2" />
-                </Link>
-              </Button>
+                View API Documentation →
+              </Link>
             </div>
 
-            {/* Social proof */}
-            <div className="pt-4 flex items-center gap-4 text-sm text-white/60 animate-fade-in-up animate-delay-500">
-              <span className="flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                99.9% uptime
+            {/* Minimal trust indicator */}
+            <div className="pt-6 flex items-center gap-3 text-sm text-white/50 animate-fade-in-up animate-delay-400">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-green-400" />
+                No credit card required
               </span>
-              <span>•</span>
-              <span>No credit card required</span>
-              <span>•</span>
-              <span>SOC 2 compliant</span>
             </div>
           </div>
 
-          {/* Right Column - Visual Element */}
-          <div className="relative hidden lg:block animate-fade-in-up animate-delay-300">
-            {/* Floating code card */}
-            <div className="relative animate-float-slow">
-              {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-r from-[var(--turquoise)]/20 to-[var(--electric-blue)]/20 rounded-2xl blur-xl" />
-
-              {/* Main card */}
-              <div className="relative bg-[var(--navy)]/80 backdrop-blur-xl border border-[var(--turquoise)]/20 rounded-xl shadow-2xl overflow-hidden">
-                {/* Window chrome */}
-                <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-black/20">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                    <div className="w-3 h-3 rounded-full bg-green-500/80" />
-                  </div>
-                  <span className="text-xs text-white/40 ml-2 font-mono">enrich-response.json</span>
-                </div>
-
-                {/* Code content */}
-                <div className="p-6 font-mono text-sm overflow-hidden">
-                  <pre className="text-white/90">
-                    <code>{`{
-  "person": {
-    "name": "Jane Smith",
-    "title": "VP Engineering",
-    "confidence": 0.98,
-    "sources": ["linkedin", "clearbit"]
-  },
-  "company": {
-    "name": "Acme Corp",
-    "employees": "500-1000",
-    "funding": "Series B"
-  }
-}`}</code>
-                  </pre>
-                </div>
-
-                {/* Stats bar */}
-                <div className="px-6 py-4 border-t border-white/10 bg-black/20 flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-green-400" />
-                      <span className="text-xs text-white/60">98% confidence</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-[var(--turquoise)]" />
-                      <span className="text-xs text-white/60">143ms</span>
-                    </div>
-                  </div>
-                  <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
-                    Fresh
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Floating badges */}
-              <div className="absolute -top-4 -right-4 px-3 py-1.5 rounded-full bg-[var(--electric-blue)] text-white text-xs font-medium shadow-lg shadow-[var(--electric-blue)]/50">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                  Live API
-                </span>
-              </div>
-            </div>
+          {/* Right Column - Empty to let hero image show through */}
+          <div className="relative hidden lg:block">
+            {/* Hero image shows through on right side */}
           </div>
         </div>
 
