@@ -71,6 +71,21 @@ const clerkAppearance = {
   },
 };
 
+// Inline script to prevent theme flash - runs before React hydration
+const themeScript = `
+(function() {
+  try {
+    var theme = localStorage.getItem('abm-dev-theme');
+    var isDark = theme === 'dark' || theme === null ||
+      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('light', !isDark);
+  } catch (e) {
+    document.documentElement.classList.add('dark');
+  }
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -78,7 +93,10 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider appearance={clerkAppearance}>
-      <html lang="en" suppressHydrationWarning>
+      <html lang="en" className="dark" suppressHydrationWarning>
+        <head>
+          <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        </head>
         <body className="antialiased">
           <ThemeProvider>
             {children}
