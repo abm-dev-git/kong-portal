@@ -14,7 +14,12 @@ import {
   Zap,
   Building2,
   Linkedin,
-  FileCode
+  FileCode,
+  Settings2,
+  Database,
+  TrendingUp,
+  Layers,
+  ArrowLeftRight
 } from "lucide-react";
 
 interface NavItem {
@@ -35,6 +40,10 @@ const docsNavigation: NavItem[] = [
     icon: <BookOpen className="w-4 h-4" />,
     items: [
       { title: "How Enrichment Works", href: "/docs/concepts/enrichment" },
+      { title: "Canonical Fields", href: "/docs/concepts/canonical-fields", icon: <Layers className="w-4 h-4" /> },
+      { title: "Confidence Scores", href: "/docs/concepts/confidence-scores", icon: <TrendingUp className="w-4 h-4" /> },
+      { title: "Field Mapping", href: "/docs/concepts/field-mapping", icon: <ArrowLeftRight className="w-4 h-4" /> },
+      { title: "Data Sources", href: "/docs/concepts/data-sources", icon: <Database className="w-4 h-4" /> },
       { title: "Authentication", href: "/docs/concepts/authentication" },
     ],
   },
@@ -52,6 +61,13 @@ const docsNavigation: NavItem[] = [
         href: "/docs/guides/linkedin",
         icon: <Linkedin className="w-4 h-4" />
       },
+    ],
+  },
+  {
+    title: "Advanced",
+    icon: <Settings2 className="w-4 h-4" />,
+    items: [
+      { title: "Enrichment Configuration", href: "/docs/advanced/enrichment-config" },
     ],
   },
   {
