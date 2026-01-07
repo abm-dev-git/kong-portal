@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
-import { Linkedin, Loader2, AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Linkedin, Loader2, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createApiClient } from '@/lib/api-client';
 
@@ -92,9 +92,6 @@ export function ConnectLinkedInModal({
       const liveUrl = result.data.sessionUrl || `${BROWSERBASE_LIVE_URL_BASE}/${result.data.sessionId}/live`;
       setSessionUrl(liveUrl);
       setState('waiting');
-
-      // Open Browserbase Live View in new window
-      window.open(liveUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       setState('error');
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
@@ -138,6 +135,9 @@ export function ConnectLinkedInModal({
     }
   };
 
+  // Determine if we should show the expanded modal with iframe
+  const showIframe = state === 'waiting' && sessionUrl;
+
   return (
     <Dialog.Root open={open} onOpenChange={handleClose}>
       <Dialog.Portal>
@@ -146,38 +146,46 @@ export function ConnectLinkedInModal({
           className={cn(
             "fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
             "bg-[var(--navy)] border border-[var(--turquoise)]/20 rounded-lg shadow-xl",
-            "w-full max-w-md p-6",
-            "focus:outline-none"
+            "focus:outline-none flex flex-col",
+            showIframe
+              ? "w-[95vw] max-w-5xl h-[90vh] p-4"
+              : "w-full max-w-md p-6"
           )}
         >
-          <Dialog.Title className="text-xl font-semibold text-[var(--cream)] mb-2 flex items-center gap-2">
-            <Linkedin className="size-6 text-[var(--turquoise)]" />
-            Connect LinkedIn Account
-          </Dialog.Title>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4 shrink-0">
+            <Dialog.Title className="text-xl font-semibold text-[var(--cream)] flex items-center gap-2">
+              <Linkedin className="size-6 text-[var(--turquoise)]" />
+              Connect LinkedIn Account
+            </Dialog.Title>
+            {showIframe && (
+              <button
+                onClick={handleClose}
+                className="p-2 rounded-lg hover:bg-[var(--turquoise)]/10 text-[var(--cream)]/60 hover:text-[var(--cream)] transition-colors"
+              >
+                <X className="size-5" />
+              </button>
+            )}
+          </div>
 
-          <Dialog.Description className="text-sm text-[var(--cream)]/70 mb-6">
+          <Dialog.Description className="text-sm text-[var(--cream)]/70 mb-4 shrink-0">
             {(state === null || state === 'initializing') && 'Initializing secure browser session...'}
-            {state === 'waiting' && 'Please log in to LinkedIn in the new window, then click "I\'m Done" below.'}
+            {state === 'waiting' && 'Log in to LinkedIn below, then click "I\'m Done" when finished.'}
             {state === 'verifying' && 'Verifying your LinkedIn connection...'}
             {state === 'connected' && 'Successfully connected your LinkedIn account!'}
             {state === 'error' && 'An error occurred while connecting your account.'}
           </Dialog.Description>
 
-          <div className="space-y-4">
-            {state === 'waiting' && sessionUrl && (
-              <div className="bg-[var(--dark-blue)]/50 border border-[var(--turquoise)]/20 rounded-md p-4">
-                <p className="text-sm text-[var(--cream)]/70 mb-3">
-                  A new window has been opened. Please log in to LinkedIn.
-                </p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(sessionUrl, '_blank', 'noopener,noreferrer')}
-                  className="w-full"
-                >
-                  <ExternalLink className="size-4 mr-2" />
-                  Reopen Login Window
-                </Button>
+          <div className={cn("flex flex-col", showIframe ? "flex-1 min-h-0" : "space-y-4")}>
+            {/* Embedded Browserbase iframe */}
+            {showIframe && (
+              <div className="flex-1 min-h-0 mb-4 rounded-lg overflow-hidden border border-[var(--turquoise)]/20 bg-white">
+                <iframe
+                  src={sessionUrl}
+                  className="w-full h-full"
+                  allow="clipboard-read; clipboard-write"
+                  title="LinkedIn Login"
+                />
               </div>
             )}
 
@@ -195,7 +203,7 @@ export function ConnectLinkedInModal({
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 shrink-0">
               {(state === null || state === 'initializing') && (
                 <Button disabled className="w-full">
                   <Loader2 className="animate-spin size-4 mr-2" />
@@ -205,11 +213,13 @@ export function ConnectLinkedInModal({
 
               {state === 'waiting' && (
                 <>
-                  <Button variant="outline" onClick={handleClose} className="flex-1">
-                    Cancel
-                  </Button>
-                  <Button onClick={handleVerify} className="flex-1">
-                    I&apos;m Done
+                  {!showIframe && (
+                    <Button variant="outline" onClick={handleClose} className="flex-1">
+                      Cancel
+                    </Button>
+                  )}
+                  <Button onClick={handleVerify} className={showIframe ? "w-full" : "flex-1"}>
+                    I&apos;m Done Logging In
                   </Button>
                 </>
               )}
