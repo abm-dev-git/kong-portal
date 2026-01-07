@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ConnectHubSpotModal, HubSpotIcon } from './ConnectHubSpotModal';
 import { DisconnectConfirmModal } from './DisconnectConfirmModal';
@@ -92,7 +93,7 @@ export function HubSpotSettingsCard({ token, orgId }: HubSpotSettingsCardProps) 
 
   const handleDisconnect = async () => {
     if (!status?.integrationId) {
-      alert('Cannot disconnect: Integration ID not found');
+      toast.error('Cannot disconnect: Integration ID not found');
       return;
     }
 
@@ -105,9 +106,10 @@ export function HubSpotSettingsCard({ token, orgId }: HubSpotSettingsCardProps) 
       }
 
       setDisconnectModalOpen(false);
+      toast.success('HubSpot account disconnected successfully');
       await refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to disconnect HubSpot account');
+      toast.error(error instanceof Error ? error.message : 'Failed to disconnect HubSpot account');
     } finally {
       setIsDisconnecting(false);
     }

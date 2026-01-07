@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -90,7 +91,9 @@ export default function BillingSettingsPage() {
     setIsLoading(true)
     // In production, this would redirect to Stripe Checkout
     await new Promise((resolve) => setTimeout(resolve, 1000))
-    alert(`Upgrade to ${planId} - Stripe Checkout would open here`)
+    toast.info(`Stripe Checkout would open for ${planId.charAt(0).toUpperCase() + planId.slice(1)} plan`, {
+      description: 'Billing integration coming soon'
+    })
     setIsLoading(false)
   }
 

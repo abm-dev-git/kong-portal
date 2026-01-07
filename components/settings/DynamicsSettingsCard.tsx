@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ConnectDynamicsModal, DynamicsIcon } from './ConnectDynamicsModal';
+import { DisconnectConfirmModal } from './DisconnectConfirmModal';
 import { useDynamicsStatus } from '@/lib/hooks/useDynamicsStatus';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +38,7 @@ interface DynamicsSettingsCardProps {
 
 export function DynamicsSettingsCard({ token, orgId }: DynamicsSettingsCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [disconnectModalOpen, setDisconnectModalOpen] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const { data: status, isLoading, refetch } = useDynamicsStatus(token, orgId);
 
@@ -43,12 +46,8 @@ export function DynamicsSettingsCard({ token, orgId }: DynamicsSettingsCardProps
   const api = useMemo(() => createApiClient(token, orgId), [token, orgId]);
 
   const handleDisconnect = async () => {
-    if (!confirm('Are you sure you want to disconnect your Dynamics 365 account? This will stop all automatic syncing.')) {
-      return;
-    }
-
     if (!status?.integrationId) {
-      alert('Cannot disconnect: Integration ID not found');
+      toast.error('Cannot disconnect: Integration ID not found');
       return;
     }
 
@@ -60,9 +59,11 @@ export function DynamicsSettingsCard({ token, orgId }: DynamicsSettingsCardProps
         throw new Error(result.error?.message || 'Failed to disconnect');
       }
 
+      setDisconnectModalOpen(false);
+      toast.success('Dynamics 365 account disconnected successfully');
       await refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to disconnect Dynamics 365 account');
+      toast.error(error instanceof Error ? error.message : 'Failed to disconnect Dynamics 365 account');
     } finally {
       setIsDisconnecting(false);
     }
@@ -194,18 +195,10 @@ export function DynamicsSettingsCard({ token, orgId }: DynamicsSettingsCardProps
               </Button>
               <Button
                 variant="outline"
-                onClick={handleDisconnect}
-                disabled={isDisconnecting}
+                onClick={() => setDisconnectModalOpen(true)}
                 className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10"
               >
-                {isDisconnecting ? (
-                  <>
-                    <Loader2 className="animate-spin size-4 mr-2" />
-                    Disconnecting...
-                  </>
-                ) : (
-                  'Disconnect'
-                )}
+                Disconnect
               </Button>
             </div>
           </div>
@@ -223,6 +216,14 @@ export function DynamicsSettingsCard({ token, orgId }: DynamicsSettingsCardProps
         onSuccess={handleSuccess}
         token={token}
         orgId={orgId}
+      />
+
+      <DisconnectConfirmModal
+        open={disconnectModalOpen}
+        onOpenChange={setDisconnectModalOpen}
+        onConfirm={handleDisconnect}
+        integrationName="Dynamics 365"
+        isDisconnecting={isDisconnecting}
       />
     </>
   );

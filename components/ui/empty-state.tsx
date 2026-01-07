@@ -188,26 +188,35 @@ EmptyStateNoAPIKeys.displayName = "EmptyStateNoAPIKeys";
 export interface EmptyStateLinkedInNotConnectedProps {
   onConnect?: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 const EmptyStateLinkedInNotConnected = React.forwardRef<
   HTMLDivElement,
   EmptyStateLinkedInNotConnectedProps
->(({ onConnect, className }, ref) => {
+>(({ onConnect, className, disabled }, ref) => {
   return (
     <EmptyState
       ref={ref}
       icon={Linkedin}
       title="LinkedIn not connected"
-      description="Connect your LinkedIn account to enable profile enrichment and Sales Navigator integration."
+      description={disabled
+        ? "Another session is in progress. Please wait for it to complete."
+        : "Connect your LinkedIn account to enable profile enrichment and Sales Navigator integration."}
       action={
         onConnect && (
           <button
             onClick={onConnect}
-            className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-[#0A66C2] text-white hover:bg-[#004182] transition-colors"
+            disabled={disabled}
+            className={cn(
+              "inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors",
+              disabled
+                ? "bg-gray-500 text-gray-300 cursor-not-allowed opacity-60"
+                : "bg-[#0A66C2] text-white hover:bg-[#004182]"
+            )}
           >
             <Linkedin className="mr-2 h-4 w-4" />
-            Connect LinkedIn
+            {disabled ? 'Session Busy' : 'Connect LinkedIn'}
           </button>
         )
       }

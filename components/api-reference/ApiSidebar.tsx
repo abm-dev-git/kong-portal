@@ -7,73 +7,84 @@ import { cn } from "@/lib/utils";
 import {
   ChevronDown,
   ChevronRight,
-  Rocket,
-  BookOpen,
-  Key,
-  Puzzle,
+  FileCode,
   Zap,
+  Briefcase,
   Building2,
   Linkedin,
-  FileCode,
-  Settings2,
-  Database,
-  TrendingUp,
-  Layers,
-  ArrowLeftRight
+  Settings,
+  Key,
 } from "lucide-react";
 
 interface NavItem {
   title: string;
   href?: string;
   icon?: React.ReactNode;
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   items?: NavItem[];
 }
 
-const docsNavigation: NavItem[] = [
+const methodColors = {
+  GET: "text-emerald-400",
+  POST: "text-blue-400",
+  PUT: "text-amber-400",
+  DELETE: "text-red-400",
+  PATCH: "text-purple-400",
+};
+
+const apiNavigation: NavItem[] = [
   {
-    title: "Getting Started",
-    href: "/docs/getting-started",
-    icon: <Rocket className="w-4 h-4" />,
-  },
-  {
-    title: "Concepts",
-    icon: <BookOpen className="w-4 h-4" />,
-    items: [
-      { title: "Authentication", href: "/docs/concepts/authentication" },
-      { title: "Canonical Fields", href: "/docs/concepts/canonical-fields", icon: <Layers className="w-4 h-4" /> },
-      { title: "Confidence Scores", href: "/docs/concepts/confidence-scores", icon: <TrendingUp className="w-4 h-4" /> },
-      { title: "Data Sources", href: "/docs/concepts/data-sources", icon: <Database className="w-4 h-4" /> },
-      { title: "Enrichment", href: "/docs/concepts/enrichment" },
-      { title: "Field Mapping", href: "/docs/concepts/field-mapping", icon: <ArrowLeftRight className="w-4 h-4" /> },
-    ],
-  },
-  {
-    title: "Integration Guides",
-    icon: <Puzzle className="w-4 h-4" />,
-    items: [
-      {
-        title: "HubSpot",
-        href: "/docs/guides/hubspot",
-        icon: <Building2 className="w-4 h-4" />
-      },
-      {
-        title: "LinkedIn",
-        href: "/docs/guides/linkedin",
-        icon: <Linkedin className="w-4 h-4" />
-      },
-    ],
-  },
-  {
-    title: "Advanced",
-    icon: <Settings2 className="w-4 h-4" />,
-    items: [
-      { title: "Enrichment Configuration", href: "/docs/advanced/enrichment-config" },
-    ],
-  },
-  {
-    title: "API Reference",
+    title: "Overview",
     href: "/api-reference",
     icon: <FileCode className="w-4 h-4" />,
+  },
+  {
+    title: "Enrichment",
+    icon: <Zap className="w-4 h-4" />,
+    items: [
+      { title: "Enrich Contact", href: "/api-reference/enrichment#enrich", method: "POST" },
+      { title: "Batch Enrich", href: "/api-reference/enrichment#batch", method: "POST" },
+    ],
+  },
+  {
+    title: "Jobs",
+    icon: <Briefcase className="w-4 h-4" />,
+    items: [
+      { title: "List Jobs", href: "/api-reference/jobs#list", method: "GET" },
+      { title: "Get Job", href: "/api-reference/jobs#get", method: "GET" },
+      { title: "Get Results", href: "/api-reference/jobs#results", method: "GET" },
+    ],
+  },
+  {
+    title: "CRM Integrations",
+    icon: <Building2 className="w-4 h-4" />,
+    items: [
+      { title: "List Integrations", href: "/api-reference/integrations#list", method: "GET" },
+      { title: "Configure", href: "/api-reference/integrations#configure", method: "POST" },
+      { title: "Test Connection", href: "/api-reference/integrations#test", method: "POST" },
+      { title: "Delete Integration", href: "/api-reference/integrations#delete", method: "DELETE" },
+    ],
+  },
+  {
+    title: "LinkedIn",
+    icon: <Linkedin className="w-4 h-4" />,
+    items: [
+      { title: "Initialize", href: "/api-reference/linkedin#initialize", method: "POST" },
+      { title: "Verify", href: "/api-reference/linkedin#verify", method: "POST" },
+      { title: "Get Status", href: "/api-reference/linkedin#status", method: "GET" },
+      { title: "Availability", href: "/api-reference/linkedin#availability", method: "GET" },
+      { title: "Disconnect", href: "/api-reference/linkedin#disconnect", method: "DELETE" },
+      { title: "Cleanup Sessions", href: "/api-reference/linkedin#cleanup", method: "POST" },
+    ],
+  },
+  {
+    title: "Configuration",
+    icon: <Settings className="w-4 h-4" />,
+    items: [
+      { title: "Organization", href: "/api-reference/configuration#organization", method: "GET" },
+      { title: "Update Settings", href: "/api-reference/configuration#update-settings", method: "PATCH" },
+      { title: "Health Check", href: "/api-reference/configuration#status", method: "GET" },
+    ],
   },
 ];
 
@@ -82,11 +93,19 @@ interface NavSectionProps {
   pathname: string;
 }
 
+function MethodBadge({ method }: { method: string }) {
+  return (
+    <span className={cn("font-mono text-xs font-medium", methodColors[method as keyof typeof methodColors])}>
+      {method}
+    </span>
+  );
+}
+
 function NavSection({ item, pathname }: NavSectionProps) {
   const hasChildren = item.items && item.items.length > 0;
-  const isActive = item.href === pathname;
+  const isActive = item.href === pathname || pathname.startsWith(item.href + "#");
   const isChildActive = hasChildren && item.items?.some(
-    child => child.href === pathname
+    child => pathname === child.href || pathname.startsWith((child.href || "").split("#")[0])
   );
   const [isOpen, setIsOpen] = useState(isChildActive || false);
 
@@ -118,14 +137,14 @@ function NavSection({ item, pathname }: NavSectionProps) {
                 key={child.href}
                 href={child.href!}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
+                  "flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors",
                   pathname === child.href
                     ? "text-[var(--turquoise)] bg-[var(--turquoise)]/10 font-medium"
                     : "text-[var(--cream)]/60 hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/5"
                 )}
               >
-                {child.icon}
-                {child.title}
+                <span>{child.title}</span>
+                {child.method && <MethodBadge method={child.method} />}
               </Link>
             ))}
           </div>
@@ -150,7 +169,7 @@ function NavSection({ item, pathname }: NavSectionProps) {
   );
 }
 
-export function DocsSidebar() {
+export function ApiSidebar() {
   const pathname = usePathname();
 
   return (
@@ -159,20 +178,20 @@ export function DocsSidebar() {
         {/* Logo/Title */}
         <div className="px-3">
           <Link
-            href="/docs"
+            href="/api-reference"
             className="flex items-center gap-2 text-lg font-semibold text-[var(--cream)]"
           >
-            <Zap className="w-5 h-5 text-[var(--turquoise)]" />
-            Documentation
+            <FileCode className="w-5 h-5 text-[var(--turquoise)]" />
+            API Reference
           </Link>
           <p className="mt-1 text-sm text-[var(--cream)]/50">
-            Learn how to use ABM.dev
+            v1.0 &middot; REST API
           </p>
         </div>
 
         {/* Navigation */}
-        <nav className="space-y-1" aria-label="Documentation navigation">
-          {docsNavigation.map((item) => (
+        <nav className="space-y-1" aria-label="API reference navigation">
+          {apiNavigation.map((item) => (
             <NavSection key={item.title} item={item} pathname={pathname} />
           ))}
         </nav>
@@ -189,6 +208,13 @@ export function DocsSidebar() {
             >
               <Key className="w-4 h-4" />
               Get API Key
+            </Link>
+            <Link
+              href="/docs"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--cream)]/60 hover:text-[var(--cream)] rounded-md transition-colors"
+            >
+              <FileCode className="w-4 h-4" />
+              Documentation
             </Link>
           </div>
         </div>

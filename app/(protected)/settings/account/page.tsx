@@ -2,6 +2,7 @@ import { currentUser } from '@clerk/nextjs/server'
 import { UserButton } from '@clerk/nextjs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { DeleteAccountButton } from '@/components/settings/DeleteAccountButton'
 import { Mail, Calendar, Shield, ExternalLink } from 'lucide-react'
 
 export default async function AccountSettingsPage() {
@@ -142,13 +143,7 @@ export default async function AccountSettingsPage() {
               Permanently delete your account and all associated data. This action cannot be undone.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500"
-          >
-            Delete Account
-          </Button>
+          <DeleteAccountButton />
         </div>
       </div>
     </div>
