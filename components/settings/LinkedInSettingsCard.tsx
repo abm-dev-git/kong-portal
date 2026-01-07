@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { LinkedInStatusBadge } from './LinkedInStatusBadge';
 import { ConnectLinkedInModal } from './ConnectLinkedInModal';
+import { DisconnectConfirmModal } from './DisconnectConfirmModal';
 import { useLinkedInStatus } from '@/lib/hooks/useLinkedInStatus';
 import { Linkedin, ExternalLink, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,17 +19,14 @@ interface LinkedInSettingsCardProps {
 
 export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [disconnectModalOpen, setDisconnectModalOpen] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const { data: status, isLoading, refetch } = useLinkedInStatus(token, orgId);
+  const { data: status, availability, isLoading, refetch } = useLinkedInStatus(token, orgId);
 
   // Create API client with auth context
   const api = useMemo(() => createApiClient(token, orgId), [token, orgId]);
 
   const handleDisconnect = async () => {
-    if (!confirm('Are you sure you want to disconnect your LinkedIn account?')) {
-      return;
-    }
-
     setIsDisconnecting(true);
     try {
       const result = await api.delete('/v1/linkedin-connection');
@@ -36,9 +35,11 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
         throw new Error(result.error?.message || 'Failed to disconnect');
       }
 
+      setDisconnectModalOpen(false);
+      toast.success('LinkedIn account disconnected successfully');
       await refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to disconnect LinkedIn account');
+      toast.error(error instanceof Error ? error.message : 'Failed to disconnect LinkedIn account');
     } finally {
       setIsDisconnecting(false);
     }
@@ -149,23 +150,16 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
 
             <Button
               variant="outline"
-              onClick={handleDisconnect}
-              disabled={isDisconnecting}
+              onClick={() => setDisconnectModalOpen(true)}
               className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10"
             >
-              {isDisconnecting ? (
-                <>
-                  <Loader2 className="animate-spin size-4 mr-2" />
-                  Disconnecting...
-                </>
-              ) : (
-                'Disconnect LinkedIn'
-              )}
+              Disconnect LinkedIn
             </Button>
           </div>
         ) : (
           <EmptyStateLinkedInNotConnected
             onConnect={() => setModalOpen(true)}
+            disabled={!availability.available}
             className="py-8"
           />
         )}
@@ -177,6 +171,14 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
         onSuccess={handleSuccess}
         token={token}
         orgId={orgId}
+      />
+
+      <DisconnectConfirmModal
+        open={disconnectModalOpen}
+        onOpenChange={setDisconnectModalOpen}
+        onConfirm={handleDisconnect}
+        integrationName="LinkedIn"
+        isDisconnecting={isDisconnecting}
       />
     </>
   );

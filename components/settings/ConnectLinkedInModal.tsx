@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Linkedin, Loader2, AlertCircle, CheckCircle2, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createApiClient } from '@/lib/api-client';
 
-type ConnectionState = 'idle' | 'initializing' | 'waiting' | 'verifying' | 'connected' | 'error';
+type ConnectionState = 'initializing' | 'waiting' | 'verifying' | 'connected' | 'error';
 
 interface InitializeResponse {
   sessionId: string;
@@ -30,6 +30,9 @@ interface ConnectLinkedInModalProps {
   orgId?: string;
 }
 
+// Browserbase Live URL format when API doesn't return it
+const BROWSERBASE_LIVE_URL_BASE = 'https://www.browserbase.com/sessions';
+
 export function ConnectLinkedInModal({
   open,
   onOpenChange,
@@ -37,13 +40,30 @@ export function ConnectLinkedInModal({
   token,
   orgId,
 }: ConnectLinkedInModalProps) {
-  const [state, setState] = useState<ConnectionState>('idle');
+  const [state, setState] = useState<ConnectionState | null>(null);
   const [sessionUrl, setSessionUrl] = useState<string>('');
   const [sessionId, setSessionId] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const hasInitialized = useRef(false);
 
   // Create API client with auth context
   const api = useMemo(() => createApiClient(token, orgId), [token, orgId]);
+
+  // Auto-start initialization when modal opens, reset when it closes
+  useEffect(() => {
+    if (open && !hasInitialized.current) {
+      hasInitialized.current = true;
+      handleInitialize();
+    }
+    // Reset everything when modal closes
+    if (!open && hasInitialized.current) {
+      hasInitialized.current = false;
+      setState(null);
+      setSessionUrl('');
+      setSessionId('');
+      setErrorMessage('');
+    }
+  }, [open]);
 
   const handleInitialize = async () => {
     setState('initializing');
@@ -53,15 +73,28 @@ export function ConnectLinkedInModal({
       const result = await api.post<InitializeResponse>('/v1/linkedin-connection/initialize');
 
       if (!result.success || !result.data) {
+        // Check for session conflict (409)
+        const errorDetails = result.error?.details as { canRetryAfter?: number; sessionAge?: number } | undefined;
+        if (errorDetails?.canRetryAfter !== undefined) {
+          const retryMinutes = errorDetails.canRetryAfter;
+          throw new Error(
+            retryMinutes > 0
+              ? `A session is already in progress. Please wait ${retryMinutes} minute(s) or complete the existing session.`
+              : 'A session is already in progress. It will be automatically cleaned up shortly. Please try again.'
+          );
+        }
         throw new Error(result.error?.message || 'Failed to initialize connection');
       }
 
       setSessionId(result.data.sessionId);
-      setSessionUrl(result.data.sessionUrl);
+
+      // Use API-provided URL or construct Browserbase Live URL from sessionId
+      const liveUrl = result.data.sessionUrl || `${BROWSERBASE_LIVE_URL_BASE}/${result.data.sessionId}/live`;
+      setSessionUrl(liveUrl);
       setState('waiting');
 
       // Open Browserbase Live View in new window
-      window.open(result.data.sessionUrl, '_blank', 'noopener,noreferrer');
+      window.open(liveUrl, '_blank', 'noopener,noreferrer');
     } catch (error) {
       setState('error');
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred');
@@ -92,7 +125,7 @@ export function ConnectLinkedInModal({
   };
 
   const resetModal = () => {
-    setState('idle');
+    setState(null);
     setSessionUrl('');
     setSessionId('');
     setErrorMessage('');
@@ -123,8 +156,7 @@ export function ConnectLinkedInModal({
           </Dialog.Title>
 
           <Dialog.Description className="text-sm text-[var(--cream)]/70 mb-6">
-            {state === 'idle' && 'Connect your LinkedIn account to enable profile data enrichment for your contacts.'}
-            {state === 'initializing' && 'Initializing secure browser session...'}
+            {(state === null || state === 'initializing') && 'Initializing secure browser session...'}
             {state === 'waiting' && 'Please log in to LinkedIn in the new window, then click "I\'m Done" below.'}
             {state === 'verifying' && 'Verifying your LinkedIn connection...'}
             {state === 'connected' && 'Successfully connected your LinkedIn account!'}
@@ -164,19 +196,7 @@ export function ConnectLinkedInModal({
             )}
 
             <div className="flex gap-3">
-              {state === 'idle' && (
-                <>
-                  <Button variant="outline" onClick={handleClose} className="flex-1">
-                    Cancel
-                  </Button>
-                  <Button onClick={handleInitialize} className="flex-1">
-                    <Linkedin className="size-4 mr-2" />
-                    Start Connection
-                  </Button>
-                </>
-              )}
-
-              {state === 'initializing' && (
+              {(state === null || state === 'initializing') && (
                 <Button disabled className="w-full">
                   <Loader2 className="animate-spin size-4 mr-2" />
                   Initializing...

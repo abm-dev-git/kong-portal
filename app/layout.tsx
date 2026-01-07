@@ -1,12 +1,61 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { Toaster } from "sonner";
 import { ThemeProvider } from "@/lib/context/theme-context";
+import { SkipToContent } from "@/components/shared/SkipToContent";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kong Portal - ABM.dev Developer Portal",
-  description: "Developer portal for ABM.dev API with Kong Gateway integration",
+  title: {
+    default: "ABM.dev - B2B Data Enrichment API",
+    template: "%s | ABM.dev",
+  },
+  description: "Enrich your B2B contacts with verified data from LinkedIn, company databases, and more. Build better ABM campaigns with accurate, real-time data enrichment.",
+  keywords: ["B2B data enrichment", "ABM", "account-based marketing", "data enrichment API", "LinkedIn enrichment", "contact enrichment", "CRM integration"],
+  authors: [{ name: "ABM.dev" }],
+  creator: "ABM.dev",
+  publisher: "ABM.dev",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://portal.abm.dev"),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    siteName: "ABM.dev",
+    title: "ABM.dev - B2B Data Enrichment API",
+    description: "Enrich your B2B contacts with verified data from LinkedIn, company databases, and more.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ABM.dev - B2B Data Enrichment",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ABM.dev - B2B Data Enrichment API",
+    description: "Enrich your B2B contacts with verified data from LinkedIn, company databases, and more.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
 };
 
 // ABM.dev Dark Theme for Clerk
@@ -98,8 +147,25 @@ export default function RootLayout({
           <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         </head>
         <body className="antialiased">
+          <SkipToContent />
           <ThemeProvider>
             {children}
+            <Toaster
+              position="bottom-right"
+              toastOptions={{
+                style: {
+                  background: "var(--dark-blue)",
+                  border: "1px solid rgba(64, 224, 208, 0.2)",
+                  color: "var(--cream)",
+                },
+                classNames: {
+                  success: "!border-emerald-500/30 !bg-emerald-500/10",
+                  error: "!border-red-500/30 !bg-red-500/10",
+                  warning: "!border-amber-500/30 !bg-amber-500/10",
+                  info: "!border-blue-500/30 !bg-blue-500/10",
+                },
+              }}
+            />
           </ThemeProvider>
         </body>
       </html>

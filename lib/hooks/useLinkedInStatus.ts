@@ -10,12 +10,19 @@ export interface LinkedInStatus {
   message?: string;
 }
 
+export interface SessionAvailability {
+  available: boolean;
+  activeSessions: number;
+  canAutoCleanup: boolean;
+}
+
 /**
  * Custom hook for LinkedIn connection status
  * SSR-safe - doesn't use react-query to avoid QueryClientProvider requirement during SSR
  */
 export function useLinkedInStatus(token?: string, orgId?: string) {
   const [data, setData] = useState<LinkedInStatus | undefined>(undefined);
+  const [availability, setAvailability] = useState<SessionAvailability>({ available: true, activeSessions: 0, canAutoCleanup: false });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -30,22 +37,33 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
 
     try {
       setIsLoading(true);
-      const result = await api.get<LinkedInStatus>('/v1/linkedin-connection/status');
 
-      if (result.success && result.data) {
-        setData(result.data);
+      // Fetch both status and availability in parallel
+      const [statusResult, availabilityResult] = await Promise.all([
+        api.get<LinkedInStatus>('/v1/linkedin-connection/status'),
+        api.get<SessionAvailability>('/v1/linkedin-connection/availability'),
+      ]);
+
+      // Handle status
+      if (statusResult.success && statusResult.data) {
+        setData(statusResult.data);
         setError(null);
       } else {
         // Handle disconnected state from backend error
-        if (result.error?.details && typeof result.error.details === 'object') {
-          const details = result.error.details as { configured?: boolean };
+        if (statusResult.error?.details && typeof statusResult.error.details === 'object') {
+          const details = statusResult.error.details as { configured?: boolean };
           if (details.configured === false) {
             setData({ status: 'disconnected' });
             setError(null);
-            return;
           }
+        } else {
+          throw new Error(statusResult.error?.message || 'Failed to fetch status');
         }
-        throw new Error(result.error?.message || 'Failed to fetch status');
+      }
+
+      // Handle availability
+      if (availabilityResult.success && availabilityResult.data) {
+        setAvailability(availabilityResult.data);
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
@@ -69,5 +87,5 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
 
   const refetch = useCallback(() => fetchStatus(), [fetchStatus]);
 
-  return { data, isLoading, error, refetch };
+  return { data, availability, isLoading, error, refetch };
 }

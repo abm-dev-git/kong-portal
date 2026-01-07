@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { ConnectSalesforceModal, SalesforceIcon } from './ConnectSalesforceModal';
+import { DisconnectConfirmModal } from './DisconnectConfirmModal';
 import { useSalesforceStatus } from '@/lib/hooks/useSalesforceStatus';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +38,7 @@ interface SalesforceSettingsCardProps {
 
 export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const [disconnectModalOpen, setDisconnectModalOpen] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const { data: status, isLoading, refetch } = useSalesforceStatus(token, orgId);
 
@@ -43,12 +46,8 @@ export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardP
   const api = useMemo(() => createApiClient(token, orgId), [token, orgId]);
 
   const handleDisconnect = async () => {
-    if (!confirm('Are you sure you want to disconnect your Salesforce account? This will stop all automatic syncing.')) {
-      return;
-    }
-
     if (!status?.integrationId) {
-      alert('Cannot disconnect: Integration ID not found');
+      toast.error('Cannot disconnect: Integration ID not found');
       return;
     }
 
@@ -60,9 +59,11 @@ export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardP
         throw new Error(result.error?.message || 'Failed to disconnect');
       }
 
+      setDisconnectModalOpen(false);
+      toast.success('Salesforce account disconnected successfully');
       await refetch();
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to disconnect Salesforce account');
+      toast.error(error instanceof Error ? error.message : 'Failed to disconnect Salesforce account');
     } finally {
       setIsDisconnecting(false);
     }
@@ -194,18 +195,10 @@ export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardP
               </Button>
               <Button
                 variant="outline"
-                onClick={handleDisconnect}
-                disabled={isDisconnecting}
+                onClick={() => setDisconnectModalOpen(true)}
                 className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10"
               >
-                {isDisconnecting ? (
-                  <>
-                    <Loader2 className="animate-spin size-4 mr-2" />
-                    Disconnecting...
-                  </>
-                ) : (
-                  'Disconnect'
-                )}
+                Disconnect
               </Button>
             </div>
           </div>
@@ -223,6 +216,14 @@ export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardP
         onSuccess={handleSuccess}
         token={token}
         orgId={orgId}
+      />
+
+      <DisconnectConfirmModal
+        open={disconnectModalOpen}
+        onOpenChange={setDisconnectModalOpen}
+        onConfirm={handleDisconnect}
+        integrationName="Salesforce"
+        isDisconnecting={isDisconnecting}
       />
     </>
   );
