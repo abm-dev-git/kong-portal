@@ -74,15 +74,20 @@ export function ConnectLinkedInModal({
       const result = await api.post<InitializeResponse>('/v1/linkedin-connection/initialize');
 
       if (!result.success || !result.data) {
-        // Check for session conflict (409)
+        // Check for session conflict (409) or other errors
+        const errorCode = result.error?.code || '';
         const errorDetails = result.error?.details as { canRetryAfter?: number; sessionAge?: number } | undefined;
-        if (errorDetails?.canRetryAfter !== undefined) {
-          const retryMinutes = errorDetails.canRetryAfter;
-          throw new Error(
-            retryMinutes > 0
-              ? `A session is already in progress. Please wait ${retryMinutes} minute(s) or complete the existing session.`
-              : 'A session is already in progress. It will be automatically cleaned up shortly. Please try again.'
-          );
+
+        if (errorCode.includes('409') || errorCode === 'CONFLICT') {
+          if (errorDetails?.canRetryAfter !== undefined) {
+            const retryMinutes = errorDetails.canRetryAfter;
+            throw new Error(
+              retryMinutes > 0
+                ? `A session is already in progress. Please wait ${retryMinutes} minute(s) or complete the existing session.`
+                : 'A session is already in progress. It will be automatically cleaned up shortly. Please try again.'
+            );
+          }
+          throw new Error('A LinkedIn session is already in progress. Please wait a moment and try again.');
         }
         throw new Error(result.error?.message || 'Failed to initialize connection');
       }

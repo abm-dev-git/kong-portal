@@ -41,11 +41,8 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
     try {
       setIsLoading(true);
 
-      // Fetch both status and availability in parallel
-      const [statusResult, availabilityResult] = await Promise.all([
-        api.get<LinkedInStatus>('/v1/linkedin-connection/status'),
-        api.get<SessionAvailability>('/v1/linkedin-connection/availability'),
-      ]);
+      // Fetch status (availability endpoint may not exist yet)
+      const statusResult = await api.get<LinkedInStatus>('/v1/linkedin-connection/status');
 
       // Handle status
       if (statusResult.success && statusResult.data) {
@@ -60,13 +57,20 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
             setError(null);
           }
         } else {
-          throw new Error(statusResult.error?.message || 'Failed to fetch status');
+          // If 404 or other error, assume disconnected
+          setData({ status: 'disconnected' });
+          setError(null);
         }
       }
 
-      // Handle availability
-      if (availabilityResult.success && availabilityResult.data) {
-        setAvailability(availabilityResult.data);
+      // Try to fetch availability (optional - may not exist)
+      try {
+        const availabilityResult = await api.get<SessionAvailability>('/v1/linkedin-connection/availability');
+        if (availabilityResult.success && availabilityResult.data) {
+          setAvailability(availabilityResult.data);
+        }
+      } catch {
+        // Availability endpoint not available, use defaults
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
