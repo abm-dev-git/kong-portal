@@ -145,6 +145,26 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
                     </span>
                   </div>
                 )}
+                {status?.lastUsedAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--cream)]/60">Last Used</span>
+                    <span className="text-sm text-[var(--cream)]">
+                      {new Date(status.lastUsedAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+                {status?.cookiesExpireAt && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-[var(--cream)]/60">Session Expires</span>
+                    <span className={`text-sm ${
+                      new Date(status.cookiesExpireAt) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                        ? 'text-yellow-400'
+                        : 'text-[var(--cream)]'
+                    }`}>
+                      {new Date(status.cookiesExpireAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

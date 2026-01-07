@@ -3,10 +3,13 @@ import { createApiClient } from '../api-client';
 
 export interface LinkedInStatus {
   status: 'connected' | 'pending' | 'disconnected' | 'error';
+  isConnected?: boolean;
   linkedInProfileName?: string;
   linkedInProfileUrl?: string;
   connectedAt?: string;
   lastVerifiedAt?: string;
+  lastUsedAt?: string;
+  cookiesExpireAt?: string;
   message?: string;
 }
 
