@@ -31,7 +31,8 @@ interface ConnectLinkedInModalProps {
 }
 
 // Browserbase Live URL format when API doesn't return it
-const BROWSERBASE_LIVE_URL_BASE = 'https://www.browserbase.com/sessions';
+// Correct format: https://live.browserbase.io/{sessionId}
+const BROWSERBASE_LIVE_URL_BASE = 'https://live.browserbase.io';
 
 export function ConnectLinkedInModal({
   open,
@@ -89,7 +90,7 @@ export function ConnectLinkedInModal({
       setSessionId(result.data.sessionId);
 
       // Use API-provided URL or construct Browserbase Live URL from sessionId
-      const liveUrl = result.data.sessionUrl || `${BROWSERBASE_LIVE_URL_BASE}/${result.data.sessionId}/live`;
+      const liveUrl = result.data.sessionUrl || `${BROWSERBASE_LIVE_URL_BASE}/${result.data.sessionId}`;
       setSessionUrl(liveUrl);
       setState('waiting');
     } catch (error) {
