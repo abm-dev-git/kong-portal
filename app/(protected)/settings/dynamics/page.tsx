@@ -10,8 +10,13 @@ export default function DynamicsSettingsPage() {
   const [token, setToken] = useState<string>();
 
   useEffect(() => {
-    getToken().then((t) => t && setToken(t));
-  }, [getToken]);
+    let mounted = true;
+    getToken().then((t) => {
+      if (mounted && t) setToken(t);
+    });
+    return () => { mounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-8">

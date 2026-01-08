@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
@@ -23,8 +23,13 @@ const navigationLinks = [
 
 export function Navigation({ className }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isSignedIn } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const router = useRouter();
+
+  // Only render auth-dependent UI after hydration to prevent mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -63,41 +68,42 @@ export function Navigation({ className }: NavigationProps) {
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex md:items-center md:gap-3">
             <ThemeToggle size="sm" />
-            {isSignedIn ? (
+            {mounted && (
               <>
-                <Button
-                  variant="default"
-                  size="default"
-                  onClick={() => router.push("/dashboard")}
-                  className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
-                  aria-label="Go to dashboard"
-                >
-                  Dashboard
-                </Button>
-                <UserButton afterSignOutUrl="/" />
-              </>
-            ) : (
-              <>
-                <SignInButton mode="modal">
-                  <Button
-                    variant="ghost"
-                    size="default"
-                    className="text-[var(--cream)] hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/15 font-medium"
-                    aria-label="Sign in to your account"
-                  >
-                    Sign in
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
+                <SignedIn>
                   <Button
                     variant="default"
                     size="default"
+                    onClick={() => router.push("/dashboard")}
                     className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
-                    aria-label="Get started"
+                    aria-label="Go to dashboard"
                   >
-                    Get Started
+                    Dashboard
                   </Button>
-                </SignUpButton>
+                  <UserButton afterSignOutUrl="/" />
+                </SignedIn>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button
+                      variant="ghost"
+                      size="default"
+                      className="text-[var(--cream)] hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/15 font-medium"
+                      aria-label="Sign in to your account"
+                    >
+                      Sign in
+                    </Button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <Button
+                      variant="default"
+                      size="default"
+                      className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                      aria-label="Get started"
+                    >
+                      Get Started
+                    </Button>
+                  </SignUpButton>
+                </SignedOut>
               </>
             )}
           </div>
@@ -143,43 +149,44 @@ export function Navigation({ className }: NavigationProps) {
 
             {/* Mobile CTA Buttons */}
             <div className="flex flex-col gap-3 pt-4 border-t border-[var(--turquoise)]/20">
-              {isSignedIn ? (
+              {mounted && (
                 <>
-                  <Button
-                    variant="default"
-                    size="lg"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      router.push("/dashboard");
-                    }}
-                    className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
-                    aria-label="Go to dashboard"
-                  >
-                    Dashboard
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <SignInButton mode="modal">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="w-full text-[var(--cream)] border-[var(--turquoise)]/30 hover:bg-[var(--turquoise)]/15 hover:border-[var(--turquoise)]/50"
-                      aria-label="Sign in to your account"
-                    >
-                      Sign in
-                    </Button>
-                  </SignInButton>
-                  <SignUpButton mode="modal">
+                  <SignedIn>
                     <Button
                       variant="default"
                       size="lg"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        router.push("/dashboard");
+                      }}
                       className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
-                      aria-label="Get started"
+                      aria-label="Go to dashboard"
                     >
-                      Get Started
+                      Dashboard
                     </Button>
-                  </SignUpButton>
+                  </SignedIn>
+                  <SignedOut>
+                    <SignInButton mode="modal">
+                      <Button
+                        variant="outline"
+                        size="lg"
+                        className="w-full text-[var(--cream)] border-[var(--turquoise)]/30 hover:bg-[var(--turquoise)]/15 hover:border-[var(--turquoise)]/50"
+                        aria-label="Sign in to your account"
+                      >
+                        Sign in
+                      </Button>
+                    </SignInButton>
+                    <SignUpButton mode="modal">
+                      <Button
+                        variant="default"
+                        size="lg"
+                        className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                        aria-label="Get started"
+                      >
+                        Get Started
+                      </Button>
+                    </SignUpButton>
+                  </SignedOut>
                 </>
               )}
             </div>
