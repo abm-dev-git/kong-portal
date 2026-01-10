@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createApiClient } from '../api-client';
 
 export interface LinkedInStatus {
@@ -17,6 +17,8 @@ export interface SessionAvailability {
   available: boolean;
   activeSessions: number;
   canAutoCleanup: boolean;
+  currentStatus?: string;
+  message?: string;
 }
 
 /**
@@ -29,17 +31,34 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Create API client with auth context
-  const api = useMemo(() => createApiClient(token, orgId), [token, orgId]);
+  // Track if initial fetch has been done
+  const hasFetchedRef = useRef(false);
+  // Use ref for token/orgId to avoid recreating fetchStatus
+  const tokenRef = useRef(token);
+  const orgIdRef = useRef(orgId);
 
-  const fetchStatus = useCallback(async () => {
-    if (!token || typeof window === 'undefined') {
+  // Keep refs up to date
+  useEffect(() => {
+    tokenRef.current = token;
+    orgIdRef.current = orgId;
+  }, [token, orgId]);
+
+  const fetchStatus = useCallback(async (isInitialFetch = false) => {
+    const currentToken = tokenRef.current;
+
+    if (!currentToken || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
 
     try {
-      setIsLoading(true);
+      // Only show loading on initial fetch, not on subsequent polls
+      if (isInitialFetch) {
+        setIsLoading(true);
+      }
+
+      // Create API client with current token/orgId
+      const api = createApiClient(currentToken, orgIdRef.current);
 
       // Fetch status (availability endpoint may not exist yet)
       const statusResult = await api.get<LinkedInStatus>('/v1/linkedin-connection/status');
@@ -63,36 +82,39 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
         }
       }
 
-      // Try to fetch availability (optional - may not exist)
-      try {
-        const availabilityResult = await api.get<SessionAvailability>('/v1/linkedin-connection/availability');
-        if (availabilityResult.success && availabilityResult.data) {
-          setAvailability(availabilityResult.data);
-        }
-      } catch {
-        // Availability endpoint not available, use defaults
+      // Fetch availability
+      const availabilityResult = await api.get<SessionAvailability>('/v1/linkedin-connection/availability');
+      if (availabilityResult.success && availabilityResult.data) {
+        setAvailability(availabilityResult.data);
       }
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
     } finally {
       setIsLoading(false);
     }
-  }, [token, api]);
+  }, []); // No dependencies - uses refs instead
 
-  // Initial fetch
+  // Initial fetch - only when token becomes available
   useEffect(() => {
-    fetchStatus();
-  }, [fetchStatus]);
+    if (token && !hasFetchedRef.current) {
+      hasFetchedRef.current = true;
+      fetchStatus(true);
+    } else if (!token) {
+      // Reset if token is cleared
+      hasFetchedRef.current = false;
+      setIsLoading(true);
+    }
+  }, [token, fetchStatus]);
 
   // Poll when status is pending
   useEffect(() => {
     if (data?.status === 'pending') {
-      const interval = setInterval(fetchStatus, 5000);
+      const interval = setInterval(() => fetchStatus(false), 5000);
       return () => clearInterval(interval);
     }
   }, [data?.status, fetchStatus]);
 
-  const refetch = useCallback(() => fetchStatus(), [fetchStatus]);
+  const refetch = useCallback((showLoading = false) => fetchStatus(showLoading), [fetchStatus]);
 
   return { data, availability, isLoading, error, refetch };
 }

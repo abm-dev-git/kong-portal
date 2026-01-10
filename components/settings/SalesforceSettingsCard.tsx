@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateSalesforceNotConnected } from '@/components/ui/empty-state';
 import { createApiClient } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
+import { formatDateTime } from '@/lib/utils';
 
 // Status badge component
 function SalesforceStatusBadge({ status }: { status: string }) {
@@ -168,7 +169,7 @@ export function SalesforceSettingsCard({ token, orgId }: SalesforceSettingsCardP
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--cream)]/60">Last Sync</span>
                     <span className="text-sm text-[var(--cream)]">
-                      {new Date(status.lastSyncAt).toLocaleString()}
+                      {formatDateTime(status.lastSyncAt)}
                     </span>
                   </div>
                 )}

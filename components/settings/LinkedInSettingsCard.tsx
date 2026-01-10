@@ -11,6 +11,7 @@ import { Linkedin, ExternalLink, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateLinkedInNotConnected } from '@/components/ui/empty-state';
 import { createApiClient } from '@/lib/api-client';
+import { formatDate } from '@/lib/utils';
 
 interface LinkedInSettingsCardProps {
   token?: string;
@@ -141,7 +142,7 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--cream)]/60">Connected At</span>
                     <span className="text-sm text-[var(--cream)]">
-                      {new Date(status.connectedAt).toLocaleDateString()}
+                      {formatDate(status.connectedAt)}
                     </span>
                   </div>
                 )}
@@ -149,7 +150,7 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-[var(--cream)]/60">Last Used</span>
                     <span className="text-sm text-[var(--cream)]">
-                      {new Date(status.lastUsedAt).toLocaleDateString()}
+                      {formatDate(status.lastUsedAt)}
                     </span>
                   </div>
                 )}
@@ -161,7 +162,7 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
                         ? 'text-yellow-400'
                         : 'text-[var(--cream)]'
                     }`}>
-                      {new Date(status.cookiesExpireAt).toLocaleDateString()}
+                      {formatDate(status.cookiesExpireAt)}
                     </span>
                   </div>
                 )}

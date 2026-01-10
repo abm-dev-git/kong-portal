@@ -13,6 +13,7 @@ import {
   Download,
   ExternalLink,
 } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
 
 interface Plan {
   id: string
@@ -159,7 +160,7 @@ export default function BillingSettingsPage() {
               />
             </div>
             <p className="text-xs text-[var(--cream)]/40 mt-2">
-              Resets on {new Date(usage.periodEnd).toLocaleDateString()}
+              Resets on {formatDate(usage.periodEnd)}
             </p>
           </div>
 
@@ -304,7 +305,7 @@ export default function BillingSettingsPage() {
             >
               <div className="flex items-center gap-4">
                 <span className="text-sm text-[var(--cream)]/60">
-                  {new Date(item.date).toLocaleDateString()}
+                  {formatDate(item.date)}
                 </span>
                 <span className="text-[var(--cream)]">{item.description}</span>
               </div>

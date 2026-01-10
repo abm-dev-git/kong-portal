@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateHubSpotNotConnected } from '@/components/ui/empty-state';
 import { createApiClient } from '@/lib/api-client';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils';
 
 // Helper to format relative time
 function formatRelativeTime(dateString: string): string {
@@ -25,7 +26,7 @@ function formatRelativeTime(dateString: string): string {
   if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
   if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
   if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-  return date.toLocaleDateString();
+  return formatDate(date);
 }
 
 // Status badge component

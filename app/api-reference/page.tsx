@@ -137,7 +137,7 @@ export default function ApiReferencePage() {
               <div className="flex flex-wrap gap-2">
                 {category.endpoints.map((endpoint) => (
                   <div
-                    key={endpoint.path}
+                    key={`${endpoint.method}-${endpoint.path}`}
                     className="flex items-center gap-2 px-2 py-1 rounded bg-[var(--navy)] text-xs"
                   >
                     <MethodBadge method={endpoint.method} className="text-[10px] px-1" />

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Key, Plus, Copy, Trash2, Check } from 'lucide-react';
 import type { ApiKey } from '@/lib/api-keys';
 import { RevokeKeyDialog } from './RevokeKeyDialog';
+import { formatDate } from '@/lib/utils';
 
 interface ApiKeysTableProps {
   keys: ApiKey[];
@@ -21,14 +22,6 @@ export function ApiKeysTable({ keys, onCreateKey, onKeyRevoked }: ApiKeysTablePr
     await navigator.clipboard.writeText(keyPrefix);
     setCopiedId(keyId);
     setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   if (keys.length === 0) {

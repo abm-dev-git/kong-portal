@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { DeleteAccountButton } from '@/components/settings/DeleteAccountButton'
 import { Mail, Calendar, Shield, ExternalLink } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
 
 export default async function AccountSettingsPage() {
   const user = await currentUser()
@@ -13,11 +14,7 @@ export default async function AccountSettingsPage() {
   }
 
   const createdAt = user.createdAt
-    ? new Date(user.createdAt).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+    ? formatDate(user.createdAt)
     : 'Unknown'
 
   return (

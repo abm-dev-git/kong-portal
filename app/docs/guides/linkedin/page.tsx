@@ -205,6 +205,12 @@ export default function LinkedInGuidePage() {
             flagged or restricted by LinkedIn. We recommend Sales Navigator accounts for
             higher rate limits.
           </Callout>
+
+          <Callout type="danger" title="Use Email/Password Login">
+            Do not use &quot;Sign in with Google&quot; or other OAuth options when logging into
+            LinkedIn. These authentication methods are blocked in embedded browsers for security
+            reasons. Use your LinkedIn email and password directly.
+          </Callout>
         </div>
       </section>
 

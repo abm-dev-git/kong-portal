@@ -225,7 +225,7 @@ export function ConnectLinkedInModal({
                     </Button>
                   )}
                   <Button onClick={handleVerify} className={showIframe ? "w-full" : "flex-1"}>
-                    I&apos;m Done Logging In
+                    I&apos;m done logging in...
                   </Button>
                 </>
               )}
