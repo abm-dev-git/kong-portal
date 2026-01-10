@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import { Badge } from '@/components/ui/badge'
-import { Linkedin, CreditCard, User, ArrowRight, ChevronRight } from 'lucide-react'
+import { Linkedin, CreditCard, User, Users, ChevronRight } from 'lucide-react'
 
 // HubSpot icon component
 function HubSpotIcon({ className }: { className?: string }) {
@@ -71,6 +71,13 @@ export default async function SettingsPage() {
 
   // Account settings
   const accountSettings = [
+    {
+      href: '/settings/team',
+      icon: Users,
+      iconColor: 'text-[var(--turquoise)]',
+      title: 'Team Members',
+      description: 'Manage team members and invitations',
+    },
     {
       href: '/settings/billing',
       icon: CreditCard,
