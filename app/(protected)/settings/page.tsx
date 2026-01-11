@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
-import { Badge } from '@/components/ui/badge'
 import { Linkedin, CreditCard, User, Users, ChevronRight } from 'lucide-react'
 
 // HubSpot icon component

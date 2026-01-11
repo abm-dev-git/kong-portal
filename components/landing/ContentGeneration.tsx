@@ -232,12 +232,12 @@ export function ContentGeneration() {
             </Badge>
 
             {/* H2 */}
-            <h2 className="text-[#0A1F3D] text-4xl lg:text-5xl" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+            <h2 className="text-[#0A1628] text-4xl lg:text-5xl font-semibold" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
               Content generation that adapts to your pipeline
             </h2>
 
             {/* Lead paragraph */}
-            <p className="text-[#0A1F3D]/80 text-lg" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+            <p className="text-[#1a2f4a] text-lg" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
               Provide a CRM reference, a prompt, and instructions from any source. The system resolves context, calls multiple models, and returns ranked drafts with rationale, citations, and validation—ready to review and ship.
             </p>
 
@@ -259,7 +259,7 @@ export function ContentGeneration() {
             </ul>
 
             {/* Supporting paragraph */}
-            <p className="text-[#0A1F3D]/60 text-sm">
+            <p className="text-[#374151] text-sm">
               The pipeline validates inputs, collects references, assembles prompts, generates drafts across providers, and quality-checks each output for tone, required elements, and personalization before returning results.
             </p>
 

@@ -11,10 +11,10 @@ interface FooterProps {
 
 export function Footer({ variant = "columns", theme = "dark" }: FooterProps) {
   const bgColor = theme === "dark" ? "bg-[#1a1a2e]" : "bg-[#FAEBD7]";
-  const textColor = theme === "dark" ? "text-[#FAEBD7]/80" : "text-[#0A1F3D]/80";
+  const textColor = theme === "dark" ? "text-[#d4d4dc]" : "text-[#374151]";
   const headingColor = theme === "dark" ? "text-[#FAEBD7]" : "text-[#0A1F3D]";
-  const linkColor = theme === "dark" ? "text-[#40E0D0] hover:text-[#40E0D0]/80" : "text-[#0084FF] hover:text-[#0084FF]/80";
-  const borderColor = theme === "dark" ? "border-[#40E0D0]/20" : "border-[#0A1F3D]/20";
+  const linkColor = theme === "dark" ? "text-[#40E0D0] hover:text-[#5fe8dd]" : "text-[#0084FF] hover:text-[#0084FF]/80";
+  const borderColor = theme === "dark" ? "border-[#40E0D0]/30" : "border-[#0A1F3D]/20";
 
   return (
     <footer className={cn(bgColor, "border-t", borderColor)}>

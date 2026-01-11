@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Initialize model - use flash for speed
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-preview-05-20",
+      model: "gemini-2.0-flash",
     });
 
     // Prepare image part
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       feedback: text,
-      model: "gemini-2.5-flash-preview-05-20",
+      model: "gemini-2.0-flash",
       timestamp: new Date().toISOString(),
     });
   } catch (error: unknown) {

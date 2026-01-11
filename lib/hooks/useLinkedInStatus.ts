@@ -1,6 +1,16 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createApiClient } from '../api-client';
 
+// Poll response type for automatic login detection
+export interface PollLinkedInResponse {
+  isComplete: boolean;
+  status: 'waiting' | 'connected' | 'error';
+  message: string;
+  currentUrl?: string;
+  profileName?: string;
+  profileUrl?: string;
+}
+
 export interface LinkedInStatus {
   status: 'connected' | 'pending' | 'disconnected' | 'error';
   isConnected?: boolean;
@@ -117,4 +127,83 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
   const refetch = useCallback((showLoading = false) => fetchStatus(showLoading), [fetchStatus]);
 
   return { data, availability, isLoading, error, refetch };
+}
+
+/**
+ * Hook for polling LinkedIn login status during connection flow
+ * Automatically detects when user completes login - no manual button needed!
+ */
+export function usePollLinkedInLogin(
+  sessionId: string | null,
+  token?: string,
+  orgId?: string,
+  enabled: boolean = true
+) {
+  const [data, setData] = useState<PollLinkedInResponse | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  // Use refs to avoid recreating callbacks
+  const tokenRef = useRef(token);
+  const orgIdRef = useRef(orgId);
+
+  useEffect(() => {
+    tokenRef.current = token;
+    orgIdRef.current = orgId;
+  }, [token, orgId]);
+
+  useEffect(() => {
+    if (!enabled || !sessionId || !tokenRef.current || typeof window === 'undefined') {
+      return;
+    }
+
+    // Stop polling if already complete
+    if (data?.isComplete) {
+      return;
+    }
+
+    setIsPolling(true);
+    let intervalId: NodeJS.Timeout;
+
+    const pollStatus = async () => {
+      try {
+        const api = createApiClient(tokenRef.current, orgIdRef.current);
+        const result = await api.get<PollLinkedInResponse>(
+          `/v1/linkedin-connection/poll/${sessionId}`
+        );
+
+        if (result.success && result.data) {
+          setData(result.data);
+          setError(null);
+
+          // Stop polling if complete
+          if (result.data.isComplete) {
+            setIsPolling(false);
+            clearInterval(intervalId);
+          }
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err : new Error('Poll failed'));
+      }
+    };
+
+    // Initial poll
+    pollStatus();
+
+    // Poll every 2.5 seconds
+    intervalId = setInterval(pollStatus, 2500);
+
+    return () => {
+      clearInterval(intervalId);
+      setIsPolling(false);
+    };
+  }, [sessionId, enabled, data?.isComplete]);
+
+  const reset = useCallback(() => {
+    setData(null);
+    setError(null);
+    setIsPolling(false);
+  }, []);
+
+  return { data, isPolling, error, reset };
 }

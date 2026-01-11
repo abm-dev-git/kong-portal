@@ -174,12 +174,12 @@ export function EnrichmentFeature() {
             </Badge>
 
             {/* H1 */}
-            <h2 className="text-[#0A1F3D] text-4xl lg:text-5xl font-serif leading-tight">
+            <h2 className="text-[#0A1628] text-4xl lg:text-5xl font-serif leading-tight font-semibold">
               Simply the deepest, most accurate enrichment API
             </h2>
 
             {/* Lead paragraph */}
-            <p className="text-[#0A1F3D]/80 text-lg font-serif leading-relaxed">
+            <p className="text-[#1a2f4a] text-lg font-serif leading-relaxed">
               Turn a seed like an email or domain into verified person and company intelligence with confidence scores, sources, and freshness—all in one consistent schema.
             </p>
 
@@ -191,16 +191,16 @@ export function EnrichmentFeature() {
                 "Cache, batch, and off-peak controls to cut costs"
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3">
-                  <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[#40E0D0]/20 flex items-center justify-center">
-                    <Check className="w-3 h-3 text-[#40E0D0]" />
+                  <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[#40E0D0]/30 flex items-center justify-center">
+                    <Check className="w-3 h-3 text-[#0d9488]" />
                   </div>
-                  <span className="text-[#0A1F3D]/80 leading-relaxed">{item}</span>
+                  <span className="text-[#1a2f4a] leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
 
             {/* Supporting paragraph */}
-            <p className="text-[#0A1F3D]/70 text-sm leading-relaxed">
+            <p className="text-[#374151] text-sm leading-relaxed">
               The engine merges multiple sources, normalizes to a canonical schema, and emits transparent citations so every field is explainable. Teams decide confidence thresholds and sources of record.
             </p>
 

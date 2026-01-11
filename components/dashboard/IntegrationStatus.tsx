@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Linkedin, ChevronRight, CheckCircle2, XCircle } from 'lucide-react';
+import { Linkedin, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Icon components
@@ -88,10 +88,8 @@ export function IntegrationStatus({ className }: IntegrationStatusProps) {
                 <span className="text-sm text-[var(--cream)]">{integration.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                {integration.connected ? (
+                {integration.connected && (
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                ) : (
-                  <XCircle className="w-4 h-4 text-[var(--cream)]/30" />
                 )}
                 <ChevronRight className="w-4 h-4 text-[var(--cream)]/30 group-hover:text-[var(--turquoise)] transition-colors" />
               </div>
