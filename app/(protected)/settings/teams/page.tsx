@@ -39,10 +39,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { useTeams, useMyTeams, useTeamMutations } from '@/lib/hooks/useTeams';
+import { useTeams, useMyTeams, useTeamMutations, useTeamMembers } from '@/lib/hooks/useTeams';
 import { useWorkspaces, useDefaultWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
-import { TEAM_COLOR_PRESETS, type Team, type CreateTeamRequest, type UpdateTeamRequest } from '@/lib/types/teams';
+import { useMembers } from '@/lib/hooks/useMembers';
+import { TEAM_COLOR_PRESETS, TEAM_ROLE_LABELS, type Team, type CreateTeamRequest, type UpdateTeamRequest, type TeamMemberRole } from '@/lib/types/teams';
 
 export default function TeamsSettingsPage() {
   const { getToken } = useAuth();
@@ -52,6 +53,7 @@ export default function TeamsSettingsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
+  const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
 
@@ -60,6 +62,10 @@ export default function TeamsSettingsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formColor, setFormColor] = useState(TEAM_COLOR_PRESETS[0]);
   const [formWorkspaceId, setFormWorkspaceId] = useState<string>('');
+
+  // Add member form state
+  const [selectedUserId, setSelectedUserId] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<TeamMemberRole>('member');
 
   // Get auth token
   useEffect(() => {
@@ -75,7 +81,9 @@ export default function TeamsSettingsPage() {
   const { data: myTeamsData, isLoading: myTeamsLoading, refetch: refetchMyTeams } = useMyTeams(token, organization?.id);
   const { data: workspacesData } = useWorkspaces(token, organization?.id);
   const { data: defaultWorkspace } = useDefaultWorkspace(token, organization?.id);
-  const { createTeam, updateTeam, archiveTeam, isLoading: mutationLoading } = useTeamMutations(token, organization?.id);
+  const { data: membersData } = useMembers(token, organization?.id);
+  const { data: teamMembersData, refetch: refetchTeamMembers } = useTeamMembers(selectedTeam?.id, token, organization?.id);
+  const { createTeam, updateTeam, archiveTeam, addMember, isLoading: mutationLoading } = useTeamMutations(token, organization?.id);
 
   const isAdmin = currentUser?.role === 'admin';
   const isLoading = userLoading || !token;
@@ -170,6 +178,40 @@ export default function TeamsSettingsPage() {
     setSelectedTeam(team);
     setArchiveDialogOpen(true);
   };
+
+  const openAddMemberDialog = (team: Team) => {
+    setSelectedTeam(team);
+    setSelectedUserId('');
+    setSelectedRole('member');
+    setAddMemberDialogOpen(true);
+  };
+
+  const handleAddMember = async () => {
+    if (!selectedTeam || !selectedUserId) {
+      toast({ title: 'Error', description: 'Please select a member', variant: 'destructive' });
+      return;
+    }
+
+    const result = await addMember(selectedTeam.id, {
+      userId: selectedUserId,
+      role: selectedRole,
+    });
+
+    if (result) {
+      const memberName = membersData?.members.find(m => m.userId === selectedUserId)?.displayName || 'Member';
+      toast({ title: 'Success', description: `${memberName} added to ${selectedTeam.name}` });
+      setAddMemberDialogOpen(false);
+      setSelectedTeam(null);
+      refetchTeamMembers();
+    } else {
+      toast({ title: 'Error', description: 'Failed to add member. They may already be in this team.', variant: 'destructive' });
+    }
+  };
+
+  // Get members not already in the selected team
+  const availableMembers = membersData?.members.filter(
+    member => !teamMembersData?.members.some(tm => tm.userId === member.userId)
+  ) || [];
 
   const resetForm = () => {
     setFormName('');
@@ -299,7 +341,7 @@ export default function TeamsSettingsPage() {
                           <Pencil className="h-4 w-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => openAddMemberDialog(team)}>
                           <UserPlus className="h-4 w-4 mr-2" />
                           Add Member
                         </DropdownMenuItem>
@@ -479,6 +521,69 @@ export default function TeamsSettingsPage() {
             </Button>
             <Button variant="destructive" onClick={handleArchiveTeam} disabled={mutationLoading}>
               {mutationLoading ? 'Archiving...' : 'Archive Team'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Member Dialog */}
+      <Dialog open={addMemberDialogOpen} onOpenChange={setAddMemberDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Member to {selectedTeam?.name}</DialogTitle>
+            <DialogDescription>
+              Select an organization member to add to this team.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="member">Member</Label>
+              <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a member" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableMembers.length === 0 ? (
+                    <div className="px-2 py-4 text-sm text-[var(--cream)]/60 text-center">
+                      All organization members are already in this team
+                    </div>
+                  ) : (
+                    availableMembers.map((member) => (
+                      <SelectItem key={member.userId} value={member.userId}>
+                        <div className="flex items-center gap-2">
+                          <span>{member.displayName || member.email}</span>
+                          {member.displayName && (
+                            <span className="text-[var(--cream)]/50 text-sm">({member.email})</span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select value={selectedRole} onValueChange={(v) => setSelectedRole(v as TeamMemberRole)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(TEAM_ROLE_LABELS) as TeamMemberRole[]).map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {TEAM_ROLE_LABELS[role]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAddMemberDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddMember} disabled={mutationLoading || !selectedUserId}>
+              {mutationLoading ? 'Adding...' : 'Add Member'}
             </Button>
           </DialogFooter>
         </DialogContent>
