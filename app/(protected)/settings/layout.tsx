@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Settings, User, Linkedin, Database, CreditCard } from 'lucide-react'
+import { Settings, User, Linkedin, Database, CreditCard, Users, Building2, UsersRound } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface NavItem {
@@ -14,6 +14,9 @@ interface NavItem {
 const settingsNav: NavItem[] = [
   { href: '/settings', label: 'Overview', icon: Settings },
   { href: '/settings/account', label: 'Account', icon: User },
+  { href: '/settings/team', label: 'Team Members', icon: Users },
+  { href: '/settings/workspaces', label: 'Workspaces', icon: Building2 },
+  { href: '/settings/teams', label: 'Teams', icon: UsersRound },
   { href: '/settings/linkedin', label: 'LinkedIn', icon: Linkedin },
   { href: '/settings/hubspot', label: 'HubSpot', icon: Database },
   { href: '/settings/dynamics', label: 'Dynamics 365', icon: Database },
