@@ -75,12 +75,14 @@ export default function TeamSettingsPage() {
             Manage your team members and invitations
           </p>
         </div>
-        {isAdmin && (
-          <Button onClick={() => setInviteDialogOpen(true)}>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Invite Member
-          </Button>
-        )}
+        <Button
+          onClick={() => setInviteDialogOpen(true)}
+          disabled={!isAdmin}
+          title={!isAdmin ? 'Only admins can invite members' : undefined}
+        >
+          <UserPlus className="mr-2 h-4 w-4" />
+          Invite Member
+        </Button>
       </div>
 
       {/* Tabs */}
