@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 
@@ -12,11 +13,8 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log error to error reporting service (Sentry, etc.)
-    // This is where you'd integrate with your error tracking
-    if (process.env.NODE_ENV === "production") {
-      // Example: Sentry.captureException(error);
-    }
+    // Log error to Sentry
+    Sentry.captureException(error);
   }, [error]);
 
   return (
