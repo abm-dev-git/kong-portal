@@ -98,3 +98,25 @@ export const ErrorMessages: Record<UserManagementErrorCode, string> = {
   INVITE_EXPIRED: 'This invitation has expired',
   INVITE_INVALID: 'This invitation is no longer valid',
 };
+
+// ============ ROLE HELPERS ============
+
+export const ROLE_LABELS: Record<MemberRole, string> = {
+  admin: 'Admin',
+  editor: 'Editor',
+  viewer: 'Viewer',
+};
+
+export const ROLE_DESCRIPTIONS: Record<MemberRole, string> = {
+  admin: 'Full access to all features, settings, and billing',
+  editor: 'Can use features and manage data, no billing or user management',
+  viewer: 'Read-only access to dashboards and reports',
+};
+
+// ============ CURRENT USER WITH PERMISSIONS ============
+
+export interface CurrentUser extends OrganizationMember {
+  organizationId: string;
+  organizationName: string;
+  permissions: string[];  // e.g., ['contacts:read', 'enrichment:trigger']
+}

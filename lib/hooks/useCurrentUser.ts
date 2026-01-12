@@ -65,5 +65,8 @@ export function useCurrentUser(token?: string, orgId?: string) {
 
   const refetch = useCallback((showLoading = false) => fetchUser(showLoading), [fetchUser]);
 
-  return { data, isLoading, error, refetch };
+  // Helper: check if user is admin
+  const isAdmin = data?.role === 'admin';
+
+  return { data, isLoading, error, refetch, isAdmin };
 }

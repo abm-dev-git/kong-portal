@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X, Sun, Moon, Monitor } from "lucide-react";
-import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { Menu, X } from "lucide-react";
+import { SignInButton, SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
-import { useTheme } from "@/lib/context/theme-context";
+import { UserMenu } from "./UserMenu";
 
 interface NavigationProps {
   className?: string;
@@ -24,7 +24,6 @@ export function Navigation({ className }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
 
   // Only render auth-dependent UI after hydration to prevent mismatch
   useEffect(() => {
@@ -79,25 +78,7 @@ export function Navigation({ className }: NavigationProps) {
                   >
                     Dashboard
                   </Button>
-                  <UserButton afterSignOutUrl="/">
-                    <UserButton.MenuItems>
-                      <UserButton.Action
-                        label="Light theme"
-                        labelIcon={<Sun className="w-4 h-4" />}
-                        onClick={() => setTheme('light')}
-                      />
-                      <UserButton.Action
-                        label="Dark theme"
-                        labelIcon={<Moon className="w-4 h-4" />}
-                        onClick={() => setTheme('dark')}
-                      />
-                      <UserButton.Action
-                        label="System theme"
-                        labelIcon={<Monitor className="w-4 h-4" />}
-                        onClick={() => setTheme('system')}
-                      />
-                    </UserButton.MenuItems>
-                  </UserButton>
+                  <UserMenu />
                 </SignedIn>
                 <SignedOut>
                   <SignInButton mode="modal">
@@ -129,25 +110,7 @@ export function Navigation({ className }: NavigationProps) {
           <div className="md:hidden flex items-center gap-2">
             {mounted && (
               <SignedIn>
-                <UserButton afterSignOutUrl="/">
-                  <UserButton.MenuItems>
-                    <UserButton.Action
-                      label="Light theme"
-                      labelIcon={<Sun className="w-4 h-4" />}
-                      onClick={() => setTheme('light')}
-                    />
-                    <UserButton.Action
-                      label="Dark theme"
-                      labelIcon={<Moon className="w-4 h-4" />}
-                      onClick={() => setTheme('dark')}
-                    />
-                    <UserButton.Action
-                      label="System theme"
-                      labelIcon={<Monitor className="w-4 h-4" />}
-                      onClick={() => setTheme('system')}
-                    />
-                  </UserButton.MenuItems>
-                </UserButton>
+                <UserMenu size="sm" />
               </SignedIn>
             )}
             <button
