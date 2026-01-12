@@ -181,7 +181,7 @@ export function LinkedInSettingsCard({ token, orgId }: LinkedInSettingsCardProps
           <EmptyStateLinkedInNotConnected
             onConnect={() => setModalOpen(true)}
             disabled={!availability.available}
-            className="py-8"
+            className="py-4"
           />
         )}
       </div>
