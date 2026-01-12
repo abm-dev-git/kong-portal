@@ -225,7 +225,7 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
             onClick={() => setIsCustomMode(!isCustomMode)}
             className="text-sm text-[var(--turquoise)] hover:underline"
           >
-            {isCustomMode ? '← Use sample contacts' : 'Or enter your own contact →'}
+            {isCustomMode ? '← Use sample contacts' : 'Or enter your own details to enrich →'}
           </button>
 
           {/* Custom Input Fields */}
