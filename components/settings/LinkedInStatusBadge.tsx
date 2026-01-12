@@ -21,12 +21,12 @@ export function LinkedInStatusBadge({ status }: LinkedInStatusBadgeProps) {
     pending: {
       variant: 'warning' as const,
       icon: Loader2,
-      label: 'Pending',
+      label: 'Connecting...',
     },
     disconnected: {
       variant: 'outline' as const,
       icon: null,
-      label: 'Disconnected',
+      label: 'Not Connected',
     },
     error: {
       variant: 'error' as const,
