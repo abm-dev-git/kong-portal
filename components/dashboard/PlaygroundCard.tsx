@@ -268,8 +268,10 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
           )}
         </Button>
 
-        {/* Streaming Logs */}
-        {logs.length > 0 && (
+        {/* Logs & Results Container - fixed height to prevent jumping */}
+        <div className="min-h-[320px] space-y-4">
+          {/* Streaming Logs */}
+          {logs.length > 0 && (
           <div className="rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/10 overflow-hidden">
             <div className="px-3 py-2 border-b border-[var(--turquoise)]/10 flex items-center justify-between">
               <span className="text-xs font-medium text-[var(--cream)]/60 uppercase tracking-wide">
@@ -340,6 +342,7 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
             </pre>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
