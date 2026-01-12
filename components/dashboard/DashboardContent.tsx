@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useAuth, useOrganization } from '@clerk/nextjs';
 import { Key, Zap, BarChart3, Users, Sparkles } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { UsageBar } from './UsageBar';
@@ -8,17 +10,61 @@ import { ActivityFeed } from './ActivityFeed';
 import { IntegrationStatus } from './IntegrationStatus';
 import { GettingStartedCard } from './GettingStartedCard';
 import { PlaygroundCard } from './PlaygroundCard';
+import { useLinkedInStatus } from '@/lib/hooks/useLinkedInStatus';
+import type { ApiKey } from '@/lib/api-keys';
 
 interface DashboardContentProps {
   firstName: string;
 }
 
 export function DashboardContent({ firstName }: DashboardContentProps) {
-  // Mock data - in production this would come from API
+  const { getToken } = useAuth();
+  const { organization } = useOrganization();
+  const [token, setToken] = useState<string | undefined>();
+  const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
+  const [isLoadingKeys, setIsLoadingKeys] = useState(true);
+  const [hasCompletedEnrichment, setHasCompletedEnrichment] = useState(false);
+
+  // Get auth token
+  useEffect(() => {
+    getToken().then((t) => setToken(t || undefined));
+  }, [getToken]);
+
+  const orgId = organization?.id;
+
+  // Fetch LinkedIn status
+  const { data: linkedInStatus, refetch: refetchLinkedIn } = useLinkedInStatus(token, orgId);
+
+  // Fetch API keys
+  const fetchApiKeys = useCallback(async () => {
+    try {
+      const response = await fetch('/api/api-keys');
+      if (response.ok) {
+        const data = await response.json();
+        setApiKeys(data.keys || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch API keys:', error);
+    } finally {
+      setIsLoadingKeys(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchApiKeys();
+  }, [fetchApiKeys]);
+
+  // Determine user state from real data
+  const hasApiKey = apiKeys.length > 0;
+  const hasLinkedIn = linkedInStatus?.status === 'connected';
+  const hasActivity = hasCompletedEnrichment;
+  const isNewUser = !hasApiKey && !hasActivity;
+
+  // Mock stats - these would come from a real API in production
   const stats = {
     apiCalls: { today: 0, change: 0 },
     enrichedContacts: { total: 0, change: 0 },
-    activeKeys: 0,
+    activeKeys: apiKeys.length,
     successRate: 100,
   };
 
@@ -28,11 +74,6 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
   };
 
   const activities: { id: string; type: 'enrichment' | 'api_key' | 'integration' | 'settings'; title: string; description: string; timestamp: string; status?: 'success' | 'error' | 'pending' }[] = [];
-
-  // Determine user state
-  const hasApiKey = stats.activeKeys > 0;
-  const hasActivity = stats.apiCalls.today > 0 || stats.enrichedContacts.total > 0;
-  const isNewUser = !hasApiKey && !hasActivity;
 
   return (
     <div className="space-y-8">
@@ -71,7 +112,13 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
           {/* Getting Started Steps */}
           <GettingStartedCard
             hasApiKey={hasApiKey}
-            hasFirstCall={hasActivity}
+            hasLinkedIn={hasLinkedIn}
+            hasFirstEnrichment={hasCompletedEnrichment}
+            token={token}
+            orgId={orgId}
+            onApiKeyCreated={fetchApiKeys}
+            onLinkedInConnected={() => refetchLinkedIn(true)}
+            onEnrichmentComplete={() => setHasCompletedEnrichment(true)}
           />
 
           {/* Integrations - smaller section for new users */}
