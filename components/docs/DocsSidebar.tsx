@@ -19,7 +19,11 @@ import {
   Database,
   TrendingUp,
   Layers,
-  ArrowLeftRight
+  ArrowLeftRight,
+  FileJson,
+  Workflow,
+  Link2,
+  Settings,
 } from "lucide-react";
 
 interface NavItem {
@@ -37,8 +41,15 @@ const docsNavigation: NavItem[] = [
   },
   {
     title: "API Reference",
-    href: "/api-reference",
     icon: <FileCode className="w-4 h-4" />,
+    items: [
+      { title: "Overview", href: "/api-reference" },
+      { title: "Enrichment", href: "/api-reference/enrichment", icon: <Zap className="w-4 h-4" /> },
+      { title: "Jobs", href: "/api-reference/jobs", icon: <Workflow className="w-4 h-4" /> },
+      { title: "Integrations", href: "/api-reference/integrations", icon: <Link2 className="w-4 h-4" /> },
+      { title: "LinkedIn", href: "/api-reference/linkedin", icon: <Linkedin className="w-4 h-4" /> },
+      { title: "Configuration", href: "/api-reference/configuration", icon: <Settings className="w-4 h-4" /> },
+    ],
   },
   {
     title: "Concepts",
@@ -86,7 +97,7 @@ function NavSection({ item, pathname }: NavSectionProps) {
   const hasChildren = item.items && item.items.length > 0;
   const isActive = item.href === pathname;
   const isChildActive = hasChildren && item.items?.some(
-    child => child.href === pathname
+    child => child.href === pathname || pathname.startsWith((child.href || "").split("#")[0])
   );
   const [isOpen, setIsOpen] = useState(isChildActive || false);
 
@@ -113,21 +124,27 @@ function NavSection({ item, pathname }: NavSectionProps) {
         </button>
         {isOpen && (
           <div className="ml-4 pl-3 border-l border-[var(--turquoise)]/20 space-y-1">
-            {item.items?.map((child) => (
-              <Link
-                key={child.href}
-                href={child.href!}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
-                  pathname === child.href
-                    ? "text-[var(--turquoise)] bg-[var(--turquoise)]/10 font-medium"
-                    : "text-[var(--cream)]/60 hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/5"
-                )}
-              >
-                {child.icon}
-                {child.title}
-              </Link>
-            ))}
+            {item.items?.map((child) => {
+              const childPath = (child.href || "").split("#")[0];
+              const isChildLinkActive = pathname === child.href ||
+                (childPath && pathname.startsWith(childPath) && childPath !== "/api-reference") ||
+                (child.href === "/api-reference" && pathname === "/api-reference");
+              return (
+                <Link
+                  key={child.href}
+                  href={child.href!}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 text-sm rounded-md transition-colors",
+                    isChildLinkActive
+                      ? "text-[var(--turquoise)] bg-[var(--turquoise)]/10 font-medium"
+                      : "text-[var(--cream)]/60 hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/5"
+                  )}
+                >
+                  {child.icon}
+                  {child.title}
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
