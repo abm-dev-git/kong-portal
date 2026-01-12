@@ -28,10 +28,10 @@ export function StatsCard({ title, value, icon: Icon, change, subtitle, classNam
         <p className="text-sm text-[var(--cream)]/60">{title}</p>
         <p className="text-2xl font-semibold text-[var(--cream)]">{value}</p>
         {change && (
-          <div className="flex items-center gap-1 mt-2">
-            {isPositive && <TrendingUp className="w-4 h-4 text-emerald-400" />}
-            {isNegative && <TrendingDown className="w-4 h-4 text-red-400" />}
-            {isNeutral && <Minus className="w-4 h-4 text-[var(--cream)]/40" />}
+          <div className="flex items-center gap-1 mt-2 whitespace-nowrap">
+            {isPositive && <TrendingUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />}
+            {isNegative && <TrendingDown className="w-4 h-4 text-red-400 flex-shrink-0" />}
+            {isNeutral && <Minus className="w-4 h-4 text-[var(--cream)]/40 flex-shrink-0" />}
             <span className={cn(
               "text-sm",
               isPositive && "text-emerald-400",
