@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useAuth, useOrganization } from '@clerk/nextjs';
+import { useAuth, useOrganization, useUser } from '@clerk/nextjs';
 import { Key, Zap, BarChart3, Users, Sparkles } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { UsageBar } from './UsageBar';
@@ -11,6 +11,7 @@ import { IntegrationStatus } from './IntegrationStatus';
 import { GettingStartedCard } from './GettingStartedCard';
 import { PlaygroundCard } from './PlaygroundCard';
 import { useLinkedInStatus } from '@/lib/hooks/useLinkedInStatus';
+import { useEnrichmentStats } from '@/lib/hooks/useEnrichmentStats';
 import type { ApiKey } from '@/lib/api-keys';
 
 interface DashboardContentProps {
@@ -20,10 +21,10 @@ interface DashboardContentProps {
 export function DashboardContent({ firstName }: DashboardContentProps) {
   const { getToken } = useAuth();
   const { organization } = useOrganization();
+  const { user } = useUser();
   const [token, setToken] = useState<string | undefined>();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [isLoadingKeys, setIsLoadingKeys] = useState(true);
-  const [hasCompletedEnrichment, setHasCompletedEnrichment] = useState(false);
 
   // Get auth token
   useEffect(() => {
@@ -34,6 +35,9 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
 
   // Fetch LinkedIn status
   const { data: linkedInStatus, refetch: refetchLinkedIn } = useLinkedInStatus(token, orgId);
+
+  // Fetch enrichment stats (for determining if Getting Started should show)
+  const { hasCompletedEnrichment, refetch: refetchEnrichmentStats } = useEnrichmentStats(token, orgId);
 
   // Fetch API keys
   const fetchApiKeys = useCallback(async () => {
@@ -58,7 +62,10 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
   const hasApiKey = apiKeys.length > 0;
   const hasLinkedIn = linkedInStatus?.status === 'connected';
   const hasActivity = hasCompletedEnrichment;
-  const isNewUser = !hasApiKey && !hasActivity;
+  // Show new user view if they don't have an API key yet
+  // Hide getting started once they have both API key AND completed an enrichment
+  const isNewUser = !hasApiKey;
+  const showGettingStarted = !hasCompletedEnrichment || !hasApiKey;
 
   // Mock stats - these would come from a real API in production
   const stats = {
@@ -92,7 +99,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
         </p>
       </div>
 
-      {/* New User Onboarding View */}
+      {/* New User Onboarding View - shown when no API key yet */}
       {isNewUser ? (
         <div className="space-y-6">
           {/* Inline Playground - First! */}
@@ -106,7 +113,13 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
             <p className="text-sm text-[var(--cream)]/60">
               No API key needed for this demo. See real enrichment in action with ABM thought leaders.
             </p>
-            <PlaygroundCard />
+            <PlaygroundCard
+              currentUser={user ? {
+                name: user.fullName || user.firstName || '',
+                email: user.primaryEmailAddress?.emailAddress || '',
+                imageUrl: user.imageUrl,
+              } : undefined}
+            />
           </div>
 
           {/* Getting Started Steps */}
@@ -118,7 +131,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
             orgId={orgId}
             onApiKeyCreated={fetchApiKeys}
             onLinkedInConnected={() => refetchLinkedIn(true)}
-            onEnrichmentComplete={() => setHasCompletedEnrichment(true)}
+            onEnrichmentComplete={() => refetchEnrichmentStats()}
           />
 
           {/* Integrations - smaller section for new users */}
@@ -167,6 +180,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
               title="Active API Keys"
               value={stats.activeKeys}
               icon={Key}
+              href="/dashboard/api-keys"
             />
             <StatsCard
               title="Success Rate"
@@ -175,6 +189,20 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
               subtitle="All-time enrichment success"
             />
           </div>
+
+          {/* Getting Started - shown until user completes first enrichment */}
+          {showGettingStarted && (
+            <GettingStartedCard
+              hasApiKey={hasApiKey}
+              hasLinkedIn={hasLinkedIn}
+              hasFirstEnrichment={hasCompletedEnrichment}
+              token={token}
+              orgId={orgId}
+              onApiKeyCreated={fetchApiKeys}
+              onLinkedInConnected={() => refetchLinkedIn(true)}
+              onEnrichmentComplete={() => refetchEnrichmentStats()}
+            />
+          )}
 
           {/* Usage & Integrations Row */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -216,7 +244,14 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
                 Open full playground →
               </Link>
             </div>
-            <PlaygroundCard className="border-0 bg-transparent p-0" />
+            <PlaygroundCard
+              className="border-0 bg-transparent p-0"
+              currentUser={user ? {
+                name: user.fullName || user.firstName || '',
+                email: user.primaryEmailAddress?.emailAddress || '',
+                imageUrl: user.imageUrl,
+              } : undefined}
+            />
           </div>
 
           {/* Activity Feed */}

@@ -1,12 +1,24 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Play, Copy, Check, Shuffle, User, Building2, Linkedin, Mail, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-// Sample ABM thought leaders for demo
-const sampleContacts = [
+// Contact type for sample and user contacts
+interface Contact {
+  id: string;
+  name: string;
+  email: string;
+  company: string;
+  linkedIn: string;
+  description: string;
+  avatarUrl?: string;
+  isCurrentUser?: boolean;
+}
+
+// Sample ABM thought leaders for demo with real profile images
+const sampleContacts: Contact[] = [
   {
     id: 'sangram',
     name: 'Sangram Vajre',
@@ -14,30 +26,34 @@ const sampleContacts = [
     company: 'GTM Partners',
     linkedIn: 'https://linkedin.com/in/sangramvajre',
     description: 'Terminus founder, ABM fundamentals & ROI',
+    avatarUrl: 'https://learn.g2.com/hubfs/Sangram%20Vajre%20Headshot.jpg',
   },
   {
     id: 'bev',
     name: 'Bev Burgess',
-    email: 'bev@itsma.com',
-    company: 'ITSMA',
+    email: 'bev@inflexiongroup.com',
+    company: 'Inflexion Group',
     linkedIn: 'https://linkedin.com/in/bevburgess',
-    description: 'ABM program design & scaling expert',
+    description: 'ABM pioneer & author',
+    avatarUrl: 'https://cdn.koganpage.com/media/public/image/author_bev-burgess.jpg',
   },
   {
     id: 'alisha',
     name: 'Alisha Lyndon',
-    email: 'alisha@momentumitsma.com',
+    email: 'alisha@momentumabm.com',
     company: 'Momentum ITSMA',
     linkedIn: 'https://linkedin.com/in/alishalyndon',
-    description: 'Strategic client engagement leader',
+    description: 'CEO & ABM Effect author',
+    avatarUrl: 'https://momentumabm.com/uploads/people/Team/_400x567_crop_center-center_none/headshot_Alisha.jpg',
   },
   {
     id: 'john',
     name: 'John Short',
-    email: 'john@influ2.com',
-    company: 'Influ2',
-    linkedIn: 'https://linkedin.com/in/johnshort',
-    description: 'Sales-marketing alignment expert',
+    email: 'john@compoundgrowthmarketing.com',
+    company: 'Compound Growth Marketing',
+    linkedIn: 'https://linkedin.com/in/johngshort',
+    description: 'B2B demand gen expert',
+    avatarUrl: 'https://cdn.prod.website-files.com/64aed602be43700a98aeba91/6823a84286ef253a83bf0afd_John%20Short%20(1).png',
   },
 ];
 
@@ -51,18 +67,64 @@ interface LogEntry {
 interface PlaygroundCardProps {
   className?: string;
   apiKey?: string;
+  currentUser?: {
+    name: string;
+    email: string;
+    imageUrl?: string;
+  };
 }
 
-export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
-  const [selectedContact, setSelectedContact] = useState(sampleContacts[0]);
+export function PlaygroundCard({ className, apiKey, currentUser }: PlaygroundCardProps) {
+  const [selectedContact, setSelectedContact] = useState<Contact>(sampleContacts[0]);
+  const [customLinkedIn, setCustomLinkedIn] = useState('');
   const [customEmail, setCustomEmail] = useState('');
   const [customName, setCustomName] = useState('');
+  const [customCompany, setCustomCompany] = useState('');
   const [isCustomMode, setIsCustomMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [result, setResult] = useState<object | null>(null);
   const [copied, setCopied] = useState(false);
+  const [hoveredContact, setHoveredContact] = useState<Contact | null>(null);
   const logsEndRef = useRef<HTMLDivElement>(null);
+  const pillsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Combine current user with sample contacts
+  const allContacts = useMemo((): Contact[] => {
+    if (currentUser) {
+      return [
+        {
+          id: 'current-user',
+          name: currentUser.name || 'You',
+          email: currentUser.email,
+          company: '',
+          linkedIn: '',
+          description: 'Your profile',
+          avatarUrl: currentUser.imageUrl,
+          isCurrentUser: true,
+        },
+        ...sampleContacts,
+      ];
+    }
+    return sampleContacts;
+  }, [currentUser]);
+
+  // Valid if: any non-empty field (AND/OR logic)
+  const isCustomInputValid =
+    customLinkedIn.trim() !== '' ||
+    customEmail.trim() !== '' ||
+    customName.trim() !== '' ||
+    customCompany.trim() !== '';
+
+  // Handle pill click - populate input fields
+  const handlePillClick = (contact: Contact) => {
+    setSelectedContact(contact);
+    setIsCustomMode(true);
+    setCustomName(contact.name || '');
+    setCustomEmail(contact.email || '');
+    setCustomCompany(contact.company || '');
+    setCustomLinkedIn(contact.linkedIn || '');
+  };
 
   // Auto-scroll logs
   useEffect(() => {
@@ -74,7 +136,7 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
   };
 
   const selectRandomContact = () => {
-    const others = sampleContacts.filter((c) => c.id !== selectedContact.id);
+    const others = allContacts.filter((c) => c.id !== selectedContact.id && !c.isCurrentUser);
     const random = others[Math.floor(Math.random() * others.length)];
     setSelectedContact(random);
     setIsCustomMode(false);
@@ -86,11 +148,28 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
     setResult(null);
 
     const contact = isCustomMode
-      ? { email: customEmail, name: customName }
-      : { email: selectedContact.email, name: selectedContact.name };
+      ? {
+          email: customEmail || undefined,
+          name: customName || undefined,
+          company: customCompany || undefined,
+          linkedIn: customLinkedIn || undefined,
+        }
+      : {
+          email: selectedContact.email,
+          name: selectedContact.name,
+          company: selectedContact.company,
+          linkedIn: selectedContact.linkedIn,
+        };
+
+    // Determine what we're enriching based on input
+    const enrichTarget = contact.linkedIn
+      ? contact.linkedIn
+      : contact.email
+        ? contact.email
+        : `${contact.name} at ${contact.company}`;
 
     // Simulated streaming logs (in production, this would be real API events)
-    addLog(`Starting enrichment for ${contact.email}...`, 'info');
+    addLog(`Starting enrichment for ${enrichTarget}...`, 'info');
 
     await delay(500);
     addLog('Searching LinkedIn profiles...', 'processing');
@@ -122,14 +201,14 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
       status: 'completed',
       data: {
         person: {
-          fullName: isCustomMode ? customName || 'Unknown' : selectedContact.name,
-          email: contact.email,
+          fullName: contact.name || 'Discovered Name',
+          email: contact.email || 'discovered@example.com',
           title: isCustomMode ? 'Professional' : 'CEO & Co-founder',
-          linkedinUrl: isCustomMode ? null : selectedContact.linkedIn,
+          linkedinUrl: contact.linkedIn || 'https://linkedin.com/in/discovered',
         },
         company: {
-          name: isCustomMode ? 'Company' : selectedContact.company,
-          domain: contact.email.split('@')[1],
+          name: contact.company || 'Discovered Company',
+          domain: contact.email?.split('@')[1] || 'example.com',
           industry: 'B2B Technology',
           employeeCount: '50-200',
         },
@@ -172,32 +251,70 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
       <div className="p-4 space-y-4">
         {/* Sample Selection */}
         <div className="space-y-3">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-[var(--cream)]/70">Try with:</span>
-            {sampleContacts.map((contact) => (
+          <div className="relative" ref={pillsContainerRef}>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-sm text-[var(--cream)]/70">Try with:</span>
+              {allContacts.map((contact) => (
+                <button
+                  key={contact.id}
+                  onClick={() => handlePillClick(contact)}
+                  onMouseEnter={() => setHoveredContact(contact)}
+                  onMouseLeave={() => setHoveredContact(null)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors",
+                    !isCustomMode && selectedContact.id === contact.id
+                      ? "bg-[var(--turquoise)] text-[var(--dark-blue)] font-medium"
+                      : "bg-[var(--turquoise)]/10 text-[var(--cream)]/70 hover:bg-[var(--turquoise)]/20",
+                    contact.isCurrentUser && "ring-1 ring-[var(--turquoise)]/40"
+                  )}
+                >
+                  {contact.avatarUrl ? (
+                    <img
+                      src={contact.avatarUrl}
+                      alt={contact.name}
+                      className="w-5 h-5 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-5 h-5 rounded-full bg-[var(--turquoise)]/30 flex items-center justify-center">
+                      <span className="text-xs">{contact.name[0]}</span>
+                    </div>
+                  )}
+                  {contact.isCurrentUser ? 'You' : contact.name.split(' ')[0]}
+                </button>
+              ))}
               <button
-                key={contact.id}
-                onClick={() => {
-                  setSelectedContact(contact);
-                  setIsCustomMode(false);
-                }}
-                className={cn(
-                  "px-3 py-1.5 rounded-full text-sm transition-colors",
-                  !isCustomMode && selectedContact.id === contact.id
-                    ? "bg-[var(--turquoise)] text-[var(--dark-blue)] font-medium"
-                    : "bg-[var(--turquoise)]/10 text-[var(--cream)]/70 hover:bg-[var(--turquoise)]/20"
-                )}
+                onClick={selectRandomContact}
+                className="p-1.5 rounded-full bg-[var(--turquoise)]/10 text-[var(--cream)]/70 hover:bg-[var(--turquoise)]/20 transition-colors"
+                title="Random selection"
               >
-                {contact.name.split(' ')[0]}
+                <Shuffle className="w-4 h-4" />
               </button>
-            ))}
-            <button
-              onClick={selectRandomContact}
-              className="p-1.5 rounded-full bg-[var(--turquoise)]/10 text-[var(--cream)]/70 hover:bg-[var(--turquoise)]/20 transition-colors"
-              title="Random selection"
-            >
-              <Shuffle className="w-4 h-4" />
-            </button>
+            </div>
+
+            {/* Hover Tooltip */}
+            {hoveredContact && (
+              <div className="absolute z-20 mt-2 p-3 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 shadow-lg min-w-[200px]">
+                <div className="flex items-center gap-2 text-sm">
+                  <User className="w-4 h-4 text-[var(--cream)]/50" />
+                  <span className="text-[var(--cream)]">{hoveredContact.name}</span>
+                </div>
+                {hoveredContact.email && (
+                  <div className="flex items-center gap-2 text-sm mt-1">
+                    <Mail className="w-4 h-4 text-[var(--cream)]/50" />
+                    <span className="text-[var(--cream)]/70">{hoveredContact.email}</span>
+                  </div>
+                )}
+                {hoveredContact.company && (
+                  <div className="flex items-center gap-2 text-sm mt-1">
+                    <Building2 className="w-4 h-4 text-[var(--cream)]/50" />
+                    <span className="text-[var(--cream)]/70">{hoveredContact.company}</span>
+                  </div>
+                )}
+                {hoveredContact.description && (
+                  <p className="text-xs text-[var(--cream)]/50 mt-2 italic">{hoveredContact.description}</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Contact Details */}
@@ -230,21 +347,62 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
 
           {/* Custom Input Fields */}
           {isCustomMode && (
-            <div className="space-y-2">
-              <input
-                type="email"
-                placeholder="Email address"
-                value={customEmail}
-                onChange={(e) => setCustomEmail(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
-              />
-              <input
-                type="text"
-                placeholder="Full name (optional)"
-                value={customName}
-                onChange={(e) => setCustomName(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
-              />
+            <div className="space-y-3">
+              <p className="text-xs text-[var(--cream)]/50">
+                Enter any combination of contact details
+              </p>
+              <div className="relative">
+                <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cream)]/40" />
+                <input
+                  type="url"
+                  placeholder="LinkedIn URL"
+                  value={customLinkedIn}
+                  onChange={(e) => setCustomLinkedIn(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
+                />
+              </div>
+              <div className="flex items-center gap-2 text-xs text-[var(--cream)]/40">
+                <span className="flex-1 h-px bg-[var(--cream)]/10" />
+                <span>and/or</span>
+                <span className="flex-1 h-px bg-[var(--cream)]/10" />
+              </div>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cream)]/40" />
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  value={customEmail}
+                  onChange={(e) => setCustomEmail(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
+                />
+              </div>
+              <div className="flex items-center gap-2 text-xs text-[var(--cream)]/40">
+                <span className="flex-1 h-px bg-[var(--cream)]/10" />
+                <span>and/or</span>
+                <span className="flex-1 h-px bg-[var(--cream)]/10" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cream)]/40" />
+                  <input
+                    type="text"
+                    placeholder="Full name"
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
+                  />
+                </div>
+                <div className="relative">
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cream)]/40" />
+                  <input
+                    type="text"
+                    placeholder="Company"
+                    value={customCompany}
+                    onChange={(e) => setCustomCompany(e.target.value)}
+                    className="w-full pl-10 pr-3 py-2 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40 focus:outline-none focus:border-[var(--turquoise)]/50"
+                  />
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -252,7 +410,7 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
         {/* Enrich Button */}
         <Button
           onClick={handleEnrich}
-          disabled={isLoading || (isCustomMode && !customEmail)}
+          disabled={isLoading || (isCustomMode && !isCustomInputValid)}
           className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-medium"
         >
           {isLoading ? (
