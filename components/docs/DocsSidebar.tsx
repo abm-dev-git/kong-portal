@@ -36,6 +36,11 @@ const docsNavigation: NavItem[] = [
     icon: <Rocket className="w-4 h-4" />,
   },
   {
+    title: "API Reference",
+    href: "/api-reference",
+    icon: <FileCode className="w-4 h-4" />,
+  },
+  {
     title: "Concepts",
     icon: <BookOpen className="w-4 h-4" />,
     items: [
@@ -69,11 +74,6 @@ const docsNavigation: NavItem[] = [
     items: [
       { title: "Enrichment Configuration", href: "/docs/advanced/enrichment-config" },
     ],
-  },
-  {
-    title: "API Reference",
-    href: "/api-reference",
-    icon: <FileCode className="w-4 h-4" />,
   },
 ];
 

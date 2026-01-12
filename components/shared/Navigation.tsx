@@ -18,7 +18,6 @@ const navigationLinks = [
   { label: "Home", href: "/" },
   { label: "Docs", href: "/docs" },
   { label: "Pricing", href: "#pricing" },
-  { label: "API Reference", href: "/api-reference" },
 ];
 
 export function Navigation({ className }: NavigationProps) {
