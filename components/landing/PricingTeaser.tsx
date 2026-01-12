@@ -75,7 +75,7 @@ export function PricingTeaser() {
               className="w-full border-2 border-[var(--navy)] text-[var(--navy)] hover:bg-[var(--navy)] hover:text-white"
               asChild
             >
-              <a href="/api-keys">Start Free</a>
+              <a href="/dashboard/api-keys">Start Free</a>
             </Button>
           </div>
 
@@ -138,7 +138,7 @@ export function PricingTeaser() {
               className="w-full bg-[var(--electric-blue)] hover:bg-[var(--electric-blue)]/90 text-white border-0"
               asChild
             >
-              <a href="/api-keys">Start Building</a>
+              <a href="/dashboard/api-keys">Start Building</a>
             </Button>
           </div>
 

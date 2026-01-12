@@ -201,7 +201,7 @@ export default function DocsPage() {
         <h3 className="font-semibold text-[var(--cream)] mb-4">Quick Links</h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Link
-            href="/api-keys"
+            href="/dashboard/api-keys"
             className="flex items-center gap-2 text-sm text-[var(--cream)]/70 hover:text-[var(--turquoise)] transition-colors"
           >
             <Key className="w-4 h-4" />

@@ -32,7 +32,7 @@ export function CtaBand() {
             className="bg-[#0A1F3D] hover:bg-[#1a1a2e] text-white font-semibold shadow-lg"
             asChild
           >
-            <a href="/api-keys">
+            <a href="/dashboard/api-keys">
               Start Building
               <ArrowRight className="w-4 h-4 ml-2" />
             </a>

@@ -82,7 +82,7 @@ export default function AuthenticationPage() {
 
         <h3 className="text-lg font-medium text-[var(--cream)]">Creating an API Key</h3>
         <ol className="space-y-2 text-[var(--cream)]/70 list-decimal list-inside">
-          <li>Go to your <Link href="/api-keys" className="text-[var(--turquoise)] hover:underline">API Keys page</Link></li>
+          <li>Go to your <Link href="/dashboard/api-keys" className="text-[var(--turquoise)] hover:underline">API Keys page</Link></li>
           <li>Click &quot;Create New Key&quot;</li>
           <li>Give your key a descriptive name (e.g., &quot;Production Server&quot;)</li>
           <li>Copy and securely store the key - it won&apos;t be shown again</li>
@@ -271,7 +271,7 @@ response = requests.post(
             <ArrowRight className="w-4 h-4 text-[var(--turquoise)] ml-auto group-hover:translate-x-1 transition-transform" />
           </Link>
           <Link
-            href="/api-keys"
+            href="/dashboard/api-keys"
             className="group flex items-center gap-3 p-4 rounded-lg bg-[var(--dark-blue)]/50 border border-[var(--turquoise)]/10 hover:border-[var(--turquoise)]/30 transition-colors"
           >
             <div>

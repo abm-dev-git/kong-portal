@@ -12,7 +12,7 @@ test.describe('API Keys Page', () => {
   test.beforeEach(async ({ page }) => {
     // Note: This will redirect to sign-in for unauthenticated users
     // In a real test environment, you'd set up authentication
-    await page.goto('/api-keys');
+    await page.goto('/dashboard/api-keys');
   });
 
   test('redirects to sign-in when not authenticated', async ({ page }) => {
@@ -26,7 +26,7 @@ test.describe('API Keys Page - Authenticated', () => {
   // For now, we test the redirect behavior which confirms route protection works
 
   test('protected route requires authentication', async ({ page }) => {
-    const response = await page.goto('/api-keys');
+    const response = await page.goto('/dashboard/api-keys');
     // Page should load (200) but redirect to sign-in
     expect(response?.status()).toBeLessThan(400);
   });

@@ -133,7 +133,7 @@ Help me:
                   className="bg-[#40E0D0] hover:bg-[#20B2AA] text-[#0A1F3D]"
                   asChild
                 >
-                  <a href="/api-keys">
+                  <a href="/dashboard/api-keys">
                     <Key className="w-4 h-4 mr-2" />
                     Get API Key
                   </a>

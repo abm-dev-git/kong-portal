@@ -159,7 +159,7 @@ export default function ConfigurationPage() {
             This ensures proper audit logging and security controls.
           </p>
           <div className="flex gap-4 text-sm">
-            <a href="/api-keys" className="text-[var(--turquoise)] hover:underline">
+            <a href="/dashboard/api-keys" className="text-[var(--turquoise)] hover:underline">
               Manage API Keys →
             </a>
           </div>

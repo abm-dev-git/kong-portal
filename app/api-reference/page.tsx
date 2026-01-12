@@ -101,7 +101,7 @@ export default function ApiReferencePage() {
             </pre>
           </div>
           <Link
-            href="/api-keys"
+            href="/dashboard/api-keys"
             className="text-sm text-[var(--turquoise)] hover:underline flex items-center gap-1"
           >
             Get API Key

@@ -184,7 +184,7 @@ export function DocsSidebar() {
           </p>
           <div className="space-y-1">
             <Link
-              href="/api-keys"
+              href="/dashboard/api-keys"
               className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--cream)]/60 hover:text-[var(--cream)] rounded-md transition-colors"
             >
               <Key className="w-4 h-4" />

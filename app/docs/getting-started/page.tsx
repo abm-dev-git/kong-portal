@@ -69,7 +69,7 @@ export default function GettingStartedPage() {
             asChild
             className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
           >
-            <Link href="/api-keys">
+            <Link href="/dashboard/api-keys">
               <Key className="w-4 h-4 mr-2" />
               Get API Key
               <ExternalLink className="w-4 h-4 ml-2" />
