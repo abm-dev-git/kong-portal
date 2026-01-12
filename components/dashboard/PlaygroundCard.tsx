@@ -268,8 +268,9 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
           )}
         </Button>
 
-        {/* Logs & Results Container - fixed height to prevent jumping */}
-        <div className="min-h-[320px] space-y-4">
+        {/* Logs & Results Container - only show min-height when content exists */}
+        {(logs.length > 0 || result) && (
+        <div className="min-h-[280px] space-y-4">
           {/* Streaming Logs */}
           {logs.length > 0 && (
           <div className="rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/10 overflow-hidden">
@@ -343,6 +344,7 @@ export function PlaygroundCard({ className, apiKey }: PlaygroundCardProps) {
           </div>
         )}
         </div>
+        )}
       </div>
     </div>
   );
