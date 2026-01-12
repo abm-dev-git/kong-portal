@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon, Monitor } from "lucide-react";
 import { SignInButton, SignUpButton, UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
-import { ThemeToggle, ThemeToggleSimple } from "./ThemeToggle";
+import { useTheme } from "@/lib/context/theme-context";
 
 interface NavigationProps {
   className?: string;
@@ -25,6 +25,7 @@ export function Navigation({ className }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   // Only render auth-dependent UI after hydration to prevent mismatch
   useEffect(() => {
@@ -67,7 +68,6 @@ export function Navigation({ className }: NavigationProps) {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex md:items-center md:gap-3">
-            <ThemeToggle size="sm" />
             {mounted && (
               <>
                 <SignedIn>
@@ -80,7 +80,25 @@ export function Navigation({ className }: NavigationProps) {
                   >
                     Dashboard
                   </Button>
-                  <UserButton afterSignOutUrl="/" />
+                  <UserButton afterSignOutUrl="/">
+                    <UserButton.MenuItems>
+                      <UserButton.Action
+                        label="Light theme"
+                        labelIcon={<Sun className="w-4 h-4" />}
+                        onClick={() => setTheme('light')}
+                      />
+                      <UserButton.Action
+                        label="Dark theme"
+                        labelIcon={<Moon className="w-4 h-4" />}
+                        onClick={() => setTheme('dark')}
+                      />
+                      <UserButton.Action
+                        label="System theme"
+                        labelIcon={<Monitor className="w-4 h-4" />}
+                        onClick={() => setTheme('system')}
+                      />
+                    </UserButton.MenuItems>
+                  </UserButton>
                 </SignedIn>
                 <SignedOut>
                   <SignInButton mode="modal">
@@ -110,7 +128,29 @@ export function Navigation({ className }: NavigationProps) {
 
           {/* Mobile Controls */}
           <div className="md:hidden flex items-center gap-2">
-            <ThemeToggleSimple />
+            {mounted && (
+              <SignedIn>
+                <UserButton afterSignOutUrl="/">
+                  <UserButton.MenuItems>
+                    <UserButton.Action
+                      label="Light theme"
+                      labelIcon={<Sun className="w-4 h-4" />}
+                      onClick={() => setTheme('light')}
+                    />
+                    <UserButton.Action
+                      label="Dark theme"
+                      labelIcon={<Moon className="w-4 h-4" />}
+                      onClick={() => setTheme('dark')}
+                    />
+                    <UserButton.Action
+                      label="System theme"
+                      labelIcon={<Monitor className="w-4 h-4" />}
+                      onClick={() => setTheme('system')}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </SignedIn>
+            )}
             <button
               type="button"
               className="inline-flex items-center justify-center p-2 rounded-md text-[var(--cream)] hover:text-[var(--turquoise)] hover:bg-[var(--turquoise)]/10 transition-colors"
