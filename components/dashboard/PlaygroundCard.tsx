@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Play, Copy, Check, Shuffle, User, Building2, Linkedin, Mail, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getGravatarUrl } from '@/lib/utils/gravatar';
 
 // Contact type for sample and user contacts
 interface Contact {
@@ -92,6 +93,11 @@ export function PlaygroundCard({ className, apiKey, currentUser }: PlaygroundCar
   // Combine current user with sample contacts
   const allContacts = useMemo((): Contact[] => {
     if (currentUser) {
+      // Use Gravatar URL based on email (same as UserAvatar component)
+      const userGravatarUrl = currentUser.email
+        ? getGravatarUrl(currentUser.email, 80, 'mp')
+        : currentUser.imageUrl;
+
       return [
         {
           id: 'current-user',
@@ -100,7 +106,7 @@ export function PlaygroundCard({ className, apiKey, currentUser }: PlaygroundCar
           company: '',
           linkedIn: '',
           description: 'Your profile',
-          avatarUrl: currentUser.imageUrl,
+          avatarUrl: userGravatarUrl,
           isCurrentUser: true,
         },
         ...sampleContacts,
