@@ -54,13 +54,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
       {/* New User Onboarding View */}
       {isNewUser ? (
         <div className="space-y-6">
-          {/* Getting Started Steps */}
-          <GettingStartedCard
-            hasApiKey={hasApiKey}
-            hasFirstCall={hasActivity}
-          />
-
-          {/* Inline Playground */}
+          {/* Inline Playground - First! */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[var(--turquoise)]" />
@@ -73,6 +67,12 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
             </p>
             <PlaygroundCard />
           </div>
+
+          {/* Getting Started Steps */}
+          <GettingStartedCard
+            hasApiKey={hasApiKey}
+            hasFirstCall={hasActivity}
+          />
 
           {/* Integrations - smaller section for new users */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
