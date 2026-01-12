@@ -8,6 +8,14 @@ export interface DocsPage {
 // Flat list of all docs pages in order
 export const docsPages: DocsPage[] = [
   { title: "Getting Started", href: "/docs/getting-started", category: "Getting Started" },
+  // API Reference
+  { title: "Overview", href: "/api-reference", category: "API Reference" },
+  { title: "Enrichment", href: "/api-reference/enrichment", category: "API Reference" },
+  { title: "Jobs", href: "/api-reference/jobs", category: "API Reference" },
+  { title: "Integrations", href: "/api-reference/integrations", category: "API Reference" },
+  { title: "LinkedIn", href: "/api-reference/linkedin", category: "API Reference" },
+  { title: "Configuration", href: "/api-reference/configuration", category: "API Reference" },
+  // Concepts
   { title: "Authentication", href: "/docs/concepts/authentication", category: "Concepts" },
   { title: "Canonical Fields", href: "/docs/concepts/canonical-fields", category: "Concepts" },
   { title: "Confidence Scores", href: "/docs/concepts/confidence-scores", category: "Concepts" },
