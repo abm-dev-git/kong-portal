@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Key, Settings, Zap, BarChart3, Users, ArrowRight, FileText, BookOpen } from 'lucide-react';
+import { Key, Zap, BarChart3, Users } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { UsageBar } from './UsageBar';
 import { ActivityFeed } from './ActivityFeed';
@@ -45,7 +45,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 lg:gap-6">
         <StatsCard
           title="API Calls Today"
           value={stats.apiCalls.today}
@@ -72,7 +72,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
       </div>
 
       {/* Usage & Integrations Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Usage Section */}
         <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20 space-y-6">
           <h3 className="text-lg font-medium text-[var(--cream)]">Usage This Month</h3>
@@ -99,70 +99,6 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
 
       {/* Activity Feed */}
       <ActivityFeed activities={activities} />
-
-      {/* Quick Actions */}
-      <div className="space-y-4">
-        <h2
-          className="text-xl text-[var(--cream)]"
-          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
-        >
-          Quick Actions
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Link href="/api-keys" className="block group">
-            <div className="p-5 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20 hover:border-[var(--turquoise)]/40 hover:bg-[var(--turquoise)]/5 transition-all h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2.5 rounded-lg bg-[var(--turquoise)]/10">
-                  <Key className="w-5 h-5 text-[var(--turquoise)]" />
-                </div>
-                <ArrowRight className="w-4 h-4 text-[var(--cream)]/30 group-hover:text-[var(--turquoise)] group-hover:translate-x-0.5 transition-all" />
-              </div>
-              <h3 className="text-[var(--cream)] font-medium mb-1">API Keys</h3>
-              <p className="text-xs text-[var(--cream)]/60">Create and manage keys</p>
-            </div>
-          </Link>
-
-          <Link href="/api-reference" className="block group">
-            <div className="p-5 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20 hover:border-[var(--turquoise)]/40 hover:bg-[var(--turquoise)]/5 transition-all h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2.5 rounded-lg bg-[var(--turquoise)]/10">
-                  <FileText className="w-5 h-5 text-[var(--turquoise)]" />
-                </div>
-                <ArrowRight className="w-4 h-4 text-[var(--cream)]/30 group-hover:text-[var(--turquoise)] group-hover:translate-x-0.5 transition-all" />
-              </div>
-              <h3 className="text-[var(--cream)] font-medium mb-1">API Reference</h3>
-              <p className="text-xs text-[var(--cream)]/60">Explore the API</p>
-            </div>
-          </Link>
-
-          <Link href="/docs" className="block group">
-            <div className="p-5 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20 hover:border-[var(--turquoise)]/40 hover:bg-[var(--turquoise)]/5 transition-all h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2.5 rounded-lg bg-[var(--turquoise)]/10">
-                  <BookOpen className="w-5 h-5 text-[var(--turquoise)]" />
-                </div>
-                <ArrowRight className="w-4 h-4 text-[var(--cream)]/30 group-hover:text-[var(--turquoise)] group-hover:translate-x-0.5 transition-all" />
-              </div>
-              <h3 className="text-[var(--cream)] font-medium mb-1">Documentation</h3>
-              <p className="text-xs text-[var(--cream)]/60">Learn how it works</p>
-            </div>
-          </Link>
-
-          <Link href="/settings" className="block group">
-            <div className="p-5 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20 hover:border-[var(--turquoise)]/40 hover:bg-[var(--turquoise)]/5 transition-all h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className="p-2.5 rounded-lg bg-[var(--turquoise)]/10">
-                  <Settings className="w-5 h-5 text-[var(--turquoise)]" />
-                </div>
-                <ArrowRight className="w-4 h-4 text-[var(--cream)]/30 group-hover:text-[var(--turquoise)] group-hover:translate-x-0.5 transition-all" />
-              </div>
-              <h3 className="text-[var(--cream)] font-medium mb-1">Settings</h3>
-              <p className="text-xs text-[var(--cream)]/60">Configure integrations</p>
-            </div>
-          </Link>
-        </div>
-      </div>
     </div>
   );
 }
