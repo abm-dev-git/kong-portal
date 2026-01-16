@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { NextResponse } from 'next/server'
 
 const isProtectedRoute = createRouteMatcher([
   '/dashboard(.*)',
@@ -16,7 +17,18 @@ const isPublicRoute = createRouteMatcher([
 
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
-    await auth.protect()
+    const { userId } = await auth()
+    if (!userId) {
+      // Use forwarded headers to get the correct origin
+      const forwardedProto = req.headers.get('x-forwarded-proto') || 'http'
+      const forwardedHost = req.headers.get('x-forwarded-host') || req.headers.get('host') || 'localhost:3000'
+      const origin = `${forwardedProto}://${forwardedHost}`
+
+      const signInUrl = new URL('/sign-in', origin)
+      const redirectUrl = new URL(req.nextUrl.pathname + req.nextUrl.search, origin)
+      signInUrl.searchParams.set('redirect_url', redirectUrl.toString())
+      return NextResponse.redirect(signInUrl)
+    }
   }
 })
 
