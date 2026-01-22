@@ -56,7 +56,7 @@ export default function EnrichmentsPage() {
     setError(null)
     try {
       const token = await getToken()
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrichments`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrichments/jobs?limit=100`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
