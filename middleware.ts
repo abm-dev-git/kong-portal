@@ -15,8 +15,51 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)',
 ])
 
+// DevLogin key for E2E testing - must match backend configuration
+// SECURITY: Only works when NEXT_PUBLIC_DEVLOGIN_ENABLED=true (non-production)
+const DEVLOGIN_KEY = process.env.DEVLOGIN_KEY || ''
+const DEVLOGIN_ENABLED = process.env.NEXT_PUBLIC_DEVLOGIN_ENABLED === 'true'
+
+/**
+ * Check if request has valid DevLogin authentication
+ * Used for E2E testing to bypass Clerk auth in non-production environments
+ */
+function hasValidDevLogin(req: Request): boolean {
+  if (!DEVLOGIN_ENABLED || !DEVLOGIN_KEY) {
+    return false
+  }
+
+  // Check X-DevLogin-Key header
+  const headerKey = req.headers.get('X-DevLogin-Key')
+  if (headerKey === DEVLOGIN_KEY) {
+    return true
+  }
+
+  // Check devlogin cookie
+  const cookieHeader = req.headers.get('cookie')
+  if (cookieHeader) {
+    const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
+      const [key, value] = cookie.trim().split('=')
+      acc[key] = value
+      return acc
+    }, {} as Record<string, string>)
+
+    if (cookies['devlogin'] === DEVLOGIN_KEY) {
+      return true
+    }
+  }
+
+  return false
+}
+
 export default clerkMiddleware(async (auth, req) => {
   if (isProtectedRoute(req)) {
+    // Check for DevLogin bypass (E2E testing only)
+    if (hasValidDevLogin(req)) {
+      // Allow request to continue without Clerk auth
+      return NextResponse.next()
+    }
+
     const { userId } = await auth()
     if (!userId) {
       // Use forwarded headers to get the correct origin
