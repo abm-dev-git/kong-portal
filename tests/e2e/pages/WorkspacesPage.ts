@@ -60,8 +60,22 @@ export class WorkspacesPage {
     // Click create
     await this.createButton.click();
 
-    // Wait for dialog to close
-    await expect(this.createDialog).not.toBeVisible({ timeout: 10000 });
+    // Wait for dialog to close (success case) or check for error
+    try {
+      await expect(this.createDialog).not.toBeVisible({ timeout: 10000 });
+    } catch {
+      // If dialog didn't close, check for error message
+      const errorToast = this.page.locator('[data-sonner-toast][data-type="error"], [role="alert"]:has-text("error"), [class*="toast"]:has-text("error")');
+      const hasError = await errorToast.isVisible({ timeout: 1000 }).catch(() => false);
+      if (hasError) {
+        const errorText = await errorToast.textContent();
+        await this.cancelButton.click().catch(() => {});
+        throw new Error(`Workspace creation failed: ${errorText}`);
+      }
+      // Close dialog manually if stuck
+      await this.cancelButton.click().catch(() => {});
+      throw new Error('Create workspace dialog did not close after submission');
+    }
   }
 
   async getWorkspaceCard(workspaceName: string): Promise<Locator> {

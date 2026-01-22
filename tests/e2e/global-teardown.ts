@@ -21,8 +21,11 @@ async function globalTeardown() {
 
   console.log('[Global Teardown] Starting E2E test data cleanup...');
 
+  // Ensure baseURL ends with /api/ for proper path joining
+  const baseURL = apiUrl.endsWith('/') ? apiUrl : `${apiUrl}/`;
+
   const context = await request.newContext({
-    baseURL: apiUrl,
+    baseURL,
     extraHTTPHeaders: {
       'X-DevLogin-Key': devLoginKey,
     },
@@ -30,7 +33,7 @@ async function globalTeardown() {
 
   try {
     // Fetch all invites
-    const invitesResponse = await context.get('/users/invites');
+    const invitesResponse = await context.get('users/invites');
     if (invitesResponse.ok()) {
       const data = await invitesResponse.json();
       const invites = data.invites || [];
@@ -45,12 +48,31 @@ async function globalTeardown() {
 
       // Delete each test invite
       for (const invite of testInvites) {
-        const deleteResponse = await context.delete(`/users/invites/${invite.id}`);
+        const deleteResponse = await context.delete(`users/invites/${invite.id}`);
         if (deleteResponse.ok()) {
           console.log(`[Global Teardown] Deleted invite: ${invite.email}`);
         } else {
           console.log(`[Global Teardown] Failed to delete invite: ${invite.email}`);
         }
+      }
+    }
+
+    // Clean up test workspaces (E2E-* pattern)
+    const workspacesResponse = await context.get('v1/workspaces');
+    if (workspacesResponse.ok()) {
+      const wsData = await workspacesResponse.json();
+      const workspaces = wsData.workspaces || [];
+
+      // Filter for E2E test workspaces (names starting with E2E-)
+      const testWorkspaces = workspaces.filter((ws: { name: string; isDefault?: boolean }) =>
+        ws.name.startsWith('E2E-') && !ws.isDefault
+      );
+
+      console.log(`[Global Teardown] Found ${testWorkspaces.length} test workspaces to clean up`);
+
+      // Delete each test workspace
+      for (const ws of testWorkspaces) {
+        await context.delete(`v1/workspaces/${ws.id}`);
       }
     }
 

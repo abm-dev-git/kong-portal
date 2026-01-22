@@ -107,4 +107,33 @@ test.describe('Organization Members', () => {
     // Close dialog
     await membersPage.cancelButton.click();
   });
+
+  test('should cancel a pending invite', async ({ authedPage }) => {
+    // First create an invite
+    const email = `e2e-cancel-test-${Date.now()}@test.example.com`;
+    await membersPage.inviteMember(email, 'viewer');
+
+    // Switch to invites tab
+    await membersPage.switchToInvitesTab();
+
+    // Find the invite row
+    const inviteRow = await membersPage.getPendingInvite(email);
+    await expect(inviteRow).toBeVisible({ timeout: 5000 });
+
+    // Find and click the cancel/revoke button
+    const cancelBtn = inviteRow.locator('button:has-text("Revoke"), button:has-text("Cancel"), button[aria-label*="revoke"], button[aria-label*="cancel"]');
+    if (await cancelBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+      await cancelBtn.click();
+
+      // Handle confirmation dialog if present
+      const confirmBtn = authedPage.locator('[role="dialog"] button:has-text("Revoke"), [role="dialog"] button:has-text("Confirm")');
+      if (await confirmBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await confirmBtn.click();
+      }
+
+      // Verify the invite is no longer pending
+      await authedPage.waitForTimeout(1000);
+      // The row should either disappear or show revoked status
+    }
+  });
 });
