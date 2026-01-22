@@ -12,6 +12,10 @@ dotenv.config({ path: path.resolve(__dirname, '.env.test') });
 export default defineConfig({
   testDir: './tests/e2e',
 
+  // Global setup and teardown for test data cleanup
+  globalSetup: './tests/e2e/global-setup.ts',
+  globalTeardown: './tests/e2e/global-teardown.ts',
+
   // Maximum time one test can run for
   timeout: process.env.CI ? 90 * 1000 : 60 * 1000,
 
