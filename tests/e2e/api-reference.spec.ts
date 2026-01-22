@@ -81,6 +81,111 @@ test.describe('API Reference', () => {
   });
 });
 
+test.describe('API Reference - Enrichment', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/api-reference/enrichment');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should load enrichment API page', async ({ page }) => {
+    await expect(page).toHaveTitle(/Enrichment API/i);
+    const heading = page.getByRole('heading', { name: /Enrichment/i });
+    await expect(heading).toBeVisible();
+  });
+
+  test('should display POST /v1/enrich endpoint', async ({ page }) => {
+    const endpoint = page.locator('text=v1/enrich').first();
+    await expect(endpoint).toBeVisible();
+  });
+
+  test('should display POST /v1/enrich/batch endpoint', async ({ page }) => {
+    const endpoint = page.locator('text=v1/enrich/batch').first();
+    await expect(endpoint).toBeVisible();
+  });
+
+  test('should show request body examples', async ({ page }) => {
+    // Should have email parameter
+    const emailParam = page.locator('text=email').first();
+    await expect(emailParam).toBeVisible();
+  });
+
+  test('should show error codes section', async ({ page }) => {
+    const errorCodes = page.locator('text=Error Codes');
+    await expect(errorCodes).toBeVisible();
+  });
+});
+
+test.describe('API Reference - Jobs', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/api-reference/jobs');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should load jobs API page', async ({ page }) => {
+    await expect(page).toHaveTitle(/Jobs API/i);
+    const heading = page.getByRole('heading', { name: /Jobs/i });
+    await expect(heading).toBeVisible();
+  });
+
+  test('should display GET /v1/jobs endpoint', async ({ page }) => {
+    const endpoint = page.locator('text=v1/jobs').first();
+    await expect(endpoint).toBeVisible();
+  });
+});
+
+test.describe('API Reference - Integrations', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/api-reference/integrations');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should load integrations API page', async ({ page }) => {
+    await expect(page).toHaveTitle(/Integrations API|CRM Integrations/i);
+  });
+
+  test('should display CRM integration endpoints', async ({ page }) => {
+    const endpoint = page.locator('text=v1/crm').first();
+    await expect(endpoint).toBeVisible();
+  });
+});
+
+test.describe('API Reference - LinkedIn', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/api-reference/linkedin');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should load LinkedIn API page', async ({ page }) => {
+    await expect(page).toHaveTitle(/LinkedIn/i);
+  });
+
+  test('should display LinkedIn connection endpoints', async ({ page }) => {
+    const endpoint = page.locator('text=v1/linkedin-connection').first();
+    await expect(endpoint).toBeVisible();
+  });
+});
+
+test.describe('API Reference - Configuration', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/api-reference/configuration');
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('should load configuration API page', async ({ page }) => {
+    await expect(page).toHaveTitle(/Configuration/i);
+  });
+
+  test('should display organization endpoint', async ({ page }) => {
+    const endpoint = page.locator('text=v1/organization').first();
+    await expect(endpoint).toBeVisible();
+  });
+
+  test('should display health check endpoint', async ({ page }) => {
+    const endpoint = page.locator('text=v1/status').first();
+    await expect(endpoint).toBeVisible();
+  });
+});
+
 test.describe('Docs Page', () => {
   test('should load the docs page', async ({ page }) => {
     await page.goto('/docs');
