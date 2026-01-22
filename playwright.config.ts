@@ -19,7 +19,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  // Limit workers to prevent overwhelming local services
+  workers: process.env.CI ? 2 : 4,
 
   // Output directory for test artifacts
   outputDir: 'test-artifacts',
