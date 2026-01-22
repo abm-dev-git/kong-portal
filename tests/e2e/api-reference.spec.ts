@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * API Reference E2E Tests
- * Tests for the Stoplight Elements API documentation page (iframe-based)
+ * Tests for the custom API documentation pages
  */
 
 test.describe('API Reference', () => {
@@ -21,51 +21,92 @@ test.describe('API Reference', () => {
     await expect(heading).toBeVisible();
   });
 
-  test('should display auth status banner', async ({ page }) => {
-    // Should show sign-in prompt for unauthenticated users
-    const authBanner = page.locator('text=Sign in to use Try It console');
-    await expect(authBanner).toBeVisible();
+  test('should display base URL section', async ({ page }) => {
+    // Should show the base URL
+    const baseUrl = page.locator('text=https://api.abm.dev');
+    await expect(baseUrl).toBeVisible();
   });
 
-  test('should load Stoplight Elements iframe', async ({ page }) => {
-    // Wait for iframe to load
-    await page.waitForTimeout(2000);
+  test('should display authentication section', async ({ page }) => {
+    // Should show authentication heading
+    const authSection = page.getByRole('heading', { name: 'Authentication' });
+    await expect(authSection).toBeVisible();
 
-    // Check for the stoplight container with iframe
-    const stoplightContainer = page.locator('.stoplight-container');
-    await expect(stoplightContainer).toBeVisible();
-
-    // Check that iframe exists and has loaded
-    const iframe = page.locator('.stoplight-container iframe');
-    await expect(iframe).toBeVisible();
+    // Should show X-API-Key header example
+    const apiKeyHeader = page.getByText('X-API-Key', { exact: true });
+    await expect(apiKeyHeader).toBeVisible();
   });
 
-  test('should load API docs in iframe', async ({ page }) => {
-    // Wait for iframe to fully render
-    await page.waitForTimeout(3000);
+  test('should display API category cards', async ({ page }) => {
+    // Check for main API category cards
+    const enrichmentCard = page.locator('text=Enrichment').first();
+    await expect(enrichmentCard).toBeVisible();
 
-    // Get the iframe
-    const iframe = page.frameLocator('.stoplight-container iframe');
+    const jobsCard = page.locator('text=Jobs').first();
+    await expect(jobsCard).toBeVisible();
 
-    // Wait for Stoplight Elements web component to load
-    // The elements-api tag should be present
-    const elementsApi = iframe.locator('elements-api');
-    await expect(elementsApi).toBeVisible({ timeout: 10000 });
+    const integrationsCard = page.locator('text=CRM Integrations').first();
+    await expect(integrationsCard).toBeVisible();
+
+    const linkedinCard = page.locator('text=LinkedIn Connection').first();
+    await expect(linkedinCard).toBeVisible();
+
+    const configCard = page.locator('text=Configuration').first();
+    await expect(configCard).toBeVisible();
   });
 
-  test('/docs should redirect to /api-reference', async ({ page }) => {
-    await page.goto('/docs');
-    // Should redirect to /api-reference
-    await expect(page).toHaveURL(/\/api-reference/);
+  test('should navigate to enrichment API page', async ({ page }) => {
+    // Click on enrichment card
+    await page.click('a[href="/api-reference/enrichment"]');
+
+    // Should navigate to enrichment page
+    await expect(page).toHaveURL(/\/api-reference\/enrichment/);
+
+    // Should show enrichment API content
+    const heading = page.getByRole('heading', { name: /Enrichment/i });
+    await expect(heading).toBeVisible();
+  });
+
+  test('should display rate limits section', async ({ page }) => {
+    // Should show rate limit information
+    const rateLimits = page.locator('text=Rate Limits');
+    await expect(rateLimits).toBeVisible();
   });
 
   test('capture API reference screenshot', async ({ page }) => {
-    // Wait for Stoplight Elements to fully load in iframe
-    await page.waitForTimeout(5000);
-
     await page.screenshot({
       path: 'test-artifacts/screenshots/api-reference.png',
       fullPage: true,
     });
+  });
+});
+
+test.describe('Docs Page', () => {
+  test('should load the docs page', async ({ page }) => {
+    await page.goto('/docs');
+    await page.waitForLoadState('networkidle');
+
+    // Check page title
+    await expect(page).toHaveTitle(/Documentation/i);
+
+    // Check for the page heading
+    const heading = page.getByRole('heading', { name: /Documentation/i });
+    await expect(heading).toBeVisible();
+  });
+
+  test('should display getting started section', async ({ page }) => {
+    await page.goto('/docs');
+
+    // Should show Getting Started card
+    const gettingStarted = page.locator('text=Getting Started').first();
+    await expect(gettingStarted).toBeVisible();
+  });
+
+  test('should have link to API reference', async ({ page }) => {
+    await page.goto('/docs');
+
+    // Should have an API Reference link
+    const apiRefLink = page.locator('a[href="/api-reference"]').first();
+    await expect(apiRefLink).toBeVisible();
   });
 });
