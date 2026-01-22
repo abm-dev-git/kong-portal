@@ -16,9 +16,11 @@ import {
   Shuffle,
   ChevronDown,
   ChevronUp,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createApiClient } from '@/lib/api-client';
+import { LinkedInMemberSelector, type LinkedInSelectionStrategy } from '@/components/enrichments';
 
 // Sample ABM thought leaders for demo (fallback when LinkedIn not connected or no connections API)
 const sampleContacts = [
@@ -74,6 +76,7 @@ interface EnrichContactModalProps {
   onOpenChange: (open: boolean) => void;
   token?: string;
   orgId?: string;
+  teamId?: string;
   hasLinkedIn?: boolean;
   onComplete?: () => void;
 }
@@ -96,6 +99,7 @@ export function EnrichContactModal({
   onOpenChange,
   token,
   orgId,
+  teamId,
   hasLinkedIn = false,
   onComplete,
 }: EnrichContactModalProps) {
@@ -109,6 +113,9 @@ export function EnrichContactModal({
   const [result, setResult] = useState<object | null>(null);
   const [copied, setCopied] = useState(false);
   const [showJson, setShowJson] = useState(false);
+  const [showTeamRouting, setShowTeamRouting] = useState(false);
+  const [selectedLinkedInUserId, setSelectedLinkedInUserId] = useState<string | undefined>();
+  const [linkedInStrategy, setLinkedInStrategy] = useState<LinkedInSelectionStrategy>('closest');
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   // Use sample contacts for now (will use real LinkedIn connections when API is available)
@@ -126,6 +133,9 @@ export function EnrichContactModal({
       setSourceStatus({});
       setResult(null);
       setShowJson(false);
+      setShowTeamRouting(false);
+      setSelectedLinkedInUserId(undefined);
+      setLinkedInStrategy('closest');
     }
   }, [open]);
 
@@ -170,6 +180,15 @@ export function EnrichContactModal({
       sources.reduce((acc, s) => ({ ...acc, [s.id]: 'pending' }), {})
     );
 
+    // Log team routing configuration if applicable
+    if (teamId) {
+      if (selectedLinkedInUserId) {
+        addLog(`Using preferred team member's LinkedIn connection`, 'info');
+      } else {
+        addLog(`Using ${linkedInStrategy} strategy for LinkedIn routing`, 'info');
+      }
+    }
+
     // Simulated enrichment process (in production, this would call the real API)
     addLog(`Starting enrichment for ${contact.fullName || contact.email || 'contact'}...`, 'info');
 
@@ -193,7 +212,11 @@ export function EnrichContactModal({
     await delay(400);
     addLog('Enrichment complete!', 'success');
 
-    // Mock result
+    // Mock result (in production, this would come from the API)
+    // The actual API call would include:
+    // - team_id: teamId
+    // - preferred_linkedin_user_id: selectedLinkedInUserId
+    // - linkedin_selection_strategy: linkedInStrategy
     const mockResult = {
       jobId: `enr_${Math.random().toString(36).substr(2, 9)}`,
       status: 'completed',
@@ -224,6 +247,14 @@ export function EnrichContactModal({
       },
       sources: sources.map((s) => s.id),
       processingTime: `${(2 + Math.random() * 2).toFixed(1)}s`,
+      ...(teamId && {
+        teamRouting: {
+          teamId,
+          strategy: linkedInStrategy,
+          preferredUserId: selectedLinkedInUserId || null,
+          usedConnection: selectedLinkedInUserId || 'auto-selected',
+        },
+      }),
     };
 
     setResult(mockResult);
@@ -367,6 +398,32 @@ export function EnrichContactModal({
                     </div>
                   )}
                 </div>
+
+                {/* Team LinkedIn Routing */}
+                {teamId && (
+                  <div className="border-t border-[var(--turquoise)]/10 pt-4">
+                    <button
+                      onClick={() => setShowTeamRouting(!showTeamRouting)}
+                      className="flex items-center gap-2 text-sm text-[var(--turquoise)] hover:text-[var(--turquoise)]/80"
+                    >
+                      {showTeamRouting ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                      <Users className="w-4 h-4" />
+                      Team LinkedIn Routing
+                    </button>
+
+                    {showTeamRouting && (
+                      <div className="mt-3 p-4 rounded-lg bg-[var(--dark-blue)] border border-[var(--turquoise)]/20">
+                        <LinkedInMemberSelector
+                          teamId={teamId}
+                          selectedUserId={selectedLinkedInUserId}
+                          selectedStrategy={linkedInStrategy}
+                          onUserSelect={setSelectedLinkedInUserId}
+                          onStrategySelect={setLinkedInStrategy}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Enrich Button */}
                 <Button

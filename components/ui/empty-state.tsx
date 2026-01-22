@@ -164,7 +164,7 @@ const EmptyStateNoAPIKeys = React.forwardRef<
       ref={ref}
       icon={Key}
       title="No API keys"
-      description="Create an API key to start integrating with ABM.dev. Your key will give you access to enrichment, content generation, and more."
+      description="Create an API key to start integrating with ABM.dev. Your key will give you access to enrichment and more."
       action={
         onCreateKey && (
           <button

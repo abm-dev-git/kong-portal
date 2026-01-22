@@ -3,7 +3,7 @@ import { ArrowRight, BookOpen, Calendar } from "lucide-react";
 
 export function CtaBand() {
   return (
-    <section className="relative py-20 lg:py-28 bg-[#40E0D0] overflow-hidden">
+    <section className="relative py-20 lg:py-28 bg-[var(--primary)] overflow-hidden">
       {/* Subtle texture overlay */}
       <div
         className="absolute inset-0 opacity-[0.08] pointer-events-none"
@@ -15,12 +15,12 @@ export function CtaBand() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         <h2
-          className="text-4xl lg:text-5xl font-bold text-[#0A1F3D] mb-4"
+          className="text-4xl lg:text-5xl font-bold text-[var(--primary-foreground)] mb-4"
           style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
         >
           Time to first call: 3 minutes
         </h2>
-        <p className="text-lg text-[#0A1F3D]/80 mb-8 max-w-2xl mx-auto">
+        <p className="text-lg text-[var(--primary-foreground)]/80 mb-8 max-w-2xl mx-auto">
           Get your API key, make your first enrichment call, and start building production-ready workflows today.
         </p>
 
@@ -29,7 +29,7 @@ export function CtaBand() {
           {/* Primary CTA - Start Building - Navy on turquoise */}
           <Button
             size="lg"
-            className="bg-[#0A1F3D] hover:bg-[#1a1a2e] text-white font-semibold shadow-lg"
+            className="bg-[var(--background)] hover:bg-[var(--navy)] text-[var(--foreground)] font-semibold shadow-lg"
             asChild
           >
             <a href="/dashboard/api-keys">
@@ -41,7 +41,7 @@ export function CtaBand() {
           {/* Secondary CTA - View Docs - White solid */}
           <Button
             size="lg"
-            className="bg-white hover:bg-white/90 text-[#0A1F3D] font-medium"
+            className="bg-white hover:bg-white/90 text-[var(--primary-foreground)] font-medium"
             asChild
           >
             <a href="/api-reference">
@@ -54,7 +54,7 @@ export function CtaBand() {
           <Button
             size="lg"
             variant="ghost"
-            className="text-[#0A1F3D] hover:bg-[#0A1F3D]/10 border border-[#0A1F3D]/30"
+            className="text-[var(--primary-foreground)] hover:bg-[var(--primary-foreground)]/10 border border-[var(--primary-foreground)]/30"
             asChild
           >
             <a href="mailto:support@abm.dev?subject=Book a Pilot Program">
@@ -65,7 +65,7 @@ export function CtaBand() {
         </div>
 
         {/* No credit card text */}
-        <div className="mt-8 text-sm text-[#0A1F3D]/60">
+        <div className="mt-8 text-sm text-[var(--primary-foreground)]/60">
           No credit card required
         </div>
       </div>

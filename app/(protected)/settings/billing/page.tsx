@@ -1,104 +1,144 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAuth } from '@clerk/nextjs'
 import { toast } from 'sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { EmptyStateError } from '@/components/ui/empty-state'
 import {
-  CreditCard,
-  Check,
+  Coins,
   Zap,
-  Building2,
-  TrendingUp,
-  Download,
-  ExternalLink,
+  ArrowRight,
+  Plus,
+  Sparkles,
 } from 'lucide-react'
-import { formatDate } from '@/lib/utils'
 
-interface Plan {
+interface CreditPackage {
   id: string
   name: string
+  credits: number
   price: number
-  period: string
-  features: string[]
-  highlighted?: boolean
+  popular?: boolean
+  bonus?: number
 }
 
-const plans: Plan[] = [
+const creditPackages: CreditPackage[] = [
   {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    period: 'forever',
-    features: [
-      '100 API calls/month',
-      '1 API key',
-      'Community support',
-      'Basic analytics',
-    ],
+    id: 'starter',
+    name: 'Starter',
+    credits: 100,
+    price: 29,
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: 49,
-    period: 'month',
-    features: [
-      '10,000 API calls/month',
-      '10 API keys',
-      'Priority support',
-      'Advanced analytics',
-      'LinkedIn integration',
-      'HubSpot integration',
-    ],
-    highlighted: true,
+    id: 'growth',
+    name: 'Growth',
+    credits: 500,
+    price: 99,
+    popular: true,
+    bonus: 50,
+  },
+  {
+    id: 'scale',
+    name: 'Scale',
+    credits: 2000,
+    price: 299,
+    bonus: 300,
   },
   {
     id: 'enterprise',
     name: 'Enterprise',
-    price: 199,
-    period: 'month',
-    features: [
-      'Unlimited API calls',
-      'Unlimited API keys',
-      'Dedicated support',
-      'Custom analytics',
-      'All integrations',
-      'SLA guarantee',
-      'Custom contracts',
-    ],
+    credits: 10000,
+    price: 999,
+    bonus: 2000,
   },
 ]
 
 export default function BillingSettingsPage() {
-  // Mock state - in production this would come from Stripe API
-  const [currentPlan] = useState('free')
+  const { getToken } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
+  const [creditBalance, setCreditBalance] = useState<number | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  // Mock usage data
-  const usage = {
-    apiCalls: { used: 78, limit: 100 },
-    apiKeys: { used: 1, limit: 1 },
-    periodEnd: '2024-02-01',
+  useEffect(() => {
+    fetchCreditBalance()
+  }, [])
+
+  const fetchCreditBalance = async () => {
+    try {
+      setError(null)
+      const token = await getToken()
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/billing/credits`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setCreditBalance(data.balance || 0)
+      } else {
+        setError('Unable to load credit balance')
+      }
+    } catch (err) {
+      setError('Unable to load credit balance')
+    }
   }
 
-  // Mock billing history
-  const billingHistory = [
-    { date: '2024-01-01', description: 'Free Plan - January 2024', amount: 0, status: 'paid' },
-    { date: '2023-12-01', description: 'Free Plan - December 2023', amount: 0, status: 'paid' },
-    { date: '2023-11-01', description: 'Free Plan - November 2023', amount: 0, status: 'paid' },
-  ]
-
-  const handleUpgrade = async (planId: string) => {
+  const handlePurchase = async (packageId: string) => {
     setIsLoading(true)
-    // In production, this would redirect to Stripe Checkout
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    toast.info(`Stripe Checkout would open for ${planId.charAt(0).toUpperCase() + planId.slice(1)} plan`, {
-      description: 'Billing integration coming soon'
-    })
-    setIsLoading(false)
+    const pkg = creditPackages.find((p) => p.id === packageId)
+
+    try {
+      const token = await getToken()
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/billing/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ package_id: packageId }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url
+        }
+      } else {
+        toast.info(`Purchase ${pkg?.name} package`, {
+          description: 'Payment integration coming soon'
+        })
+      }
+    } catch (err) {
+      toast.info(`Purchase ${pkg?.name} package`, {
+        description: 'Payment integration coming soon'
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const usagePercentage = (usage.apiCalls.used / usage.apiCalls.limit) * 100
+  if (error) {
+    return (
+      <div className="space-y-8">
+        <div className="space-y-2">
+          <h1
+            className="text-3xl text-[var(--cream)]"
+            style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+          >
+            Billing
+          </h1>
+          <p className="text-[var(--cream)]/70">
+            Manage your credit balance and purchase additional credits.
+          </p>
+        </div>
+        <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
+          <EmptyStateError
+            message={error}
+            onRetry={fetchCreditBalance}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -108,218 +148,114 @@ export default function BillingSettingsPage() {
           className="text-3xl text-[var(--cream)]"
           style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
         >
-          Billing & Subscription
+          Billing
         </h1>
         <p className="text-[var(--cream)]/70">
-          Manage your subscription plan and payment methods.
+          Manage your credit balance and purchase additional credits.
         </p>
       </div>
 
-      {/* Current Plan Card */}
-      <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
-        <div className="flex items-center justify-between mb-6">
+      {/* Credit Balance Card */}
+      <div className="p-6 rounded-lg bg-gradient-to-br from-[var(--turquoise)]/20 to-[var(--navy)] border border-[var(--turquoise)]/30">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg bg-[var(--turquoise)]/10">
-              <Zap className="w-8 h-8 text-[var(--turquoise)]" />
+            <div className="p-3 rounded-lg bg-[var(--turquoise)]/20">
+              <Coins className="w-8 h-8 text-[var(--turquoise)]" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-[var(--cream)]">
-                Current Plan
-              </h2>
-              <p className="text-sm text-[var(--cream)]/60">
-                {currentPlan === 'free'
-                  ? 'You are on the Free plan'
-                  : `You are on the ${currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)} plan`}
-              </p>
+              <h2 className="text-lg font-medium text-[var(--cream)]">Credit Balance</h2>
+              <p className="text-sm text-[var(--cream)]/60">Available for enrichments</p>
             </div>
           </div>
-          <Badge variant="secondary" className="text-lg px-4 py-1">
-            {currentPlan.charAt(0).toUpperCase() + currentPlan.slice(1)}
-          </Badge>
-        </div>
-
-        {/* Usage Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-[var(--cream)]/60">API Calls</span>
-              <span className="text-sm text-[var(--cream)]">
-                {usage.apiCalls.used} / {usage.apiCalls.limit}
-              </span>
+          <div className="text-right">
+            <div className="text-4xl font-bold text-[var(--turquoise)]">
+              {creditBalance !== null ? creditBalance.toLocaleString() : '—'}
             </div>
-            <div className="w-full h-2 bg-[var(--turquoise)]/10 rounded-full overflow-hidden">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  usagePercentage > 90
-                    ? 'bg-red-500'
-                    : usagePercentage > 70
-                    ? 'bg-yellow-500'
-                    : 'bg-[var(--turquoise)]'
-                }`}
-                style={{ width: `${Math.min(usagePercentage, 100)}%` }}
-              />
-            </div>
-            <p className="text-xs text-[var(--cream)]/40 mt-2">
-              Resets on {formatDate(usage.periodEnd)}
-            </p>
-          </div>
-
-          <div className="p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-[var(--cream)]/60">API Keys</span>
-              <span className="text-sm text-[var(--cream)]">
-                {usage.apiKeys.used} / {usage.apiKeys.limit}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-[var(--turquoise)]/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[var(--turquoise)] rounded-full"
-                style={{
-                  width: `${(usage.apiKeys.used / usage.apiKeys.limit) * 100}%`,
-                }}
-              />
-            </div>
-            <p className="text-xs text-[var(--cream)]/40 mt-2">
-              {usage.apiKeys.limit - usage.apiKeys.used} keys remaining
-            </p>
+            <div className="text-sm text-[var(--cream)]/60">credits remaining</div>
           </div>
         </div>
 
-        {currentPlan === 'free' && (
-          <div className="flex items-center gap-2 p-4 rounded-lg bg-[var(--turquoise)]/10 border border-[var(--turquoise)]/30">
-            <TrendingUp className="w-5 h-5 text-[var(--turquoise)]" />
-            <p className="text-sm text-[var(--cream)]">
-              Upgrade to Pro to unlock more API calls, keys, and integrations.
+        {creditBalance !== null && creditBalance < 50 && (
+          <div className="mt-4 flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+            <Zap className="w-5 h-5 text-yellow-400" />
+            <p className="text-sm text-yellow-200">
+              Running low on credits! Purchase more to continue enriching contacts.
             </p>
           </div>
         )}
       </div>
 
-      {/* Plans Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {plans.map((plan) => (
-          <div
-            key={plan.id}
-            className={`p-6 rounded-lg border ${
-              plan.highlighted
-                ? 'bg-[var(--turquoise)]/10 border-[var(--turquoise)]'
-                : 'bg-[var(--navy)] border-[var(--turquoise)]/20'
-            }`}
-          >
-            {plan.highlighted && (
-              <Badge className="mb-4 bg-[var(--turquoise)] text-[var(--navy)]">
-                Most Popular
-              </Badge>
-            )}
-            <h3 className="text-xl font-medium text-[var(--cream)]">{plan.name}</h3>
-            <div className="mt-2 mb-6">
-              <span className="text-3xl font-bold text-[var(--cream)]">
-                ${plan.price}
-              </span>
-              <span className="text-[var(--cream)]/60">/{plan.period}</span>
-            </div>
-            <ul className="space-y-3 mb-6">
-              {plan.features.map((feature) => (
-                <li
-                  key={feature}
-                  className="flex items-center gap-2 text-sm text-[var(--cream)]/70"
-                >
-                  <Check className="w-4 h-4 text-[var(--turquoise)]" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-            {plan.id === currentPlan ? (
-              <Button variant="outline" className="w-full" disabled>
-                Current Plan
-              </Button>
-            ) : plan.id === 'enterprise' ? (
-              <Button variant="outline" className="w-full">
-                <Building2 className="w-4 h-4 mr-2" />
-                Contact Sales
-              </Button>
-            ) : (
+      {/* Credit Packages */}
+      <div>
+        <h2 className="text-xl font-medium text-[var(--cream)] mb-4">Purchase Credits</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {creditPackages.map((pkg) => (
+            <div
+              key={pkg.id}
+              className={`p-6 rounded-lg border transition-all ${
+                pkg.popular
+                  ? 'bg-[var(--turquoise)]/10 border-[var(--turquoise)] ring-1 ring-[var(--turquoise)]/50'
+                  : 'bg-[var(--navy)] border-[var(--turquoise)]/20 hover:border-[var(--turquoise)]/40'
+              }`}
+            >
+              {pkg.popular && (
+                <Badge className="mb-3 bg-[var(--turquoise)] text-[var(--navy)]">
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Most Popular
+                </Badge>
+              )}
+              <h3 className="text-lg font-medium text-[var(--cream)]">{pkg.name}</h3>
+              <div className="mt-2 mb-4">
+                <span className="text-3xl font-bold text-[var(--cream)]">${pkg.price}</span>
+              </div>
+              <div className="space-y-2 mb-6">
+                <div className="flex items-center gap-2 text-[var(--cream)]">
+                  <Coins className="w-4 h-4 text-[var(--turquoise)]" />
+                  <span>{pkg.credits.toLocaleString()} credits</span>
+                </div>
+                {pkg.bonus && (
+                  <div className="flex items-center gap-2 text-emerald-400">
+                    <Plus className="w-4 h-4" />
+                    <span>{pkg.bonus.toLocaleString()} bonus credits</span>
+                  </div>
+                )}
+                <div className="text-sm text-[var(--cream)]/60">
+                  ${(pkg.price / (pkg.credits + (pkg.bonus || 0))).toFixed(3)} per credit
+                </div>
+              </div>
               <Button
                 className="w-full"
-                onClick={() => handleUpgrade(plan.id)}
+                variant={pkg.popular ? 'default' : 'outline'}
+                onClick={() => handlePurchase(pkg.id)}
                 disabled={isLoading}
               >
-                {plan.price > plans.find((p) => p.id === currentPlan)!.price
-                  ? 'Upgrade'
-                  : 'Downgrade'}
+                Purchase
+                <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Payment Method Card */}
-      <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
-        <div className="flex items-center gap-3 mb-6">
-          <CreditCard className="w-5 h-5 text-[var(--turquoise)]" />
-          <h2 className="text-lg font-medium text-[var(--cream)]">Payment Method</h2>
-        </div>
-
-        {currentPlan === 'free' ? (
-          <p className="text-[var(--cream)]/60">
-            No payment method required for the Free plan. Add one when you upgrade.
-          </p>
-        ) : (
-          <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
-            <div className="flex items-center gap-4">
-              <div className="p-2 rounded bg-[var(--cream)]/10">
-                <CreditCard className="w-6 h-6 text-[var(--cream)]" />
-              </div>
-              <div>
-                <p className="text-[var(--cream)]">Visa ending in 4242</p>
-                <p className="text-sm text-[var(--cream)]/60">Expires 12/2025</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm">
-              Update
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Billing History Card */}
-      <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Download className="w-5 h-5 text-[var(--turquoise)]" />
-            <h2 className="text-lg font-medium text-[var(--cream)]">
-              Billing History
-            </h2>
-          </div>
-          <Button variant="outline" size="sm">
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Stripe Portal
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          {billingHistory.map((item, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10"
-            >
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-[var(--cream)]/60">
-                  {formatDate(item.date)}
-                </span>
-                <span className="text-[var(--cream)]">{item.description}</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <span className="text-[var(--cream)]">
-                  ${item.amount.toFixed(2)}
-                </span>
-                <Badge variant="success">Paid</Badge>
-                <Button variant="ghost" size="sm">
-                  <Download className="w-4 h-4" />
-                </Button>
-              </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Credit Pricing Info */}
+      <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
+        <h2 className="text-lg font-medium text-[var(--cream)] mb-4">Credit Pricing</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
+            <div className="text-2xl font-bold text-[var(--turquoise)]">1</div>
+            <div className="text-sm text-[var(--cream)]">Person Enrichment</div>
+            <div className="text-xs text-[var(--cream)]/40">Basic profile data</div>
+          </div>
+          <div className="p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
+            <div className="text-2xl font-bold text-[var(--turquoise)]">2</div>
+            <div className="text-sm text-[var(--cream)]">Company Enrichment</div>
+            <div className="text-xs text-[var(--cream)]/40">Full company data</div>
+          </div>
+          <div className="p-4 rounded-lg bg-[var(--turquoise)]/5 border border-[var(--turquoise)]/10">
+            <div className="text-2xl font-bold text-[var(--turquoise)]">5</div>
+            <div className="text-sm text-[var(--cream)]">Deep Enrichment</div>
+            <div className="text-xs text-[var(--cream)]/40">With intent signals</div>
+          </div>
         </div>
       </div>
     </div>

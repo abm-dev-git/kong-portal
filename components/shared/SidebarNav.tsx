@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { WorkspaceSwitcher } from './WorkspaceSwitcher'
 
 export interface NavItem {
   href: string
@@ -26,6 +27,8 @@ interface SidebarNavProps {
   basePath: string
   className?: string
   navClassName?: string
+  /** Show workspace switcher at top of sidebar */
+  showWorkspaceSwitcher?: boolean
 }
 
 export function SidebarNav({
@@ -34,6 +37,7 @@ export function SidebarNav({
   basePath,
   className,
   navClassName,
+  showWorkspaceSwitcher = true,
 }: SidebarNavProps) {
   const pathname = usePathname()
   const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({})
@@ -65,6 +69,12 @@ export function SidebarNav({
 
   return (
     <aside className={cn('flex-shrink-0', className)}>
+      {/* Workspace Switcher */}
+      {showWorkspaceSwitcher && (
+        <div className="mb-6">
+          <WorkspaceSwitcher />
+        </div>
+      )}
       <nav className={cn('space-y-6', navClassName)}>
         {groups.map((group, groupIndex) => {
           const isCollapsed = group.title ? collapsedSections[group.title] : false

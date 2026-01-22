@@ -16,7 +16,7 @@ export function Hero() {
         style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
       />
 
-      {/* Gradient overlay for text readability - dark across most of width */}
+      {/* Gradient overlay for text readability - stays dark for photo background */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628] via-[#0A1628]/95 to-[#0A1628]/40 lg:via-[#0A1628]/90" />
 
       {/* Film grain texture for retro feel */}

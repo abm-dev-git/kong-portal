@@ -7,14 +7,6 @@ export { LinkedInSettingsCard } from './LinkedInSettingsCard';
 export { ConnectHubSpotModal, HubSpotIcon } from './ConnectHubSpotModal';
 export { HubSpotSettingsCard } from './HubSpotSettingsCard';
 
-// Dynamics
-export { ConnectDynamicsModal, DynamicsIcon } from './ConnectDynamicsModal';
-export { DynamicsSettingsCard } from './DynamicsSettingsCard';
-
-// Salesforce
-export { ConnectSalesforceModal, SalesforceIcon } from './ConnectSalesforceModal';
-export { SalesforceSettingsCard } from './SalesforceSettingsCard';
-
 // Shared
 export { DisconnectConfirmModal } from './DisconnectConfirmModal';
 

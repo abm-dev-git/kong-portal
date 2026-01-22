@@ -13,14 +13,6 @@ function HubSpotIcon({ className }: { className?: string }) {
   );
 }
 
-function SalesforceIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-      <path d="M9.98 6.182a4.27 4.27 0 013.38-1.655 4.277 4.277 0 013.967 2.674 3.643 3.643 0 011.404-.28 3.675 3.675 0 013.678 3.678 3.643 3.643 0 01-.285 1.416 3.196 3.196 0 011.877 2.914 3.203 3.203 0 01-3.203 3.203 3.203 3.203 0 01-.54-.046 3.95 3.95 0 01-3.487 2.089 3.947 3.947 0 01-1.772-.418 4.494 4.494 0 01-7.83-1.573 3.315 3.315 0 01-.616.058 3.34 3.34 0 01-3.34-3.34 3.34 3.34 0 012.035-3.074 4.072 4.072 0 01-.19-1.234 4.094 4.094 0 014.094-4.094 4.072 4.072 0 01.828.085z" />
-    </svg>
-  );
-}
-
 interface Integration {
   id: string;
   name: string;
@@ -46,14 +38,6 @@ const integrations: Integration[] = [
     iconColor: 'text-[#ff7a59]',
     connected: false,
     href: '/settings/hubspot',
-  },
-  {
-    id: 'salesforce',
-    name: 'Salesforce',
-    icon: SalesforceIcon,
-    iconColor: 'text-[#00a1e0]',
-    connected: false,
-    href: '/settings/salesforce',
   },
 ];
 

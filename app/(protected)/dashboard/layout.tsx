@@ -1,7 +1,7 @@
 'use client'
 
 import { SidebarNav } from '@/components/shared/SidebarNav'
-import { dashboardNav } from '@/lib/config/navigation'
+import { unifiedNav } from '@/lib/config/navigation'
 
 export default function DashboardLayout({
   children,
@@ -11,11 +11,12 @@ export default function DashboardLayout({
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
       <SidebarNav
-        groups={dashboardNav}
-        storageKey="dashboard-nav-collapsed"
+        groups={unifiedNav}
+        storageKey="unified-nav-collapsed"
         basePath="/dashboard"
-        className="w-full lg:w-60"
+        className="w-full lg:w-64"
         navClassName="lg:sticky lg:top-24"
+        showWorkspaceSwitcher={true}
       />
       <main className="flex-1 min-w-0 lg:pl-4">
         {children}

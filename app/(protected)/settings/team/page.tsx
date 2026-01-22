@@ -69,10 +69,10 @@ export default function TeamSettingsPage() {
             className="text-3xl text-[var(--cream)]"
             style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
           >
-            Team Settings
+            Members
           </h1>
           <p className="text-[var(--cream)]/70">
-            Manage your team members and invitations
+            Manage organization members and invitations
           </p>
         </div>
         <Button

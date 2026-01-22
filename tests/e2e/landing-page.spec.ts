@@ -26,7 +26,7 @@ test.describe('Landing Page', () => {
 
     // Check for hero heading
     const heroHeading = page.getByRole('heading', { level: 1 });
-    await expect(heroHeading).toContainText(/personalization|accounts/i);
+    await expect(heroHeading).toContainText(/decision|intelligence|personalization|accounts/i);
   });
 
   test('should display navigation with logo and links', async ({ page }) => {

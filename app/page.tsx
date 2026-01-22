@@ -1,7 +1,6 @@
 import { Navigation } from "@/components/shared/Navigation";
 import { Hero } from "@/components/landing/Hero";
 import { EnrichmentFeature } from "@/components/landing/EnrichmentFeature";
-import { ContentGeneration } from "@/components/landing/ContentGeneration";
 import { QuickStart } from "@/components/landing/QuickStart";
 import { PricingTeaser } from "@/components/landing/PricingTeaser";
 import { CtaBand } from "@/components/landing/CtaBand";
@@ -16,7 +15,6 @@ export default function HomePage() {
       <main id="main-content">
         <Hero />
         <EnrichmentFeature />
-        <ContentGeneration />
         <QuickStart />
         <PricingTeaser />
         <CtaBand />
