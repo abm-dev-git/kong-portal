@@ -31,6 +31,7 @@ interface InviteDialogProps {
   token?: string;
   orgId?: string;
   onSuccess?: () => void;
+  devLoginKey?: string;
 }
 
 const roleDescriptions: Record<MemberRole, string> = {
@@ -45,13 +46,14 @@ export function InviteDialog({
   token,
   orgId,
   onSuccess,
+  devLoginKey,
 }: InviteDialogProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<MemberRole>('viewer');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { createInvite } = useUserManagement(token, orgId);
+  const { createInvite } = useUserManagement(token, orgId, devLoginKey);
 
   const resetForm = () => {
     setEmail('');

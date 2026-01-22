@@ -21,6 +21,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_GATEWAY_URL || 'http://localhost:800
 export interface ApiClientConfig {
   token?: string;
   orgId?: string;
+  /** DevLogin key for E2E testing bypass */
+  devLoginKey?: string;
+  /** Custom headers to include in all requests */
+  customHeaders?: Record<string, string>;
 }
 
 export interface ApiError {
@@ -43,10 +47,14 @@ export interface ApiResponse<T> {
 export class ApiClient {
   private token?: string;
   private orgId?: string;
+  private devLoginKey?: string;
+  private customHeaders?: Record<string, string>;
 
   constructor(config: ApiClientConfig = {}) {
     this.token = config.token;
     this.orgId = config.orgId;
+    this.devLoginKey = config.devLoginKey;
+    this.customHeaders = config.customHeaders;
   }
 
   /**
@@ -63,17 +71,39 @@ export class ApiClient {
     this.orgId = orgId;
   }
 
+  /**
+   * Update the DevLogin key (for E2E testing)
+   */
+  setDevLoginKey(key: string | undefined): void {
+    this.devLoginKey = key;
+  }
+
+  /**
+   * Set custom headers
+   */
+  setCustomHeaders(headers: Record<string, string> | undefined): void {
+    this.customHeaders = headers;
+  }
+
   private getHeaders(): HeadersInit {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
-    if (this.token) {
+    // Use Bearer token if available, otherwise use DevLogin key
+    if (this.token && this.token !== 'DEVLOGIN') {
       headers['Authorization'] = `Bearer ${this.token}`;
+    } else if (this.devLoginKey) {
+      headers['X-DevLogin-Key'] = this.devLoginKey;
     }
 
     if (this.orgId) {
       headers['x-org-id'] = this.orgId;
+    }
+
+    // Apply any custom headers
+    if (this.customHeaders) {
+      Object.assign(headers, this.customHeaders);
     }
 
     return headers;
@@ -204,8 +234,8 @@ export class ApiClient {
 /**
  * Create an API client instance (for use in components)
  */
-export function createApiClient(token?: string, orgId?: string): ApiClient {
-  return new ApiClient({ token, orgId });
+export function createApiClient(token?: string, orgId?: string, devLoginKey?: string): ApiClient {
+  return new ApiClient({ token, orgId, devLoginKey });
 }
 
 /**

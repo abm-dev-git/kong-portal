@@ -13,28 +13,35 @@ import type {
 /**
  * Custom hook for fetching and managing workspaces
  * SSR-safe - follows useMembers pattern
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useWorkspaces(token?: string, orgId?: string) {
+export function useWorkspaces(token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<WorkspaceListResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Track if initial fetch has been done
   const hasFetchedRef = useRef(false);
-  // Use ref for token/orgId to avoid recreating fetch function
+  // Use ref for token/orgId/devLoginKey to avoid recreating fetch function
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   // Keep refs up to date
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
-  }, [token, orgId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, devLoginKey]);
 
   const fetchWorkspaces = useCallback(async (isInitialFetch = false, includeArchived = false) => {
     const currentToken = tokenRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key
+    if ((!currentToken && !currentDevLoginKey) || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -44,7 +51,7 @@ export function useWorkspaces(token?: string, orgId?: string) {
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const params = includeArchived ? '?includeArchived=true' : '';
       const result = await api.get<WorkspaceListResponse>(`/v1/workspaces${params}`);
 
@@ -61,16 +68,17 @@ export function useWorkspaces(token?: string, orgId?: string) {
     }
   }, []);
 
-  // Initial fetch - only when token becomes available
+  // Initial fetch - only when token or devLoginKey becomes available
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchWorkspaces(true);
-    } else if (!token) {
+    } else if (!hasAuth) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, fetchWorkspaces]);
+  }, [token, devLoginKey, fetchWorkspaces]);
 
   const refetch = useCallback((showLoading = false) => fetchWorkspaces(showLoading), [fetchWorkspaces]);
 
@@ -79,8 +87,11 @@ export function useWorkspaces(token?: string, orgId?: string) {
 
 /**
  * Hook for fetching the default workspace
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useDefaultWorkspace(token?: string, orgId?: string) {
+export function useDefaultWorkspace(token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<Workspace | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -88,16 +99,20 @@ export function useDefaultWorkspace(token?: string, orgId?: string) {
   const hasFetchedRef = useRef(false);
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
-  }, [token, orgId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, devLoginKey]);
 
   const fetchDefault = useCallback(async (isInitialFetch = false) => {
     const currentToken = tokenRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key
+    if ((!currentToken && !currentDevLoginKey) || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -107,7 +122,7 @@ export function useDefaultWorkspace(token?: string, orgId?: string) {
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.get<Workspace>('/v1/workspaces/default');
 
       if (result.success && result.data) {
@@ -124,14 +139,15 @@ export function useDefaultWorkspace(token?: string, orgId?: string) {
   }, []);
 
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchDefault(true);
-    } else if (!token) {
+    } else if (!hasAuth) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, fetchDefault]);
+  }, [token, devLoginKey, fetchDefault]);
 
   const refetch = useCallback((showLoading = false) => fetchDefault(showLoading), [fetchDefault]);
 
@@ -140,8 +156,12 @@ export function useDefaultWorkspace(token?: string, orgId?: string) {
 
 /**
  * Hook for fetching a single workspace by ID
+ * @param workspaceId - Workspace ID
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useWorkspace(workspaceId: string | undefined, token?: string, orgId?: string) {
+export function useWorkspace(workspaceId: string | undefined, token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<Workspace | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -282,21 +302,24 @@ export function useWorkspaceMembers(workspaceId: string | undefined, token?: str
 /**
  * Hook for workspace mutation operations
  */
-export function useWorkspaceMutations(token?: string, orgId?: string) {
+export function useWorkspaceMutations(token?: string, orgId?: string, devLoginKey?: string) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
-  }, [token, orgId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, devLoginKey]);
 
   const createWorkspace = useCallback(async (request: CreateWorkspaceRequest): Promise<Workspace | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -305,7 +328,7 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.post<Workspace>('/v1/workspaces', request);
 
       if (result.success && result.data) {
@@ -324,7 +347,8 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
 
   const updateWorkspace = useCallback(async (workspaceId: string, request: UpdateWorkspaceRequest): Promise<Workspace | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -333,7 +357,7 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.put<Workspace>(`/v1/workspaces/${workspaceId}`, request);
 
       if (result.success && result.data) {
@@ -352,7 +376,8 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
 
   const archiveWorkspace = useCallback(async (workspaceId: string): Promise<boolean> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return false;
     }
@@ -361,7 +386,7 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.delete(`/v1/workspaces/${workspaceId}`);
 
       if (result.success) {
@@ -380,7 +405,8 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
 
   const addMember = useCallback(async (workspaceId: string, request: AddWorkspaceMemberRequest): Promise<WorkspaceMember | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -389,7 +415,7 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.post<WorkspaceMember>(`/v1/workspaces/${workspaceId}/members`, request);
 
       if (result.success && result.data) {
@@ -408,7 +434,8 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
 
   const removeMember = useCallback(async (workspaceId: string, userId: string): Promise<boolean> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return false;
     }
@@ -417,7 +444,7 @@ export function useWorkspaceMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.delete(`/v1/workspaces/${workspaceId}/members/${userId}`);
 
       if (result.success) {

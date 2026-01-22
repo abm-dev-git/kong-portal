@@ -34,6 +34,7 @@ interface MembersTableProps {
   token?: string;
   orgId?: string;
   onMemberChange?: () => void;
+  devLoginKey?: string;
 }
 
 const roleIcons: Record<MemberRole, typeof Shield> = {
@@ -56,8 +57,9 @@ export function MembersTable({
   token,
   orgId,
   onMemberChange,
+  devLoginKey,
 }: MembersTableProps) {
-  const { updateMemberRole, removeMember } = useUserManagement(token, orgId);
+  const { updateMemberRole, removeMember } = useUserManagement(token, orgId, devLoginKey);
   const [loadingActions, setLoadingActions] = useState<Record<string, boolean>>({});
 
   const handleRoleChange = async (userId: string, newRole: MemberRole) => {

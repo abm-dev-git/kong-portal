@@ -25,6 +25,7 @@ interface InvitesTableProps {
   token?: string;
   orgId?: string;
   onInviteChange?: () => void;
+  devLoginKey?: string;
 }
 
 const statusBadgeStyles: Record<InviteStatus, string> = {
@@ -47,8 +48,9 @@ export function InvitesTable({
   token,
   orgId,
   onInviteChange,
+  devLoginKey,
 }: InvitesTableProps) {
-  const { revokeInvite } = useUserManagement(token, orgId);
+  const { revokeInvite } = useUserManagement(token, orgId, devLoginKey);
   const [loadingRevoke, setLoadingRevoke] = useState<Record<string, boolean>>({});
 
   const handleRevoke = async (inviteId: string, email: string) => {

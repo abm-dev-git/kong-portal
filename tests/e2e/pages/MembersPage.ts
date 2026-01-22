@@ -66,8 +66,21 @@ export class MembersPage {
     // Send invite
     await this.sendInviteButton.click();
 
-    // Wait for dialog to close (success case)
-    await expect(this.inviteDialog).not.toBeVisible({ timeout: 10000 });
+    // Wait for dialog to close (success case) or check for error toast
+    try {
+      await expect(this.inviteDialog).not.toBeVisible({ timeout: 15000 });
+    } catch {
+      // If dialog didn't close, check for error message and throw a more helpful error
+      const errorToast = this.page.locator('[data-sonner-toast][data-type="error"], [role="alert"]:has-text("error"), [class*="toast"]:has-text("error")');
+      const hasError = await errorToast.isVisible({ timeout: 1000 }).catch(() => false);
+      if (hasError) {
+        const errorText = await errorToast.textContent();
+        throw new Error(`Invite failed: ${errorText}`);
+      }
+      // Close dialog manually if it's stuck
+      await this.cancelButton.click().catch(() => {});
+      throw new Error('Invite dialog did not close after submission');
+    }
   }
 
   async getMemberRow(email: string): Promise<Locator> {

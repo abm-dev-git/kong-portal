@@ -25,18 +25,27 @@ const DEVLOGIN_ENABLED = process.env.NEXT_PUBLIC_DEVLOGIN_ENABLED === 'true'
  * Used for E2E testing to bypass Clerk auth in non-production environments
  */
 function hasValidDevLogin(req: Request): boolean {
+  console.log('[DevLogin] Checking DevLogin auth', {
+    enabled: DEVLOGIN_ENABLED,
+    keyConfigured: !!DEVLOGIN_KEY,
+    keyLength: DEVLOGIN_KEY.length
+  })
+
   if (!DEVLOGIN_ENABLED || !DEVLOGIN_KEY) {
+    console.log('[DevLogin] DevLogin disabled or no key configured')
     return false
   }
 
   // Check X-DevLogin-Key header
   const headerKey = req.headers.get('X-DevLogin-Key')
   if (headerKey === DEVLOGIN_KEY) {
+    console.log('[DevLogin] Valid header key found')
     return true
   }
 
   // Check devlogin cookie
   const cookieHeader = req.headers.get('cookie')
+  console.log('[DevLogin] Cookie header:', cookieHeader?.substring(0, 100))
   if (cookieHeader) {
     const cookies = cookieHeader.split(';').reduce((acc, cookie) => {
       const [key, value] = cookie.trim().split('=')
@@ -44,11 +53,14 @@ function hasValidDevLogin(req: Request): boolean {
       return acc
     }, {} as Record<string, string>)
 
+    console.log('[DevLogin] Cookie keys:', Object.keys(cookies))
     if (cookies['devlogin'] === DEVLOGIN_KEY) {
+      console.log('[DevLogin] Valid cookie key found')
       return true
     }
   }
 
+  console.log('[DevLogin] No valid DevLogin credentials found')
   return false
 }
 

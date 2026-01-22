@@ -15,30 +15,38 @@ import type {
 /**
  * Custom hook for fetching and managing teams
  * SSR-safe - follows useMembers pattern
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param workspaceId - Optional workspace ID filter
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useTeams(token?: string, orgId?: string, workspaceId?: string) {
+export function useTeams(token?: string, orgId?: string, workspaceId?: string, devLoginKey?: string) {
   const [data, setData] = useState<TeamListResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Track if initial fetch has been done
   const hasFetchedRef = useRef(false);
-  // Use ref for token/orgId to avoid recreating fetch function
+  // Use ref for token/orgId/devLoginKey to avoid recreating fetch function
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
   const workspaceIdRef = useRef(workspaceId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   // Keep refs up to date
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
     workspaceIdRef.current = workspaceId;
-  }, [token, orgId, workspaceId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, workspaceId, devLoginKey]);
 
   const fetchTeams = useCallback(async (isInitialFetch = false, includeArchived = false) => {
     const currentToken = tokenRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key
+    if ((!currentToken && !currentDevLoginKey) || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -48,7 +56,7 @@ export function useTeams(token?: string, orgId?: string, workspaceId?: string) {
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const params = new URLSearchParams();
       if (workspaceIdRef.current) {
         params.append('workspaceId', workspaceIdRef.current);
@@ -72,23 +80,25 @@ export function useTeams(token?: string, orgId?: string, workspaceId?: string) {
     }
   }, []);
 
-  // Initial fetch - only when token becomes available
+  // Initial fetch - only when token or devLoginKey becomes available
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchTeams(true);
-    } else if (!token) {
+    } else if (!hasAuth) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, fetchTeams]);
+  }, [token, devLoginKey, fetchTeams]);
 
   // Refetch when workspaceId changes
   useEffect(() => {
-    if (token && hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && hasFetchedRef.current) {
       fetchTeams(false);
     }
-  }, [workspaceId, token, fetchTeams]);
+  }, [workspaceId, token, devLoginKey, fetchTeams]);
 
   const refetch = useCallback((showLoading = false) => fetchTeams(showLoading), [fetchTeams]);
 
@@ -97,8 +107,12 @@ export function useTeams(token?: string, orgId?: string, workspaceId?: string) {
 
 /**
  * Hook for fetching teams the current user belongs to
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param workspaceId - Optional workspace ID filter
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useMyTeams(token?: string, orgId?: string, workspaceId?: string) {
+export function useMyTeams(token?: string, orgId?: string, workspaceId?: string, devLoginKey?: string) {
   const [data, setData] = useState<TeamListResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -107,17 +121,21 @@ export function useMyTeams(token?: string, orgId?: string, workspaceId?: string)
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
   const workspaceIdRef = useRef(workspaceId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
     workspaceIdRef.current = workspaceId;
-  }, [token, orgId, workspaceId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, workspaceId, devLoginKey]);
 
   const fetchMyTeams = useCallback(async (isInitialFetch = false) => {
     const currentToken = tokenRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key
+    if ((!currentToken && !currentDevLoginKey) || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -127,7 +145,7 @@ export function useMyTeams(token?: string, orgId?: string, workspaceId?: string)
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const params = workspaceIdRef.current ? `?workspaceId=${workspaceIdRef.current}` : '';
       const result = await api.get<TeamListResponse>(`/v1/teams/my${params}`);
 
@@ -145,20 +163,22 @@ export function useMyTeams(token?: string, orgId?: string, workspaceId?: string)
   }, []);
 
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchMyTeams(true);
-    } else if (!token) {
+    } else if (!hasAuth) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, fetchMyTeams]);
+  }, [token, devLoginKey, fetchMyTeams]);
 
   useEffect(() => {
-    if (token && hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && hasFetchedRef.current) {
       fetchMyTeams(false);
     }
-  }, [workspaceId, token, fetchMyTeams]);
+  }, [workspaceId, token, devLoginKey, fetchMyTeams]);
 
   const refetch = useCallback((showLoading = false) => fetchMyTeams(showLoading), [fetchMyTeams]);
 
@@ -167,8 +187,12 @@ export function useMyTeams(token?: string, orgId?: string, workspaceId?: string)
 
 /**
  * Hook for fetching a single team by ID
+ * @param teamId - Team ID
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useTeam(teamId: string | undefined, token?: string, orgId?: string) {
+export function useTeam(teamId: string | undefined, token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<Team | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -177,18 +201,22 @@ export function useTeam(teamId: string | undefined, token?: string, orgId?: stri
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
   const teamIdRef = useRef(teamId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
     teamIdRef.current = teamId;
-  }, [token, orgId, teamId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, teamId, devLoginKey]);
 
   const fetchTeam = useCallback(async (isInitialFetch = false) => {
     const currentToken = tokenRef.current;
     const currentTeamId = teamIdRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || !currentTeamId || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key, plus teamId
+    if ((!currentToken && !currentDevLoginKey) || !currentTeamId || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -198,7 +226,7 @@ export function useTeam(teamId: string | undefined, token?: string, orgId?: stri
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.get<Team>(`/v1/teams/${currentTeamId}`);
 
       if (result.success && result.data) {
@@ -215,20 +243,22 @@ export function useTeam(teamId: string | undefined, token?: string, orgId?: stri
   }, []);
 
   useEffect(() => {
-    if (token && teamId && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && teamId && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchTeam(true);
-    } else if (!token || !teamId) {
+    } else if (!hasAuth || !teamId) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, teamId, fetchTeam]);
+  }, [token, devLoginKey, teamId, fetchTeam]);
 
   useEffect(() => {
-    if (token && teamId && hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && teamId && hasFetchedRef.current) {
       fetchTeam(false);
     }
-  }, [teamId, token, fetchTeam]);
+  }, [teamId, token, devLoginKey, fetchTeam]);
 
   const refetch = useCallback((showLoading = false) => fetchTeam(showLoading), [fetchTeam]);
 
@@ -237,8 +267,12 @@ export function useTeam(teamId: string | undefined, token?: string, orgId?: stri
 
 /**
  * Hook for fetching team members
+ * @param teamId - Team ID
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useTeamMembers(teamId: string | undefined, token?: string, orgId?: string) {
+export function useTeamMembers(teamId: string | undefined, token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<TeamMemberListResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -247,18 +281,22 @@ export function useTeamMembers(teamId: string | undefined, token?: string, orgId
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
   const teamIdRef = useRef(teamId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
     teamIdRef.current = teamId;
-  }, [token, orgId, teamId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, teamId, devLoginKey]);
 
   const fetchMembers = useCallback(async (isInitialFetch = false) => {
     const currentToken = tokenRef.current;
     const currentTeamId = teamIdRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || !currentTeamId || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key, plus teamId
+    if ((!currentToken && !currentDevLoginKey) || !currentTeamId || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -268,7 +306,7 @@ export function useTeamMembers(teamId: string | undefined, token?: string, orgId
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.get<TeamMemberListResponse>(`/v1/teams/${currentTeamId}/members`);
 
       if (result.success && result.data) {
@@ -285,20 +323,22 @@ export function useTeamMembers(teamId: string | undefined, token?: string, orgId
   }, []);
 
   useEffect(() => {
-    if (token && teamId && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && teamId && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchMembers(true);
-    } else if (!token || !teamId) {
+    } else if (!hasAuth || !teamId) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, teamId, fetchMembers]);
+  }, [token, devLoginKey, teamId, fetchMembers]);
 
   useEffect(() => {
-    if (token && teamId && hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && teamId && hasFetchedRef.current) {
       fetchMembers(false);
     }
-  }, [teamId, token, fetchMembers]);
+  }, [teamId, token, devLoginKey, fetchMembers]);
 
   const refetch = useCallback((showLoading = false) => fetchMembers(showLoading), [fetchMembers]);
 
@@ -307,22 +347,28 @@ export function useTeamMembers(teamId: string | undefined, token?: string, orgId
 
 /**
  * Hook for team mutation operations
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useTeamMutations(token?: string, orgId?: string) {
+export function useTeamMutations(token?: string, orgId?: string, devLoginKey?: string) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
-  }, [token, orgId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, devLoginKey]);
 
   const createTeam = useCallback(async (request: CreateTeamRequest): Promise<Team | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -331,7 +377,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.post<Team>('/v1/teams', request);
 
       if (result.success && result.data) {
@@ -350,7 +396,8 @@ export function useTeamMutations(token?: string, orgId?: string) {
 
   const updateTeam = useCallback(async (teamId: string, request: UpdateTeamRequest): Promise<Team | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -359,7 +406,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.put<Team>(`/v1/teams/${teamId}`, request);
 
       if (result.success && result.data) {
@@ -378,7 +425,8 @@ export function useTeamMutations(token?: string, orgId?: string) {
 
   const archiveTeam = useCallback(async (teamId: string): Promise<boolean> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return false;
     }
@@ -387,7 +435,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.delete(`/v1/teams/${teamId}`);
 
       if (result.success) {
@@ -406,7 +454,8 @@ export function useTeamMutations(token?: string, orgId?: string) {
 
   const addMember = useCallback(async (teamId: string, request: AddTeamMemberRequest): Promise<TeamMember | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -415,7 +464,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.post<TeamMember>(`/v1/teams/${teamId}/members`, request);
 
       if (result.success && result.data) {
@@ -434,7 +483,8 @@ export function useTeamMutations(token?: string, orgId?: string) {
 
   const removeMember = useCallback(async (teamId: string, userId: string): Promise<boolean> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return false;
     }
@@ -443,7 +493,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.delete(`/v1/teams/${teamId}/members/${userId}`);
 
       if (result.success) {
@@ -462,7 +512,8 @@ export function useTeamMutations(token?: string, orgId?: string) {
 
   const updateMemberRole = useCallback(async (teamId: string, userId: string, role: TeamMemberRole): Promise<TeamMember | null> => {
     const currentToken = tokenRef.current;
-    if (!currentToken) {
+    const currentDevLoginKey = devLoginKeyRef.current;
+    if (!currentToken && !currentDevLoginKey) {
       setError(new Error('Not authenticated'));
       return null;
     }
@@ -471,7 +522,7 @@ export function useTeamMutations(token?: string, orgId?: string) {
     setError(null);
 
     try {
-      const api = createApiClient(currentToken, orgIdRef.current);
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
       const result = await api.patch<TeamMember>(`/v1/teams/${teamId}/members/${userId}/role`, { role } as UpdateTeamMemberRoleRequest);
 
       if (result.success && result.data) {

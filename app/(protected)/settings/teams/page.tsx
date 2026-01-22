@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth, useOrganization } from '@clerk/nextjs';
+import { useOrganization } from '@clerk/nextjs';
 import { Plus, UsersRound, Users, MoreVertical, Pencil, Archive, UserPlus } from 'lucide-react';
+import { useDevLoginAuth } from '@/lib/hooks/useDevLoginAuth';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -46,10 +47,9 @@ import { useMembers } from '@/lib/hooks/useMembers';
 import { TEAM_COLOR_PRESETS, TEAM_ROLE_LABELS, type Team, type CreateTeamRequest, type UpdateTeamRequest, type TeamMemberRole } from '@/lib/types/teams';
 
 export default function TeamsSettingsPage() {
-  const { getToken } = useAuth();
+  const { token, devLoginKey, orgId, isReady } = useDevLoginAuth();
   const { organization } = useOrganization();
   const { toast } = useToast();
-  const [token, setToken] = useState<string>();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
@@ -67,26 +67,21 @@ export default function TeamsSettingsPage() {
   const [selectedUserId, setSelectedUserId] = useState<string>('');
   const [selectedRole, setSelectedRole] = useState<TeamMemberRole>('member');
 
-  // Get auth token
-  useEffect(() => {
-    let mounted = true;
-    getToken().then((t) => {
-      if (mounted && t) setToken(t);
-    });
-    return () => { mounted = false; };
-  }, [getToken]);
+  // Use the effective org ID (from Clerk or DevLogin default)
+  const effectiveOrgId = organization?.id || orgId;
 
-  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token, organization?.id);
-  const { data: allTeamsData, isLoading: allTeamsLoading, refetch: refetchAllTeams } = useTeams(token, organization?.id);
-  const { data: myTeamsData, isLoading: myTeamsLoading, refetch: refetchMyTeams } = useMyTeams(token, organization?.id);
-  const { data: workspacesData } = useWorkspaces(token, organization?.id);
-  const { data: defaultWorkspace } = useDefaultWorkspace(token, organization?.id);
-  const { data: membersData } = useMembers(token, organization?.id);
-  const { data: teamMembersData, refetch: refetchTeamMembers } = useTeamMembers(selectedTeam?.id, token, organization?.id);
-  const { createTeam, updateTeam, archiveTeam, addMember, isLoading: mutationLoading } = useTeamMutations(token, organization?.id);
+  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { data: allTeamsData, isLoading: allTeamsLoading, refetch: refetchAllTeams } = useTeams(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
+  const { data: myTeamsData, isLoading: myTeamsLoading, refetch: refetchMyTeams } = useMyTeams(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
+  const { data: workspacesData } = useWorkspaces(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { data: defaultWorkspace } = useDefaultWorkspace(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { data: membersData } = useMembers(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
+  const { data: teamMembersData, refetch: refetchTeamMembers } = useTeamMembers(selectedTeam?.id, token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { createTeam, updateTeam, archiveTeam, addMember, isLoading: mutationLoading } = useTeamMutations(token || undefined, effectiveOrgId, devLoginKey || undefined);
 
   const isAdmin = currentUser?.role === 'admin';
-  const isLoading = userLoading || !token;
+  // Show loading until auth is ready and user data is loaded
+  const isLoading = !isReady || userLoading;
 
   // Set default workspace when loaded
   useEffect(() => {

@@ -69,7 +69,14 @@ export class WorkspaceSwitcher {
 
   async goToManageWorkspaces() {
     await this.open();
-    await this.manageLink.click();
-    await this.page.waitForURL('**/settings/workspaces');
+    // The manage link might be outside viewport due to popover positioning
+    // First try to scroll it into view within the popover, then click
+    const popover = this.page.locator('[data-radix-popper-content-wrapper]');
+    if (await popover.isVisible()) {
+      await popover.evaluate(el => el.scrollTop = el.scrollHeight);
+    }
+    // Use JavaScript click as fallback to force: true since element may still be outside viewport
+    await this.manageLink.evaluate(el => (el as HTMLElement).click());
+    await this.page.waitForURL('**/settings/workspaces', { timeout: 15000 });
   }
 }

@@ -57,17 +57,19 @@ export const test = base.extend<{ authedPage: Page }>({
     else if (devLoginKey) {
       console.log('Using DevLogin key for authentication');
       const baseURL = process.env.BASE_URL || 'https://dev.abm.dev';
-      const domain = new URL(baseURL).hostname;
+      const url = new URL(baseURL);
+      const domain = url.hostname;
+      const isLocalhost = domain === 'localhost' || domain === '127.0.0.1';
 
       context = await browser.newContext();
       await context.addCookies([
         {
           name: 'devlogin',
           value: devLoginKey,
-          domain: domain,
+          domain: isLocalhost ? domain : domain,
           path: '/',
-          httpOnly: true,
-          secure: true,
+          httpOnly: false, // Must be false so client-side JS can read it
+          secure: !isLocalhost, // Localhost doesn't use HTTPS
           sameSite: 'Lax',
         },
       ]);

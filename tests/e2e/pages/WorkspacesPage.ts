@@ -75,13 +75,15 @@ export class WorkspacesPage {
 
   async isDefaultWorkspace(workspaceName: string): Promise<boolean> {
     const card = await this.getWorkspaceCard(workspaceName);
-    const defaultBadge = card.locator('[class*="badge"]:has-text("Default"), :has-text("Default")');
+    // Target the specific badge element with data-slot="badge" containing "Default" text
+    const defaultBadge = card.locator('[data-slot="badge"]:has-text("Default")');
     return await defaultBadge.isVisible();
   }
 
   async openWorkspaceMenu(workspaceName: string) {
     const card = await this.getWorkspaceCard(workspaceName);
-    const menuButton = card.locator('button:has([class*="MoreVertical"])');
+    // The menu button is an icon button (h-8 w-8) containing an SVG - it's the only button without text
+    const menuButton = card.locator('button:has(svg)').filter({ hasNotText: /.+/ }).first();
     await menuButton.click();
   }
 

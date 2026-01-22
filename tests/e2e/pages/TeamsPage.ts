@@ -97,7 +97,8 @@ export class TeamsPage {
 
   async openTeamMenu(teamName: string) {
     const card = await this.getTeamCard(teamName);
-    const menuButton = card.locator('button:has([class*="MoreVertical"])');
+    // Find the menu button - it's a ghost button with an icon inside
+    const menuButton = card.locator('button:has(svg)').last();
     await menuButton.click();
   }
 

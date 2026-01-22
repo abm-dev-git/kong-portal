@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth, useOrganization } from '@clerk/nextjs';
+import { useState } from 'react';
+import { useOrganization } from '@clerk/nextjs';
 import { UserPlus } from 'lucide-react';
+import { useDevLoginAuth } from '@/lib/hooks/useDevLoginAuth';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -14,26 +15,19 @@ import { useInvites } from '@/lib/hooks/useInvites';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 
 export default function TeamSettingsPage() {
-  const { getToken } = useAuth();
+  const { token, devLoginKey, orgId, isReady } = useDevLoginAuth();
   const { organization } = useOrganization();
-  const [token, setToken] = useState<string>();
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-  // Get auth token
-  useEffect(() => {
-    let mounted = true;
-    getToken().then((t) => {
-      if (mounted && t) setToken(t);
-    });
-    return () => { mounted = false; };
-  }, [getToken]);
+  // Use the effective org ID (from Clerk or DevLogin default)
+  const effectiveOrgId = organization?.id || orgId;
 
-  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token, organization?.id);
-  const { data: membersData, isLoading: membersLoading, refetch: refetchMembers } = useMembers(token, organization?.id);
-  const { data: invitesData, isLoading: invitesLoading, refetch: refetchInvites } = useInvites(token, organization?.id, 'pending');
+  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { data: membersData, isLoading: membersLoading, refetch: refetchMembers } = useMembers(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
+  const { data: invitesData, isLoading: invitesLoading, refetch: refetchInvites } = useInvites(token || undefined, effectiveOrgId, 'pending', devLoginKey || undefined);
 
   const isAdmin = currentUser?.role === 'admin';
-  const isLoading = userLoading || !token;
+  const isLoading = !isReady || userLoading;
 
   const handleInviteSuccess = () => {
     refetchInvites();
@@ -102,9 +96,10 @@ export default function TeamSettingsPage() {
             currentUserId={currentUser?.userId}
             isAdmin={isAdmin}
             isLoading={membersLoading}
-            token={token}
-            orgId={organization?.id}
+            token={token || undefined}
+            orgId={effectiveOrgId}
             onMemberChange={handleMemberChange}
+            devLoginKey={devLoginKey || undefined}
           />
         </TabsContent>
 
@@ -113,9 +108,10 @@ export default function TeamSettingsPage() {
             invites={invitesData?.invites || []}
             isAdmin={isAdmin}
             isLoading={invitesLoading}
-            token={token}
-            orgId={organization?.id}
+            token={token || undefined}
+            orgId={effectiveOrgId}
             onInviteChange={handleInviteChange}
+            devLoginKey={devLoginKey || undefined}
           />
         </TabsContent>
       </Tabs>
@@ -124,9 +120,10 @@ export default function TeamSettingsPage() {
       <InviteDialog
         open={inviteDialogOpen}
         onOpenChange={setInviteDialogOpen}
-        token={token}
-        orgId={organization?.id}
+        token={token || undefined}
+        orgId={effectiveOrgId}
         onSuccess={handleInviteSuccess}
+        devLoginKey={devLoginKey || undefined}
       />
     </div>
   );

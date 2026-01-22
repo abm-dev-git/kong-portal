@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth, useOrganization } from '@clerk/nextjs';
+import { useState } from 'react';
+import { useOrganization } from '@clerk/nextjs';
 import { Plus, Building2, Users, MoreVertical, Pencil, Archive, Star } from 'lucide-react';
+import { useDevLoginAuth } from '@/lib/hooks/useDevLoginAuth';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -38,10 +39,9 @@ import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import type { Workspace, CreateWorkspaceRequest, UpdateWorkspaceRequest } from '@/lib/types/workspaces';
 
 export default function WorkspacesSettingsPage() {
-  const { getToken } = useAuth();
+  const { token, devLoginKey, orgId, isReady } = useDevLoginAuth();
   const { organization } = useOrganization();
   const { toast } = useToast();
-  const [token, setToken] = useState<string>();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
@@ -52,21 +52,15 @@ export default function WorkspacesSettingsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formIsDefault, setFormIsDefault] = useState(false);
 
-  // Get auth token
-  useEffect(() => {
-    let mounted = true;
-    getToken().then((t) => {
-      if (mounted && t) setToken(t);
-    });
-    return () => { mounted = false; };
-  }, [getToken]);
+  // Use the effective org ID (from Clerk or DevLogin default)
+  const effectiveOrgId = organization?.id || orgId;
 
-  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token, organization?.id);
-  const { data: workspacesData, isLoading: workspacesLoading, refetch } = useWorkspaces(token, organization?.id);
-  const { createWorkspace, updateWorkspace, archiveWorkspace, isLoading: mutationLoading } = useWorkspaceMutations(token, organization?.id);
+  const { data: currentUser, isLoading: userLoading } = useCurrentUser(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { data: workspacesData, isLoading: workspacesLoading, refetch } = useWorkspaces(token || undefined, effectiveOrgId, devLoginKey || undefined);
+  const { createWorkspace, updateWorkspace, archiveWorkspace, isLoading: mutationLoading } = useWorkspaceMutations(token || undefined, effectiveOrgId, devLoginKey || undefined);
 
   const isAdmin = currentUser?.role === 'admin';
-  const isLoading = userLoading || !token;
+  const isLoading = !isReady || userLoading;
 
   const handleCreateWorkspace = async () => {
     if (!formName.trim()) {

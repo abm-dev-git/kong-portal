@@ -5,28 +5,35 @@ import type { CurrentUserResponse } from '../types/user-management';
 /**
  * Custom hook for fetching current user's organization membership
  * SSR-safe - follows useLinkedInStatus pattern
+ * @param token - Clerk JWT token or 'DEVLOGIN' for DevLogin mode
+ * @param orgId - Organization ID
+ * @param devLoginKey - Optional DevLogin key for E2E testing
  */
-export function useCurrentUser(token?: string, orgId?: string) {
+export function useCurrentUser(token?: string, orgId?: string, devLoginKey?: string) {
   const [data, setData] = useState<CurrentUserResponse | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   // Track if initial fetch has been done
   const hasFetchedRef = useRef(false);
-  // Use ref for token/orgId to avoid recreating fetchUser
+  // Use ref for token/orgId/devLoginKey to avoid recreating fetchUser
   const tokenRef = useRef(token);
   const orgIdRef = useRef(orgId);
+  const devLoginKeyRef = useRef(devLoginKey);
 
   // Keep refs up to date
   useEffect(() => {
     tokenRef.current = token;
     orgIdRef.current = orgId;
-  }, [token, orgId]);
+    devLoginKeyRef.current = devLoginKey;
+  }, [token, orgId, devLoginKey]);
 
   const fetchUser = useCallback(async (isInitialFetch = false) => {
     const currentToken = tokenRef.current;
+    const currentDevLoginKey = devLoginKeyRef.current;
 
-    if (!currentToken || typeof window === 'undefined') {
+    // Need either a real token or a DevLogin key
+    if ((!currentToken && !currentDevLoginKey) || typeof window === 'undefined') {
       setIsLoading(false);
       return;
     }
@@ -36,8 +43,8 @@ export function useCurrentUser(token?: string, orgId?: string) {
         setIsLoading(true);
       }
 
-      const api = createApiClient(currentToken, orgIdRef.current);
-      const result = await api.get<CurrentUserResponse>('/v1/users/me');
+      const api = createApiClient(currentToken, orgIdRef.current, currentDevLoginKey);
+      const result = await api.get<CurrentUserResponse>('/users/me');
 
       if (result.success && result.data) {
         setData(result.data);
@@ -52,16 +59,17 @@ export function useCurrentUser(token?: string, orgId?: string) {
     }
   }, []);
 
-  // Initial fetch - only when token becomes available
+  // Initial fetch - only when token or devLoginKey becomes available
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    const hasAuth = token || devLoginKey;
+    if (hasAuth && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchUser(true);
-    } else if (!token) {
+    } else if (!hasAuth) {
       hasFetchedRef.current = false;
       setIsLoading(true);
     }
-  }, [token, fetchUser]);
+  }, [token, devLoginKey, fetchUser]);
 
   const refetch = useCallback((showLoading = false) => fetchUser(showLoading), [fetchUser]);
 
