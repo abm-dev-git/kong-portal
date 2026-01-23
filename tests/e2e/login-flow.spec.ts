@@ -101,6 +101,46 @@ test.describe('Login Flow', () => {
     // This is expected behavior - Clerk validates JWT format
     // Real handshake URLs with valid JWTs work correctly
   });
+
+  test('should capture diagnostics for cookie issues', async ({ page }) => {
+    // This test captures diagnostic info for debugging cookie/handshake issues
+    const consoleLogs: string[] = [];
+    const consoleErrors: string[] = [];
+
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        consoleErrors.push(msg.text());
+      } else {
+        consoleLogs.push(msg.text());
+      }
+    });
+
+    await page.goto('/sign-in', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(5000);
+
+    // Check if Clerk initialized
+    const clerkLoaded = await page.evaluate(() => {
+      return typeof (window as Window & typeof globalThis & { Clerk?: unknown }).Clerk !== 'undefined';
+    });
+
+    // Get cookies
+    const cookies = await page.context().cookies();
+    const clerkCookies = cookies.filter(c =>
+      c.name.includes('clerk') || c.name.includes('__session') || c.name.includes('__client')
+    );
+
+    // Log diagnostics
+    console.log('=== Clerk Diagnostics ===');
+    console.log('Clerk loaded:', clerkLoaded);
+    console.log('Clerk cookies found:', clerkCookies.length);
+    console.log('Console errors:', consoleErrors.length > 0 ? consoleErrors.join(', ') : 'None');
+
+    // Should at least have Clerk loaded
+    expect(clerkLoaded).toBeTruthy();
+
+    // Save diagnostics screenshot
+    await page.screenshot({ path: 'test-artifacts/clerk-diagnostics.png', fullPage: true });
+  });
 });
 
 test.describe('Sign-up Flow', () => {
