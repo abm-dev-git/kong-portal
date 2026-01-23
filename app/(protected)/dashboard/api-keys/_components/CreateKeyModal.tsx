@@ -116,6 +116,20 @@ export function CreateKeyModal({ open, onOpenChange, onKeyCreated }: CreateKeyMo
               <p className="text-xs text-[var(--cream)]/50">
                 {keyName.length}/50 characters
               </p>
+              {!keyName && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {['Development Key', 'Production Key', 'Testing Key'].map((suggestion) => (
+                    <button
+                      key={suggestion}
+                      type="button"
+                      onClick={() => setKeyName(suggestion)}
+                      className="px-3 py-1 text-xs rounded-full bg-[var(--turquoise)]/10 text-[var(--turquoise)] border border-[var(--turquoise)]/20 hover:bg-[var(--turquoise)]/20"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {error && (

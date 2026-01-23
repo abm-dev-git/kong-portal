@@ -331,7 +331,7 @@ export default function EnrichmentDetailPage({ params }: { params: Promise<{ id:
               </div>
             </div>
 
-            <div className="space-y-2 max-h-[600px] overflow-y-auto">
+            <div className="space-y-2 max-h-[600px] min-h-[200px] overflow-y-scroll">
               {logs.length === 0 ? (
                 <div className="text-center py-8 text-[var(--cream)]/40">
                   <Activity className="w-8 h-8 mx-auto mb-2 opacity-40" />

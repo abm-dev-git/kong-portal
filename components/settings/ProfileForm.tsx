@@ -20,12 +20,16 @@ export function ProfileForm({ onEmailChangeClick }: ProfileFormProps) {
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
   const [username, setUsername] = useState(user?.username || '');
+  const [linkedInUrl, setLinkedInUrl] = useState(
+    (user?.unsafeMetadata?.linkedInUrl as string) || ''
+  );
 
   // Track if values have changed
   const hasChanges =
     firstName !== (user?.firstName || '') ||
     lastName !== (user?.lastName || '') ||
-    username !== (user?.username || '');
+    username !== (user?.username || '') ||
+    linkedInUrl !== ((user?.unsafeMetadata?.linkedInUrl as string) || '');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +43,10 @@ export function ProfileForm({ onEmailChangeClick }: ProfileFormProps) {
         firstName: firstName || undefined,
         lastName: lastName || undefined,
         username: username || undefined,
+        unsafeMetadata: {
+          ...user.unsafeMetadata,
+          linkedInUrl: linkedInUrl || undefined,
+        },
       });
 
       toast.success('Profile updated successfully');
@@ -138,6 +146,23 @@ export function ProfileForm({ onEmailChangeClick }: ProfileFormProps) {
           />
           <p className="text-xs text-[var(--cream)]/50">
             This will be your unique identifier. Leave blank to use your user ID.
+          </p>
+        </div>
+
+        {/* LinkedIn URL Field */}
+        <div className="space-y-2">
+          <Label htmlFor="linkedInUrl" className="text-[var(--cream)]/70">
+            LinkedIn Profile URL
+          </Label>
+          <Input
+            id="linkedInUrl"
+            value={linkedInUrl}
+            onChange={(e) => setLinkedInUrl(e.target.value)}
+            placeholder="https://linkedin.com/in/yourprofile"
+            className="bg-[var(--dark-blue)] border-[var(--turquoise)]/20 text-[var(--cream)] placeholder:text-[var(--cream)]/40"
+          />
+          <p className="text-xs text-[var(--cream)]/50">
+            Optional. Used for LinkedIn data enrichment features.
           </p>
         </div>
 
