@@ -155,10 +155,13 @@ test.describe('Sign-up Flow', () => {
 
   test('should have link to sign-in from sign-up', async ({ page }) => {
     await page.goto('/sign-up', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(3000);
 
-    // Look for "Already have an account? Sign in" link
-    const signInLink = page.getByText('Sign in').or(page.locator('a[href*="sign-in"]'));
-    await expect(signInLink.first()).toBeVisible({ timeout: 5000 });
+    // Wait for Clerk sign-up form to fully load first
+    const signUpForm = page.locator('.cl-rootBox, .cl-signUp-root, [data-clerk-component]');
+    await expect(signUpForm.first()).toBeVisible({ timeout: 15000 });
+
+    // Look for "Already have an account? Sign in" link (various Clerk text patterns)
+    const signInLink = page.getByText('Sign in').or(page.getByText('sign in')).or(page.locator('a[href*="sign-in"]'));
+    await expect(signInLink.first()).toBeVisible({ timeout: 10000 });
   });
 });

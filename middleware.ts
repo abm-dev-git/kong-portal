@@ -65,6 +65,13 @@ function hasValidDevLogin(req: Request): boolean {
 }
 
 export default clerkMiddleware(async (auth, req) => {
+  // Let Clerk handle handshake URLs without any custom logic
+  // This is critical for OAuth callback flow to work correctly
+  if (req.nextUrl.searchParams.has('__clerk_handshake')) {
+    console.log('[Middleware] Clerk handshake detected, skipping custom logic')
+    return NextResponse.next()
+  }
+
   if (isProtectedRoute(req)) {
     // Check for DevLogin bypass (E2E testing only)
     if (hasValidDevLogin(req)) {
