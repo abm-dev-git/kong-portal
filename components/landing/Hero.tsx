@@ -18,14 +18,19 @@ export function Hero() {
         }}
       />
 
-      {/* White/cream bevel border around hero - like mesa.dev */}
+      {/* White bevel border with corner accents */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-4 pointer-events-none"
         style={{
-          border: '12px solid rgba(250, 235, 215, 0.9)',
-          boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.3)'
+          border: '1px solid rgba(255, 255, 255, 0.4)',
+          borderRadius: '2px'
         }}
       />
+      {/* Corner accents */}
+      <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-white/60 pointer-events-none" />
+      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-white/60 pointer-events-none" />
+      <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-white/60 pointer-events-none" />
+      <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-white/60 pointer-events-none" />
 
       {/* Inner vignette for depth */}
       <div
