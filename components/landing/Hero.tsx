@@ -9,44 +9,11 @@ import { SiHubspot, SiLinkedin } from "react-icons/si";
 export function Hero() {
   return (
     <section className="relative min-h-[85vh] overflow-hidden bg-[#0A1628]">
-      {/* Hero background image with bevel effect */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url(/images/hero-bg.jpg)',
-          boxShadow: 'inset 0 0 100px rgba(10, 22, 40, 0.8), inset 0 0 200px rgba(10, 22, 40, 0.4)'
-        }}
-      />
-
-      {/* Bevel frame - visible picture frame effect */}
-      <div
-        className="absolute inset-4 sm:inset-6 lg:inset-8 pointer-events-none rounded-lg"
-        style={{
-          border: '1px solid rgba(250, 235, 215, 0.15)',
-          boxShadow: `
-            inset 0 0 0 1px rgba(250, 235, 215, 0.05),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-            inset 1px 0 0 rgba(255, 255, 255, 0.05),
-            inset -1px 0 0 rgba(0, 0, 0, 0.1),
-            0 0 60px rgba(0, 0, 0, 0.4)
-          `
-        }}
-      />
-
-      {/* Inner vignette for depth */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at 65% 50%, transparent 30%, rgba(10,22,40,0.5) 100%)'
-        }}
-      />
-
-      {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/50 to-transparent lg:via-[#0A1628]/25" />
+      {/* Solid background for text area */}
+      <div className="absolute inset-0 bg-[#0A1628]" />
 
       {/* Film grain texture for retro feel */}
-      <div className="absolute inset-0 film-grain opacity-20" />
+      <div className="absolute inset-0 film-grain opacity-10" />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
@@ -120,9 +87,27 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Right Column - Empty to let hero image show through */}
+          {/* Right Column - Framed hero image like mesa.dev */}
           <div className="relative hidden lg:block">
-            {/* Hero image shows through on right side */}
+            <div
+              className="relative overflow-hidden"
+              style={{
+                border: '1px solid rgba(10, 22, 40, 0.8)',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+              }}
+            >
+              {/* The framed image */}
+              <img
+                src="/images/hero-bg.jpg"
+                alt="Professional woman representing ABM intelligence"
+                className="w-full h-auto object-cover"
+                style={{
+                  minHeight: '480px',
+                  maxHeight: '580px',
+                  objectPosition: '75% center'
+                }}
+              />
+            </div>
           </div>
         </div>
       </div>
