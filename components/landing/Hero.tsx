@@ -18,19 +18,12 @@ export function Hero() {
         }}
       />
 
-      {/* Bevel frame - visible picture frame effect */}
+      {/* White/cream bevel border around hero - like mesa.dev */}
       <div
-        className="absolute inset-4 sm:inset-6 lg:inset-8 pointer-events-none rounded-lg"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          border: '1px solid rgba(250, 235, 215, 0.15)',
-          boxShadow: `
-            inset 0 0 0 1px rgba(250, 235, 215, 0.05),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1),
-            inset 0 -1px 0 rgba(0, 0, 0, 0.2),
-            inset 1px 0 0 rgba(255, 255, 255, 0.05),
-            inset -1px 0 0 rgba(0, 0, 0, 0.1),
-            0 0 60px rgba(0, 0, 0, 0.4)
-          `
+          border: '12px solid rgba(250, 235, 215, 0.9)',
+          boxShadow: 'inset 0 0 20px rgba(0, 0, 0, 0.3)'
         }}
       />
 
