@@ -28,9 +28,9 @@ export function EnrichmentFeature() {
   return (
     <section className="relative bg-gray-50 py-16 lg:py-24 overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          {/* Left Column - Product Card */}
-          <div className="lg:col-span-7">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-start">
+          {/* Left Column - Product Card - aligned with h2 "Depth" */}
+          <div className="lg:col-span-7 lg:mt-14">
             <div className="bg-[#0A1F3D] border border-[#40E0D0]/20 rounded-lg shadow-2xl overflow-hidden">
               {/* Tabs */}
               <div className="border-b border-[#40E0D0]/20 bg-[#0A1F3D]/50 backdrop-blur-sm">
