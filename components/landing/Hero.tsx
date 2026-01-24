@@ -3,24 +3,35 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { SiHubspot, SiSalesforce, SiGmail } from "react-icons/si";
-import { Mail } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
+import { SiHubspot, SiLinkedin } from "react-icons/si";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[100vh] overflow-hidden bg-[#0A1628]">
-      {/* Hero background image */}
+    <section className="relative min-h-[85vh] overflow-hidden bg-[#0A1628]">
+      {/* Hero background image with bevel effect */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/images/hero-bg.jpg)' }}
+        style={{
+          backgroundImage: 'url(/images/hero-bg.jpg)',
+          boxShadow: 'inset 0 0 100px rgba(10, 22, 40, 0.8), inset 0 0 200px rgba(10, 22, 40, 0.4)'
+        }}
       />
 
-      {/* Gradient overlay for text readability - stays dark for photo background */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628] via-[#0A1628]/95 to-[#0A1628]/40 lg:via-[#0A1628]/90" />
+      {/* Bevel/vignette overlay - subtle modern frame */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          boxShadow: 'inset 0 0 80px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05)',
+          background: 'radial-gradient(ellipse at 60% 50%, transparent 40%, rgba(10,22,40,0.4) 100%)'
+        }}
+      />
+
+      {/* Gradient overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/50 to-transparent lg:via-[#0A1628]/25" />
 
       {/* Film grain texture for retro feel */}
-      <div className="absolute inset-0 film-grain opacity-30" />
+      <div className="absolute inset-0 film-grain opacity-20" />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
@@ -33,26 +44,32 @@ export function Hero() {
                 variant="secondary"
                 className="bg-[var(--turquoise)]/10 text-[var(--turquoise)] border border-[var(--turquoise)]/30 backdrop-blur-sm px-4 py-1.5 text-sm"
               >
-                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-                GTM Intelligence Platform
+                <Zap className="w-3.5 h-3.5 mr-1.5" />
+                B2B Data Enrichment API
               </Badge>
             </div>
 
-            {/* Headline - Transformation-focused */}
-            <h1 className="font-serif text-white text-4xl sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.1] tracking-tight animate-fade-in-up animate-delay-100 drop-shadow-lg">
-              Every Decision,{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--turquoise)] to-[var(--electric-blue)] drop-shadow-none">
-                Powered by Intelligence
+            {/* Headline - Retro serif typography */}
+            <h1
+              className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.05] tracking-tight animate-fade-in-up animate-delay-100"
+              style={{ fontFamily: 'Playfair Display, Georgia, "Times New Roman", serif' }}
+            >
+              <span className="text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">Know your customer</span>
+              <br />
+              <span className="text-[#40E0D0] drop-shadow-[0_2px_10px_rgba(64,224,208,0.3)]">
+                before they know they are.
               </span>
             </h1>
 
-            {/* Subheadline */}
-            <p className="font-serif text-xl lg:text-2xl text-white max-w-md leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow-md">
-              Enrich leads with verified company data, generate targeted content,
-              and surface intent signals—all in one API built for GTM teams.
+            {/* Subheadline - Warm, relationship-focused */}
+            <p
+              className="text-2xl lg:text-3xl text-white font-medium max-w-xl leading-relaxed animate-fade-in-up animate-delay-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+              style={{ fontFamily: 'Playfair Display, Georgia, "Times New Roman", serif' }}
+            >
+              30+ verified data points per relationship, each one sourced live, scored, and ready for your team to act upon.
             </p>
 
-            {/* Single Primary CTA */}
+            {/* CTAs */}
             <div className="flex flex-col sm:flex-row items-start gap-4 pt-2 animate-fade-in-up animate-delay-300">
               <Button
                 size="lg"
@@ -67,16 +84,23 @@ export function Hero() {
               <Link
                 href="/api-reference"
                 className="text-[var(--cream)] hover:text-white text-sm underline underline-offset-4 py-3 transition-colors"
+                style={{ fontFamily: 'Courier New, monospace' }}
               >
                 View API Documentation →
               </Link>
             </div>
 
-            {/* Minimal trust indicator */}
-            <div className="pt-6 flex items-center gap-3 text-sm text-[var(--cream)] animate-fade-in-up animate-delay-400">
-              <span className="flex items-center gap-1.5">
+            {/* Trust indicators - honest, developer-focused */}
+            <div className="pt-6 flex flex-wrap items-center gap-6 text-sm text-[var(--cream)] animate-fade-in-up animate-delay-400" style={{ fontFamily: 'Courier New, monospace' }}>
+              <span className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-400" />
                 No credit card required
+              </span>
+              <span className="flex items-center gap-2">
+                OpenAPI spec included
+              </span>
+              <span className="flex items-center gap-2">
+                TypeScript SDK
               </span>
             </div>
           </div>
@@ -86,66 +110,40 @@ export function Hero() {
             {/* Hero image shows through on right side */}
           </div>
         </div>
-
-        {/* Enhanced Social Proof Bar */}
-        <div className="relative z-10 mt-16 pt-8 border-t border-white/10">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-              {/* Trust metric */}
-              <div className="flex items-center gap-8 text-center lg:text-left">
-                <div>
-                  <div className="text-3xl font-bold text-white">500+</div>
-                  <div className="text-sm text-[var(--cream)]">GTM Teams</div>
-                </div>
-                <div className="h-10 w-px bg-[var(--cream)]/40 hidden lg:block" />
-                <div>
-                  <div className="text-3xl font-bold text-white">10M+</div>
-                  <div className="text-sm text-[var(--cream)]">Enrichments/month</div>
-                </div>
-                <div className="h-10 w-px bg-[var(--cream)]/40 hidden lg:block" />
-                <div>
-                  <div className="text-3xl font-bold text-[var(--turquoise)]">98%</div>
-                  <div className="text-sm text-[var(--cream)]">Data Accuracy</div>
-                </div>
-              </div>
-
-              {/* Compliance badges */}
-              <div className="flex items-center gap-4">
-                <div className="px-3 py-1.5 rounded border border-[var(--cream)]/50 bg-[var(--cream)]/10 text-xs text-[var(--cream)] font-medium">
-                  SOC 2 Type II
-                </div>
-                <div className="px-3 py-1.5 rounded border border-[var(--cream)]/50 bg-[var(--cream)]/10 text-xs text-[var(--cream)] font-medium">
-                  GDPR Ready
-                </div>
-                <div className="px-3 py-1.5 rounded border border-[var(--cream)]/50 bg-[var(--cream)]/10 text-xs text-[var(--cream)] font-medium">
-                  CCPA Compliant
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Integration logos - Bottom */}
+      {/* Real Data Sources - Bottom */}
       <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[var(--navy)] to-transparent pt-20 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-[var(--cream)] mb-6 text-center lg:text-left">Integrates with your stack</p>
+          <p className="text-sm text-[var(--cream)] mb-6 text-center lg:text-left" style={{ fontFamily: 'Courier New, monospace' }}>
+            Real data sources, unified schema
+          </p>
           <div className="flex items-center justify-center lg:justify-start gap-4 flex-wrap">
             <div className="integration-logo flex items-center gap-2 px-5 py-2.5 border border-[var(--cream)]/30 rounded-lg bg-[var(--cream)]/10 backdrop-blur-sm hover:bg-[var(--cream)]/15 hover:border-[var(--turquoise)]/50 transition-all duration-300 cursor-default">
               <SiHubspot className="w-5 h-5 text-[#ff7a59]" />
               <span className="text-sm text-white font-medium">HubSpot</span>
             </div>
             <div className="integration-logo flex items-center gap-2 px-5 py-2.5 border border-[var(--cream)]/30 rounded-lg bg-[var(--cream)]/10 backdrop-blur-sm hover:bg-[var(--cream)]/15 hover:border-[var(--turquoise)]/50 transition-all duration-300 cursor-default">
-              <SiSalesforce className="w-5 h-5 text-[#00a1e0]" />
-              <span className="text-sm text-white font-medium">Salesforce</span>
+              <SiLinkedin className="w-5 h-5 text-[#0A66C2]" />
+              <span className="text-sm text-white font-medium">LinkedIn</span>
             </div>
             <div className="integration-logo flex items-center gap-2 px-5 py-2.5 border border-[var(--cream)]/30 rounded-lg bg-[var(--cream)]/10 backdrop-blur-sm hover:bg-[var(--cream)]/15 hover:border-[var(--turquoise)]/50 transition-all duration-300 cursor-default">
-              <SiGmail className="w-5 h-5 text-[#ea4335]" />
-              <span className="text-sm text-white font-medium">Gmail</span>
+              <svg className="w-5 h-5 text-[#ff6b35]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              <span className="text-sm text-white font-medium">Hunter.io</span>
             </div>
             <div className="integration-logo flex items-center gap-2 px-5 py-2.5 border border-[var(--cream)]/30 rounded-lg bg-[var(--cream)]/10 backdrop-blur-sm hover:bg-[var(--cream)]/15 hover:border-[var(--turquoise)]/50 transition-all duration-300 cursor-default">
-              <Mail className="w-5 h-5 text-[#0078d4]" />
-              <span className="text-sm text-white font-medium">Outlook</span>
+              <svg className="w-5 h-5 text-[#20808D]" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              <span className="text-sm text-white font-medium">Perplexity AI</span>
+            </div>
+            <div className="integration-logo flex items-center gap-2 px-5 py-2.5 border border-[var(--cream)]/30 rounded-lg bg-[var(--cream)]/10 backdrop-blur-sm hover:bg-[var(--cream)]/15 hover:border-[var(--turquoise)]/50 transition-all duration-300 cursor-default">
+              <svg className="w-5 h-5 text-[#5436DA]" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+              </svg>
+              <span className="text-sm text-white font-medium">Tavily</span>
             </div>
           </div>
         </div>

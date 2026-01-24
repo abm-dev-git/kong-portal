@@ -17,15 +17,7 @@ export function EnrichmentFeature() {
   };
 
   return (
-    <section className="relative bg-[#F5F5DC] py-16 lg:py-24 overflow-hidden">
-      {/* Film grain texture */}
-      <div
-        className="absolute inset-0 opacity-[0.07] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E")`,
-        }}
-      />
-
+    <section className="relative bg-gray-50 py-16 lg:py-24 overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           {/* Left Column - Product Card */}
@@ -77,36 +69,39 @@ export function EnrichmentFeature() {
                       </div>
                     </div>
 
-                    {/* Fields */}
+                    {/* Fields - showing depth */}
                     <div className="space-y-3 pt-2">
                       <DataField
                         label="Email"
                         value="jane.smith@acme.com"
                         confidence="High"
-                        source="LinkedIn, Clearbit"
-                        freshness="Updated 2d ago"
+                        source="LinkedIn, Hunter"
+                        freshness="Live"
                       />
                       <DataField
                         label="Title"
                         value="VP of Engineering"
                         confidence="High"
-                        source="LinkedIn"
-                        freshness="Updated 1w ago"
+                        source="LinkedIn, Perplexity"
+                        freshness="Live"
                       />
                       <DataField
-                        label="Company"
-                        value="Acme Corp"
+                        label="Company Revenue"
+                        value="$50M–$100M ARR"
                         confidence="High"
-                        source="Clearbit, ZoomInfo"
+                        source="Tavily, Perplexity"
                         freshness="Updated 3d ago"
                       />
                       <DataField
-                        label="Phone"
-                        value="+1 (555) 123-4567"
+                        label="Tech Stack"
+                        value="React, Node.js, AWS"
                         confidence="Medium"
-                        source="Public records"
-                        freshness="Updated 2w ago"
+                        source="Hunter, Tavily"
+                        freshness="Updated 1w ago"
                       />
+                      <p className="text-[#40E0D0]/70 text-xs text-center pt-2" style={{ fontFamily: 'Courier New, monospace' }}>
+                        +32 more fields available
+                      </p>
                     </div>
                   </div>
                 )}
@@ -120,15 +115,18 @@ export function EnrichmentFeature() {
     "email": "jane.smith@acme.com",
     "title": "VP of Engineering",
     "confidence": 0.98,
-    "sources": ["linkedin", "clearbit"],
-    "updated_at": "2025-11-12T14:32:00Z"
+    "sources": ["linkedin", "hunter", "perplexity"],
+    "enriched_at": "2025-11-12T14:32:00Z"
   },
   "company": {
     "name": "Acme Corp",
-    "domain": "acme.com",
-    "employees": "500-1000",
-    "confidence": 0.95
-  }
+    "revenue_range": "$50M-$100M",
+    "tech_stack": ["react", "nodejs", "aws"],
+    "confidence": 0.95,
+    "sources": ["tavily", "perplexity"]
+  },
+  "fields_count": 36,
+  "hallucination_check": "passed"
 }`}</code>
                     </pre>
                   </div>
@@ -139,26 +137,26 @@ export function EnrichmentFeature() {
                     <AuditEntry
                       timestamp="2025-11-12 14:32"
                       action="Email verified"
-                      source="LinkedIn API"
+                      source="LinkedIn + Hunter"
                       confidence="98%"
                     />
                     <AuditEntry
                       timestamp="2025-11-12 14:32"
                       action="Title confirmed"
-                      source="LinkedIn Profile"
+                      source="LinkedIn + Perplexity"
                       confidence="98%"
                     />
                     <AuditEntry
-                      timestamp="2025-11-10 09:15"
-                      action="Company data merged"
-                      source="Clearbit + ZoomInfo"
+                      timestamp="2025-11-12 14:30"
+                      action="Company revenue synthesized"
+                      source="Tavily + Perplexity"
                       confidence="95%"
                     />
                     <AuditEntry
-                      timestamp="2025-11-05 16:22"
-                      action="Phone number found"
-                      source="Public records"
-                      confidence="72%"
+                      timestamp="2025-11-12 14:30"
+                      action="Hallucination check passed"
+                      source="Multi-source validation"
+                      confidence="100%"
                     />
                   </div>
                 )}
@@ -170,38 +168,39 @@ export function EnrichmentFeature() {
           <div className="lg:col-span-5 space-y-6">
             {/* Eyebrow */}
             <Badge variant="secondary" className="bg-[#0A1F3D]/90 text-[#40E0D0] border border-[#40E0D0]/50">
-              Enrichment that won&apos;t break your pipeline
+              30–48 fields per profile
             </Badge>
 
             {/* H1 */}
-            <h2 className="text-[#0A1628] text-4xl lg:text-5xl font-serif leading-tight font-semibold">
-              Simply the deepest, most accurate enrichment API
+            <h2 className="text-[#0A1628] text-4xl lg:text-5xl leading-tight font-semibold" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+              Depth you can trust, sources you can cite
             </h2>
 
             {/* Lead paragraph */}
-            <p className="text-[#1a2f4a] text-lg font-serif leading-relaxed">
-              Turn a seed like an email or domain into verified person and company intelligence with confidence scores, sources, and freshness—all in one consistent schema.
+            <p className="text-[#1a2f4a] text-lg leading-relaxed" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+              Every field comes with a confidence score and source citation. Our multi-stage LLM pipeline synthesizes data from LinkedIn, Hunter, Perplexity, and Tavily—with hallucination detection built in.
             </p>
 
             {/* Bullet list */}
             <ul className="space-y-4">
               {[
-                "Deterministic over guesses with full audit trails",
-                "Confidence-scored fields and freshness windows",
-                "Cache, batch, and off-peak controls to cut costs"
+                "AI synthesis from 4 sources with transparent citations",
+                "Confidence scores + freshness on every field",
+                "Hallucination detection—no made-up data",
+                "HubSpot auto-sync: CRM writeback without manual entry"
               ].map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3">
                   <div className="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-[#40E0D0]/30 flex items-center justify-center">
                     <Check className="w-3 h-3 text-[#0d9488]" />
                   </div>
-                  <span className="text-[#1a2f4a] leading-relaxed">{item}</span>
+                  <span className="text-gray-700 leading-relaxed">{item}</span>
                 </li>
               ))}
             </ul>
 
             {/* Supporting paragraph */}
-            <p className="text-[#374151] text-sm leading-relaxed">
-              The engine merges multiple sources, normalizes to a canonical schema, and emits transparent citations so every field is explainable. Teams decide confidence thresholds and sources of record.
+            <p className="text-gray-500 text-sm leading-relaxed">
+              Canonical fields from multi-stage LLM processing. Configurable prompts let you customize enrichment behavior. Real-time SSE streaming so you can watch enrichment happen live.
             </p>
 
             {/* CTA Row */}
@@ -211,8 +210,8 @@ export function EnrichmentFeature() {
                 className="bg-[#40E0D0] hover:bg-[#20B2AA] text-[#0A1F3D]"
                 asChild
               >
-                <a href="/dashboard/api-keys">
-                  Get API key
+                <a href="/dashboard/playground">
+                  Try the Playground
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </a>
               </Button>
