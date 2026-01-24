@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 type TabType = "person" | "ai" | "company" | "audit";
 
 export function EnrichmentFeature() {
-  const [activeTab, setActiveTab] = useState<TabType>("person");
+  const [activeTab, setActiveTab] = useState<TabType>("ai");
 
   const handleKeyDown = (event: React.KeyboardEvent, tab: TabType) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -19,8 +19,8 @@ export function EnrichmentFeature() {
   };
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: "person", label: "Person", icon: <User className="w-3.5 h-3.5" /> },
     { id: "ai", label: "AI Insights", icon: <Sparkles className="w-3.5 h-3.5" /> },
+    { id: "person", label: "Person", icon: <User className="w-3.5 h-3.5" /> },
     { id: "company", label: "Company", icon: <Building2 className="w-3.5 h-3.5" /> },
     { id: "audit", label: "Audit", icon: <Database className="w-3.5 h-3.5" /> },
   ];
@@ -58,8 +58,8 @@ export function EnrichmentFeature() {
                 </div>
               </div>
 
-              {/* Tab Content */}
-              <div className="p-6 min-h-[420px]" role="tabpanel" id={`enrichment-panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+              {/* Tab Content - Fixed height to prevent jumping */}
+              <div className="p-6 h-[480px] overflow-y-auto" role="tabpanel" id={`enrichment-panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
                 {/* Person Tab */}
                 {activeTab === "person" && (
                   <div className="space-y-4">
