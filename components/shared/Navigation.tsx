@@ -43,7 +43,7 @@ export function Navigation({ className, variant = "dark" }: NavigationProps) {
         "sticky top-0 z-50 w-full border-b backdrop-blur-md",
         isLight
           ? "border-gray-200 bg-white/95"
-          : "border-[var(--turquoise)]/20 bg-[var(--dark-blue)]/95",
+          : "border-white/10 bg-white",
         className
       )}
     >
@@ -52,7 +52,7 @@ export function Navigation({ className, variant = "dark" }: NavigationProps) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center" aria-label="ABM.dev home">
-              <Logo variant={isLight ? "light" : "dark"} size="sm" />
+              <Logo variant="light" size="sm" />
             </Link>
           </div>
 
@@ -66,7 +66,7 @@ export function Navigation({ className, variant = "dark" }: NavigationProps) {
                   "transition-colors text-sm font-medium",
                   isLight
                     ? "text-gray-700 hover:text-gray-900"
-                    : "text-[var(--cream)] hover:text-[var(--turquoise)]"
+                    : "text-gray-700 hover:text-[var(--dark-blue)]"
                 )}
                 aria-label={`Navigate to ${link.label}`}
               >
@@ -101,12 +101,7 @@ export function Navigation({ className, variant = "dark" }: NavigationProps) {
                     <Button
                       variant="default"
                       size="default"
-                      className={cn(
-                        "font-semibold",
-                        isLight
-                          ? "bg-gray-900 text-white hover:bg-gray-800"
-                          : "bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
-                      )}
+                      className="font-semibold bg-[var(--dark-blue)] text-white hover:bg-[var(--dark-blue)]/90"
                       aria-label="Get started"
                     >
                       Get Started
