@@ -6,10 +6,14 @@ import {
   Database,
   Target,
   Play,
-  RefreshCw,
-  Shield
+  Shield,
+  Users,
+  Layers,
+  Code2,
+  Bell,
+  Clock
 } from "lucide-react";
-import { SiHubspot } from "react-icons/si";
+import { SiHubspot, SiLinkedin } from "react-icons/si";
 
 const features = [
   {
@@ -53,6 +57,36 @@ const features = [
     title: "Hallucination Detection",
     description: "Every AI-generated field is validated against source data. If we can't verify it, we flag it—no made-up information.",
     color: "#EF4444",
+  },
+  {
+    icon: SiLinkedin,
+    title: "Team LinkedIn Routing",
+    description: "Connect multiple team members' LinkedIn accounts. We'll automatically route enrichments through the closest connection to each prospect.",
+    color: "#0A66C2",
+  },
+  {
+    icon: Layers,
+    title: "Batch Enrichment",
+    description: "Upload thousands of contacts at once. Our queue processes them in parallel with progress tracking and webhook notifications.",
+    color: "#EC4899",
+  },
+  {
+    icon: Code2,
+    title: "TypeScript SDK",
+    description: "Fully typed client library with autocomplete for all 90 fields. Also available: OpenAPI spec, Postman collection, and cURL examples.",
+    color: "#06B6D4",
+  },
+  {
+    icon: Bell,
+    title: "Webhook Notifications",
+    description: "Get notified when enrichments complete. Perfect for async workflows—trigger Slack alerts, update dashboards, or kick off sequences.",
+    color: "#F97316",
+  },
+  {
+    icon: Clock,
+    title: "Off-peak Processing",
+    description: "Schedule batch jobs for off-peak hours and save 30% on costs. Great for overnight list enrichment when you don't need real-time results.",
+    color: "#6366F1",
   },
 ];
 
