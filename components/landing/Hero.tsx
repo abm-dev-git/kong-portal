@@ -11,7 +11,7 @@ export function Hero() {
     <section className="relative min-h-[85vh] overflow-hidden bg-[#0A1628]">
       {/* Hero background image with bevel effect */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-[8px] bg-cover bg-center bg-no-repeat rounded-lg"
         style={{
           backgroundImage: 'url(/images/hero-bg.jpg)',
           boxShadow: 'inset 0 0 100px rgba(10, 22, 40, 0.8), inset 0 0 200px rgba(10, 22, 40, 0.4)'
@@ -20,20 +20,20 @@ export function Hero() {
 
       {/* Inner vignette for depth */}
       <div
-        className="absolute inset-0 pointer-events-none"
+        className="absolute inset-[8px] pointer-events-none rounded-lg"
         style={{
           background: 'radial-gradient(ellipse at 65% 50%, transparent 30%, rgba(10,22,40,0.5) 100%)'
         }}
       />
 
       {/* Gradient overlay for text readability */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/50 to-transparent lg:via-[#0A1628]/25" />
+      <div className="absolute inset-[8px] rounded-lg bg-gradient-to-r from-[#0A1628]/85 via-[#0A1628]/50 to-transparent lg:via-[#0A1628]/25" />
 
       {/* Film grain texture for retro feel */}
-      <div className="absolute inset-0 film-grain opacity-20" />
+      <div className="absolute inset-[8px] rounded-lg film-grain opacity-20" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-20">
+      <div className="relative z-30 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 lg:pt-32 pb-40">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Text Content */}
           <div className="space-y-8">
@@ -90,15 +90,15 @@ export function Hero() {
             </div>
 
             {/* Trust indicators - honest, developer-focused */}
-            <div className="pt-6 flex flex-wrap items-center gap-6 text-sm text-[var(--cream)] animate-fade-in-up animate-delay-400" style={{ fontFamily: 'Courier New, monospace' }}>
-              <span className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-green-400" />
+            <div className="pt-6 flex flex-wrap items-center gap-4 text-sm text-white" style={{ fontFamily: 'Courier New, monospace' }}>
+              <span className="flex items-center gap-2 bg-[#0A1628]/90 px-4 py-2 rounded-full border border-white/20">
+                <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.8)]" />
                 No credit card required
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 bg-[#0A1628]/90 px-4 py-2 rounded-full border border-white/20">
                 OpenAPI spec included
               </span>
-              <span className="flex items-center gap-2">
+              <span className="flex items-center gap-2 bg-[#0A1628]/90 px-4 py-2 rounded-full border border-white/20">
                 TypeScript SDK
               </span>
             </div>
@@ -112,7 +112,7 @@ export function Hero() {
       </div>
 
       {/* Real Data Sources - Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[var(--navy)] to-transparent pt-20 pb-8">
+      <div className="absolute bottom-[8px] left-[8px] right-[8px] z-20 bg-gradient-to-t from-[var(--navy)] to-transparent pt-20 pb-8 rounded-b-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-sm text-[var(--cream)] mb-6 text-center lg:text-left" style={{ fontFamily: 'Courier New, monospace' }}>
             Real data sources, unified schema

@@ -9,6 +9,7 @@ import {
   ConfigurablePromptsVisual,
   LogStreamingVisual,
 } from "@/components/landing/FeatureShowcase";
+import { FeaturesGrid } from "@/components/landing/FeaturesGrid";
 import { QuickStart } from "@/components/landing/QuickStart";
 import { PricingTeaser } from "@/components/landing/PricingTeaser";
 import { CtaBand } from "@/components/landing/CtaBand";
@@ -86,7 +87,7 @@ export default function HomePage() {
           reversed
         />
 
-        {/* Log Streaming - Visual Left */}
+        {/* Log Streaming - Visual Right */}
         <FeatureShowcase
           badge="Real-time visibility"
           title="Watch enrichment happen live"
@@ -99,8 +100,10 @@ export default function HomePage() {
           ]}
           footnote="Perfect for building responsive UIs that show enrichment progress to your users."
           visual={<LogStreamingVisual />}
+          reversed
         />
 
+        <FeaturesGrid />
         <QuickStart />
         <PricingTeaser />
         <CtaBand />
