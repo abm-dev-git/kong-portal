@@ -18,14 +18,6 @@ export function Hero() {
         }}
       />
 
-      {/* White border at page edge */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          border: '8px solid white'
-        }}
-      />
-
       {/* Inner vignette for depth */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -155,6 +147,14 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* White border at page edge - on top of everything */}
+      <div
+        className="absolute inset-0 z-50 pointer-events-none"
+        style={{
+          border: '8px solid #ffffff'
+        }}
+      />
     </section>
   );
 }
