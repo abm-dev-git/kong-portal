@@ -89,22 +89,21 @@ export function Hero() {
 
           {/* Right Column - Framed hero image like mesa.dev */}
           <div className="relative hidden lg:block">
-            <div
-              className="relative overflow-hidden"
-              style={{
-                border: '1px solid rgba(10, 22, 40, 0.8)',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
-              }}
-            >
+            {/* Picture frame container with slight rotation like a pinned photo */}
+            <div className="relative rotate-[-0.5deg]">
+              {/* Decorative tape pieces */}
+              <div className="absolute -top-3 left-12 w-16 h-5 bg-[#FAEBD7]/40 rotate-[-3deg] shadow-sm z-10" />
+              <div className="absolute -top-3 right-16 w-14 h-5 bg-[#FAEBD7]/30 rotate-[2deg] shadow-sm z-10" />
+
               {/* The framed image */}
               <img
                 src="/images/hero-bg.jpg"
                 alt="Professional woman representing ABM intelligence"
-                className="w-full h-auto object-cover"
+                className="w-full h-auto shadow-lg border-2 border-[#FAEBD7]/20"
                 style={{
-                  minHeight: '480px',
-                  maxHeight: '580px',
-                  objectPosition: '75% center'
+                  maxHeight: '540px',
+                  objectFit: 'cover',
+                  objectPosition: '65% center'
                 }}
               />
             </div>
