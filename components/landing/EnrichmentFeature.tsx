@@ -52,55 +52,63 @@ export function EnrichmentFeature() {
               <div className="p-6" role="tabpanel" id={`enrichment-panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
                 {activeTab === "fields" && (
                   <div className="space-y-4">
-                    {/* Profile header */}
+                    {/* Profile header with Buyer Score */}
                     <div className="flex items-start gap-4">
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#40E0D0] to-[#20B2AA] flex items-center justify-center text-[#0A1F3D] text-xl font-semibold">
-                        JS
+                        MC
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-[#FAEBD7] text-lg font-semibold">Jane Smith</h3>
+                          <h3 className="text-[#FAEBD7] text-lg font-semibold">Marcus Chen</h3>
                           <Badge className="bg-[#10B981] text-white text-xs border-0">
-                            High
+                            92% Buyer Score
                           </Badge>
                         </div>
-                        <p className="text-[#FAEBD7]/60 text-sm">VP of Engineering</p>
-                        <p className="text-[#FAEBD7]/60 text-sm">Acme Corp</p>
+                        <p className="text-[#FAEBD7]/60 text-sm">VP of Revenue Operations</p>
+                        <p className="text-[#FAEBD7]/60 text-sm">Datawise Analytics • Series B</p>
                       </div>
+                    </div>
+
+                    {/* AI-Generated Insights */}
+                    <div className="p-3 rounded-lg bg-[#40E0D0]/10 border border-[#40E0D0]/20">
+                      <p className="text-xs text-[#40E0D0] uppercase tracking-wide font-medium mb-2">AI Outreach Angle</p>
+                      <p className="text-[#FAEBD7] text-sm leading-relaxed">
+                        &ldquo;Marcus recently posted about scaling RevOps for hypergrowth. Lead with how ABM.dev eliminates manual data entry—his team is drowning in spreadsheet imports.&rdquo;
+                      </p>
                     </div>
 
                     {/* Fields - showing depth */}
                     <div className="space-y-3 pt-2">
                       <DataField
-                        label="Email"
-                        value="jane.smith@acme.com"
+                        label="Matched Persona"
+                        value="Technical Decision Maker"
                         confidence="High"
-                        source="LinkedIn, Hunter"
+                        source="AI Synthesis"
                         freshness="Live"
                       />
                       <DataField
-                        label="Title"
-                        value="VP of Engineering"
+                        label="ICP Fit Score"
+                        value="94/100 — Tier 1 Account"
                         confidence="High"
-                        source="LinkedIn, Perplexity"
+                        source="Firmographic + Behavioral"
                         freshness="Live"
                       />
                       <DataField
-                        label="Company Revenue"
-                        value="$50M–$100M ARR"
+                        label="Expansion Signals"
+                        value="Hiring 12 SDRs, opened Austin office"
                         confidence="High"
-                        source="Tavily, Perplexity"
-                        freshness="Updated 3d ago"
+                        source="LinkedIn, Tavily"
+                        freshness="Updated 2d ago"
                       />
                       <DataField
                         label="Tech Stack"
-                        value="React, Node.js, AWS"
+                        value="HubSpot, Snowflake, dbt, Fivetran"
                         confidence="Medium"
-                        source="Hunter, Tavily"
+                        source="Hunter, Perplexity"
                         freshness="Updated 1w ago"
                       />
                       <p className="text-[#40E0D0]/70 text-xs text-center pt-2" style={{ fontFamily: 'Courier New, monospace' }}>
-                        +32 more fields available
+                        +38 more fields including email, phone, company financials
                       </p>
                     </div>
                   </div>
@@ -111,22 +119,25 @@ export function EnrichmentFeature() {
                     <pre className="text-xs text-[#FAEBD7]" style={{ fontFamily: '"Courier New", Courier, monospace' }}>
                       <code>{`{
   "person": {
-    "name": "Jane Smith",
-    "email": "jane.smith@acme.com",
-    "title": "VP of Engineering",
-    "confidence": 0.98,
-    "sources": ["linkedin", "hunter", "perplexity"],
-    "enriched_at": "2025-11-12T14:32:00Z"
+    "full_name": "Marcus Chen",
+    "email": "marcus.chen@datawise.io",
+    "title": "VP of Revenue Operations",
+    "seniority_level": "VP",
+    "matched_persona": "Technical Decision Maker",
+    "persona_confidence_score": 92,
+    "outreach_angle": "Lead with RevOps automation..."
   },
   "company": {
-    "name": "Acme Corp",
-    "revenue_range": "$50M-$100M",
-    "tech_stack": ["react", "nodejs", "aws"],
-    "confidence": 0.95,
-    "sources": ["tavily", "perplexity"]
+    "firm_name": "Datawise Analytics",
+    "revenue": "$25M-$50M",
+    "employees": "200-500",
+    "icp_fit_score": 94,
+    "priority_tier": "Tier 1",
+    "expansion_signals": "Hiring 12 SDRs..."
   },
-  "fields_count": 36,
-  "hallucination_check": "passed"
+  "fields_count": 42,
+  "hallucination_check": "passed",
+  "sources": ["linkedin", "hunter", "perplexity", "tavily"]
 }`}</code>
                     </pre>
                   </div>
@@ -135,27 +146,27 @@ export function EnrichmentFeature() {
                 {activeTab === "audit" && (
                   <div className="space-y-3">
                     <AuditEntry
-                      timestamp="2025-11-12 14:32"
-                      action="Email verified"
-                      source="LinkedIn + Hunter"
-                      confidence="98%"
+                      timestamp="2026-01-24 09:15"
+                      action="Persona matched: Technical Decision Maker"
+                      source="AI Synthesis (4 sources)"
+                      confidence="92%"
                     />
                     <AuditEntry
-                      timestamp="2025-11-12 14:32"
-                      action="Title confirmed"
-                      source="LinkedIn + Perplexity"
-                      confidence="98%"
+                      timestamp="2026-01-24 09:15"
+                      action="ICP fit score calculated"
+                      source="Firmographic + Intent signals"
+                      confidence="94%"
                     />
                     <AuditEntry
-                      timestamp="2025-11-12 14:30"
-                      action="Company revenue synthesized"
-                      source="Tavily + Perplexity"
-                      confidence="95%"
+                      timestamp="2026-01-24 09:14"
+                      action="Outreach angle generated"
+                      source="Perplexity + LinkedIn activity"
+                      confidence="88%"
                     />
                     <AuditEntry
-                      timestamp="2025-11-12 14:30"
+                      timestamp="2026-01-24 09:14"
                       action="Hallucination check passed"
-                      source="Multi-source validation"
+                      source="Cross-source validation"
                       confidence="100%"
                     />
                   </div>
