@@ -101,7 +101,7 @@ export function Navigation({ className, variant = "dark" }: NavigationProps) {
                     <Button
                       variant="default"
                       size="default"
-                      className="font-semibold bg-[var(--dark-blue)] text-white hover:bg-[var(--dark-blue)]/90"
+                      className="font-semibold bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
                       aria-label="Get started"
                     >
                       Get Started

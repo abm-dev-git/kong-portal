@@ -18,19 +18,13 @@ export function Hero() {
         }}
       />
 
-      {/* White bevel border with corner accents */}
+      {/* White border at page edge */}
       <div
-        className="absolute inset-4 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          border: '1px solid rgba(255, 255, 255, 0.4)',
-          borderRadius: '2px'
+          border: '8px solid white'
         }}
       />
-      {/* Corner accents */}
-      <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-white/60 pointer-events-none" />
-      <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-white/60 pointer-events-none" />
-      <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-white/60 pointer-events-none" />
-      <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-white/60 pointer-events-none" />
 
       {/* Inner vignette for depth */}
       <div
