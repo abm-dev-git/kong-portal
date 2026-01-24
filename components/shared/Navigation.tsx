@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { SignInButton, SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./Logo";
@@ -12,6 +12,7 @@ import { UserMenu } from "./UserMenu";
 
 interface NavigationProps {
   className?: string;
+  variant?: "dark" | "light";
 }
 
 const navigationLinks = [
@@ -20,7 +21,7 @@ const navigationLinks = [
   { label: "Pricing", href: "#pricing" },
 ];
 
-export function Navigation({ className }: NavigationProps) {
+export function Navigation({ className, variant = "dark" }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
@@ -34,10 +35,15 @@ export function Navigation({ className }: NavigationProps) {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  const isLight = variant === "light";
+
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full border-b border-[var(--turquoise)]/20 bg-[var(--dark-blue)]/95 backdrop-blur-md",
+        "sticky top-0 z-50 w-full border-b backdrop-blur-md",
+        isLight
+          ? "border-gray-200 bg-white/95"
+          : "border-[var(--turquoise)]/20 bg-[var(--dark-blue)]/95",
         className
       )}
     >
@@ -46,7 +52,7 @@ export function Navigation({ className }: NavigationProps) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center" aria-label="ABM.dev home">
-              <Logo variant="dark" size="sm" />
+              <Logo variant={isLight ? "light" : "dark"} size="sm" />
             </Link>
           </div>
 
@@ -56,7 +62,12 @@ export function Navigation({ className }: NavigationProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[var(--cream)] hover:text-[var(--turquoise)] transition-colors text-sm font-medium"
+                className={cn(
+                  "transition-colors text-sm font-medium",
+                  isLight
+                    ? "text-gray-700 hover:text-gray-900"
+                    : "text-[var(--cream)] hover:text-[var(--turquoise)]"
+                )}
                 aria-label={`Navigate to ${link.label}`}
               >
                 {link.label}
@@ -73,7 +84,12 @@ export function Navigation({ className }: NavigationProps) {
                     variant="default"
                     size="default"
                     onClick={() => router.push("/dashboard")}
-                    className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                    className={cn(
+                      "font-semibold",
+                      isLight
+                        ? "bg-gray-900 text-white hover:bg-gray-800"
+                        : "bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
+                    )}
                     aria-label="Go to dashboard"
                   >
                     Dashboard
@@ -81,21 +97,16 @@ export function Navigation({ className }: NavigationProps) {
                   <UserMenu />
                 </SignedIn>
                 <SignedOut>
-                  <SignInButton mode="modal">
-                    <Button
-                      variant="ghost"
-                      size="default"
-                      className="text-[var(--cream)] hover:text-[var(--cream)] hover:bg-[var(--turquoise)]/15 font-medium"
-                      aria-label="Sign in to your account"
-                    >
-                      Sign in
-                    </Button>
-                  </SignInButton>
                   <SignUpButton mode="modal">
                     <Button
                       variant="default"
                       size="default"
-                      className="bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                      className={cn(
+                        "font-semibold",
+                        isLight
+                          ? "bg-gray-900 text-white hover:bg-gray-800"
+                          : "bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
+                      )}
                       aria-label="Get started"
                     >
                       Get Started
@@ -115,7 +126,12 @@ export function Navigation({ className }: NavigationProps) {
             )}
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-[var(--cream)] hover:text-[var(--turquoise)] hover:bg-[var(--turquoise)]/10 transition-colors"
+              className={cn(
+                "inline-flex items-center justify-center p-2 rounded-md transition-colors",
+                isLight
+                  ? "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                  : "text-[var(--cream)] hover:text-[var(--turquoise)] hover:bg-[var(--turquoise)]/10"
+              )}
               onClick={toggleMobileMenu}
               aria-expanded={isMobileMenuOpen}
               aria-label="Toggle navigation menu"
@@ -132,7 +148,12 @@ export function Navigation({ className }: NavigationProps) {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-[var(--turquoise)]/20 bg-[var(--dark-blue)] animate-slide-in">
+        <div className={cn(
+          "md:hidden border-t animate-slide-in",
+          isLight
+            ? "border-gray-200 bg-white"
+            : "border-[var(--turquoise)]/20 bg-[var(--dark-blue)]"
+        )}>
           <div className="container mx-auto px-4 py-4 space-y-4">
             {/* Mobile Navigation Links */}
             <nav className="flex flex-col space-y-3" aria-label="Mobile navigation">
@@ -140,7 +161,12 @@ export function Navigation({ className }: NavigationProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-[var(--cream)] hover:text-[var(--turquoise)] transition-colors text-base font-medium py-2"
+                  className={cn(
+                    "transition-colors text-base font-medium py-2",
+                    isLight
+                      ? "text-gray-700 hover:text-gray-900"
+                      : "text-[var(--cream)] hover:text-[var(--turquoise)]"
+                  )}
                   onClick={() => setIsMobileMenuOpen(false)}
                   aria-label={`Navigate to ${link.label}`}
                 >
@@ -150,7 +176,10 @@ export function Navigation({ className }: NavigationProps) {
             </nav>
 
             {/* Mobile CTA Buttons */}
-            <div className="flex flex-col gap-3 pt-4 border-t border-[var(--turquoise)]/20">
+            <div className={cn(
+              "flex flex-col gap-3 pt-4 border-t",
+              isLight ? "border-gray-200" : "border-[var(--turquoise)]/20"
+            )}>
               {mounted && (
                 <>
                   <SignedIn>
@@ -161,28 +190,28 @@ export function Navigation({ className }: NavigationProps) {
                         setIsMobileMenuOpen(false);
                         router.push("/dashboard");
                       }}
-                      className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                      className={cn(
+                        "w-full font-semibold",
+                        isLight
+                          ? "bg-gray-900 text-white hover:bg-gray-800"
+                          : "bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
+                      )}
                       aria-label="Go to dashboard"
                     >
                       Dashboard
                     </Button>
                   </SignedIn>
                   <SignedOut>
-                    <SignInButton mode="modal">
-                      <Button
-                        variant="outline"
-                        size="lg"
-                        className="w-full text-[var(--cream)] border-[var(--turquoise)]/30 hover:bg-[var(--turquoise)]/15 hover:border-[var(--turquoise)]/50"
-                        aria-label="Sign in to your account"
-                      >
-                        Sign in
-                      </Button>
-                    </SignInButton>
                     <SignUpButton mode="modal">
                       <Button
                         variant="default"
                         size="lg"
-                        className="w-full bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)] font-semibold"
+                        className={cn(
+                          "w-full font-semibold",
+                          isLight
+                            ? "bg-gray-900 text-white hover:bg-gray-800"
+                            : "bg-[var(--turquoise)] text-[var(--dark-blue)] hover:bg-[var(--dark-turquoise)]"
+                        )}
                         aria-label="Get started"
                       >
                         Get Started

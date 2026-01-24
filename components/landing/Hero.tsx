@@ -18,12 +18,27 @@ export function Hero() {
         }}
       />
 
-      {/* Bevel/vignette overlay - subtle modern frame */}
+      {/* Bevel frame - visible picture frame effect */}
+      <div
+        className="absolute inset-4 sm:inset-6 lg:inset-8 pointer-events-none rounded-lg"
+        style={{
+          border: '1px solid rgba(250, 235, 215, 0.15)',
+          boxShadow: `
+            inset 0 0 0 1px rgba(250, 235, 215, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+            inset 1px 0 0 rgba(255, 255, 255, 0.05),
+            inset -1px 0 0 rgba(0, 0, 0, 0.1),
+            0 0 60px rgba(0, 0, 0, 0.4)
+          `
+        }}
+      />
+
+      {/* Inner vignette for depth */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          boxShadow: 'inset 0 0 80px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.05)',
-          background: 'radial-gradient(ellipse at 60% 50%, transparent 40%, rgba(10,22,40,0.4) 100%)'
+          background: 'radial-gradient(ellipse at 65% 50%, transparent 30%, rgba(10,22,40,0.5) 100%)'
         }}
       />
 
@@ -77,7 +92,7 @@ export function Hero() {
                 asChild
               >
                 <Link href="/dashboard">
-                  Start Building Free
+                  Start Building
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
               </Button>
