@@ -26,12 +26,13 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [isLoadingKeys, setIsLoadingKeys] = useState(true);
 
-  // Get auth token
-  useEffect(() => {
-    getToken().then((t) => setToken(t || undefined));
-  }, [getToken]);
-
   const orgId = organization?.id;
+
+  // Get auth token - refetch when organization changes to get updated claims
+  useEffect(() => {
+    // Force fresh token when org changes to ensure org_id claim is included
+    getToken({ skipCache: true }).then((t) => setToken(t || undefined));
+  }, [getToken, orgId]);
 
   // Fetch LinkedIn status
   const { data: linkedInStatus, isLoading: isLoadingLinkedIn, refetch: refetchLinkedIn } = useLinkedInStatus(token, orgId);
