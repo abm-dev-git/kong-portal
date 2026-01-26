@@ -104,17 +104,19 @@ export function useLinkedInStatus(token?: string, orgId?: string) {
     }
   }, []); // No dependencies - uses refs instead
 
-  // Initial fetch - only when token becomes available
+  // Initial fetch - only when BOTH token and orgId are available
   useEffect(() => {
-    if (token && !hasFetchedRef.current) {
+    if (token && orgId && !hasFetchedRef.current) {
       hasFetchedRef.current = true;
       fetchStatus(true);
-    } else if (!token) {
-      // Reset if token is cleared
+    } else if (!token || !orgId) {
+      // Reset if token or orgId is cleared (user logged out or switched org)
       hasFetchedRef.current = false;
-      setIsLoading(true);
+      if (!token) {
+        setIsLoading(true);
+      }
     }
-  }, [token, fetchStatus]);
+  }, [token, orgId, fetchStatus]);
 
   // Poll when status is pending
   useEffect(() => {

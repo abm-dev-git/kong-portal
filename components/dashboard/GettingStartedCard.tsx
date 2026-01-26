@@ -123,25 +123,24 @@ export function GettingStartedCard({
                 key={step.id}
                 onClick={isClickable ? step.onClick : undefined}
                 className={cn(
-                  "flex items-center gap-4 p-4 transition-colors",
+                  "flex items-center gap-4 p-4 transition-all duration-300",
                   isClickable && "hover:bg-[var(--turquoise)]/5 cursor-pointer",
-                  step.completed && "opacity-60",
                   step.disabled && !step.completed && "opacity-40"
                 )}
               >
                 {/* Step number / check */}
                 <div
                   className={cn(
-                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0",
+                    "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300",
                     step.completed
-                      ? "bg-emerald-500/20 text-emerald-400"
+                      ? "bg-emerald-500/20 text-emerald-400 ring-2 ring-emerald-500/30"
                       : step.disabled
                       ? "bg-[var(--turquoise)]/10 text-[var(--turquoise)]/50"
                       : "bg-[var(--turquoise)]/20 text-[var(--turquoise)]"
                   )}
                 >
                   {step.completed ? (
-                    <CheckCircle2 className="w-5 h-5" />
+                    <CheckCircle2 className="w-6 h-6" />
                   ) : (
                     <step.icon className="w-5 h-5" />
                   )}
@@ -150,28 +149,34 @@ export function GettingStartedCard({
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h4 className={cn(
-                    "text-sm font-medium",
-                    step.completed ? "text-[var(--cream)]/60 line-through" : "text-[var(--cream)]"
+                    "text-sm font-medium transition-colors duration-300",
+                    step.completed ? "text-emerald-400" : "text-[var(--cream)]"
                   )}>
                     {step.title}
                   </h4>
-                  <p className="text-sm text-[var(--cream)]/50 truncate">
+                  <p className={cn(
+                    "text-sm truncate transition-colors duration-300",
+                    step.completed ? "text-emerald-400/60" : "text-[var(--cream)]/50"
+                  )}>
                     {step.description}
                   </p>
                 </div>
 
-                {/* Action */}
-                {!step.completed && step.action && !step.disabled && (
+                {/* Action or Completed indicator */}
+                {step.completed ? (
+                  <span className="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-full">
+                    Done
+                  </span>
+                ) : !step.disabled && step.action ? (
                   <div className="flex items-center gap-1 text-sm text-[var(--turquoise)] font-medium">
                     {step.action}
                     <ArrowRight className="w-4 h-4" />
                   </div>
-                )}
-                {step.disabled && !step.completed && (
+                ) : step.disabled ? (
                   <span className="text-xs text-[var(--cream)]/40">
                     Complete step 1 first
                   </span>
-                )}
+                ) : null}
               </div>
             );
           })}

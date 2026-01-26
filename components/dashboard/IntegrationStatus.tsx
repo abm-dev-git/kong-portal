@@ -22,30 +22,36 @@ interface Integration {
   href: string;
 }
 
-const integrations: Integration[] = [
-  {
-    id: 'linkedin',
-    name: 'LinkedIn',
-    icon: Linkedin,
-    iconColor: 'text-[#0A66C2]',
-    connected: false,
-    href: '/settings/linkedin',
-  },
-  {
-    id: 'hubspot',
-    name: 'HubSpot',
-    icon: HubSpotIcon,
-    iconColor: 'text-[#ff7a59]',
-    connected: false,
-    href: '/settings/hubspot',
-  },
-];
-
 interface IntegrationStatusProps {
   className?: string;
+  linkedInConnected?: boolean;
+  hubspotConnected?: boolean;
 }
 
-export function IntegrationStatus({ className }: IntegrationStatusProps) {
+export function IntegrationStatus({
+  className,
+  linkedInConnected = false,
+  hubspotConnected = false,
+}: IntegrationStatusProps) {
+  const integrations: Integration[] = [
+    {
+      id: 'linkedin',
+      name: 'LinkedIn',
+      icon: Linkedin,
+      iconColor: 'text-[#0A66C2]',
+      connected: linkedInConnected,
+      href: '/settings/linkedin',
+    },
+    {
+      id: 'hubspot',
+      name: 'HubSpot',
+      icon: HubSpotIcon,
+      iconColor: 'text-[#ff7a59]',
+      connected: hubspotConnected,
+      href: '/settings/hubspot',
+    },
+  ];
+
   const connectedCount = integrations.filter((i) => i.connected).length;
 
   return (

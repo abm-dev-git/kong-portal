@@ -41,6 +41,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { useWorkspaceContext } from '@/lib/contexts/WorkspaceContext'
+import { EnrichmentSettingsCard } from '@/components/dashboard/EnrichmentSettingsCard'
 
 interface ContentInstruction {
   id: string
@@ -279,6 +280,22 @@ export default function PromptsPage() {
             New Prompt
           </Button>
         </div>
+      </div>
+
+      {/* Enrichment Settings */}
+      <EnrichmentSettingsCard />
+
+      {/* Content Prompts Section Header */}
+      <div className="flex items-center gap-3 pt-2">
+        <h2
+          className="text-xl text-[var(--cream)]"
+          style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}
+        >
+          Content Prompts
+        </h2>
+        <Badge variant="outline" className="text-[var(--cream)]/60 border-[var(--cream)]/20">
+          Role &times; Content Type
+        </Badge>
       </div>
 
       {/* Filters */}

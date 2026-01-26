@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useAuth, useOrganization, useUser } from '@clerk/nextjs';
-import { Key, Zap, BarChart3, Users, Sparkles } from 'lucide-react';
+import { Key, Zap, BarChart3, Users, Sparkles, Loader2 } from 'lucide-react';
 import { StatsCard } from './StatsCard';
 import { UsageBar } from './UsageBar';
 import { ActivityFeed } from './ActivityFeed';
@@ -34,10 +34,10 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
   const orgId = organization?.id;
 
   // Fetch LinkedIn status
-  const { data: linkedInStatus, refetch: refetchLinkedIn } = useLinkedInStatus(token, orgId);
+  const { data: linkedInStatus, isLoading: isLoadingLinkedIn, refetch: refetchLinkedIn } = useLinkedInStatus(token, orgId);
 
   // Fetch enrichment stats (for determining if Getting Started should show)
-  const { hasCompletedEnrichment, refetch: refetchEnrichmentStats } = useEnrichmentStats(token, orgId);
+  const { hasCompletedEnrichment, isLoading: isLoadingEnrichment, refetch: refetchEnrichmentStats } = useEnrichmentStats(token, orgId);
 
   // Fetch API keys
   const fetchApiKeys = useCallback(async () => {
@@ -60,12 +60,16 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
 
   // Determine user state from real data
   const hasApiKey = apiKeys.length > 0;
-  const hasLinkedIn = linkedInStatus?.status === 'connected';
+  // Check for connected status - API may return isConnected boolean or status string
+  const hasLinkedIn = linkedInStatus?.isConnected === true || linkedInStatus?.status === 'connected';
   const hasActivity = hasCompletedEnrichment;
   // Show new user view if they don't have an API key yet
   // Hide getting started once they have both API key AND completed an enrichment
   const isNewUser = !hasApiKey;
   const showGettingStarted = !hasCompletedEnrichment || !hasApiKey;
+
+  // Show loading state while initial data is being fetched to prevent layout jumping
+  const isInitialLoading = isLoadingKeys || (token && (isLoadingLinkedIn || isLoadingEnrichment));
 
   // Mock stats - these would come from a real API in production
   const stats = {
@@ -81,6 +85,28 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
   };
 
   const activities: { id: string; type: 'enrichment' | 'api_key' | 'integration' | 'settings'; title: string; description: string; timestamp: string; status?: 'success' | 'error' | 'pending' }[] = [];
+
+  // Show loading skeleton while initial data loads
+  if (isInitialLoading) {
+    return (
+      <div className="space-y-8">
+        {/* Header skeleton */}
+        <div className="space-y-2">
+          <div className="h-9 w-64 bg-[var(--navy)] rounded animate-pulse" />
+          <div className="h-5 w-80 bg-[var(--navy)] rounded animate-pulse" />
+        </div>
+        {/* Content skeleton */}
+        <div className="space-y-6">
+          <div className="h-64 bg-[var(--navy)] rounded-lg animate-pulse" />
+          <div className="h-48 bg-[var(--navy)] rounded-lg animate-pulse" />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="h-40 bg-[var(--navy)] rounded-lg animate-pulse" />
+            <div className="h-40 bg-[var(--navy)] rounded-lg animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -136,7 +162,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
 
           {/* Integrations - smaller section for new users */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <IntegrationStatus />
+            <IntegrationStatus linkedInConnected={hasLinkedIn} />
             <div className="p-6 rounded-lg bg-[var(--navy)] border border-[var(--turquoise)]/20">
               <h3 className="text-lg font-medium text-[var(--cream)] mb-3">Need help?</h3>
               <p className="text-sm text-[var(--cream)]/60 mb-4">
@@ -227,7 +253,7 @@ export function DashboardContent({ firstName }: DashboardContentProps) {
             </div>
 
             {/* Integrations Section */}
-            <IntegrationStatus />
+            <IntegrationStatus linkedInConnected={hasLinkedIn} />
           </div>
 
           {/* Quick Playground Access for existing users */}

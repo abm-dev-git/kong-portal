@@ -5,3 +5,4 @@ export { IntegrationStatus } from './IntegrationStatus';
 export { DashboardContent } from './DashboardContent';
 export { GettingStartedCard } from './GettingStartedCard';
 export { PlaygroundCard } from './PlaygroundCard';
+export { EnrichmentSettingsCard } from './EnrichmentSettingsCard';
