@@ -124,6 +124,8 @@ export default function TeamSettingsPage() {
         orgId={effectiveOrgId}
         onSuccess={handleInviteSuccess}
         devLoginKey={devLoginKey || undefined}
+        inviterName={currentUser?.displayName || currentUser?.email || 'A team member'}
+        organizationName={currentUser?.organizationName || organization?.name || 'your organization'}
       />
     </div>
   );

@@ -32,6 +32,10 @@ interface InviteDialogProps {
   orgId?: string;
   onSuccess?: () => void;
   devLoginKey?: string;
+  /** Name of the person sending the invite (for email) */
+  inviterName?: string;
+  /** Organization name (for email) */
+  organizationName?: string;
 }
 
 const roleDescriptions: Record<MemberRole, string> = {
@@ -47,6 +51,8 @@ export function InviteDialog({
   orgId,
   onSuccess,
   devLoginKey,
+  inviterName,
+  organizationName,
 }: InviteDialogProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<MemberRole>('viewer');
@@ -77,7 +83,29 @@ export function InviteDialog({
         message: message.trim() || undefined,
       };
 
-      await createInvite(invite);
+      const createdInvite = await createInvite(invite);
+
+      // Send the invitation email
+      if (createdInvite?.token && organizationName && inviterName) {
+        try {
+          await fetch('/api/send-invite-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: email.trim(),
+              organizationName,
+              inviterName,
+              role,
+              personalMessage: message.trim() || undefined,
+              inviteToken: createdInvite.token,
+            }),
+          });
+        } catch (emailError) {
+          // Log but don't fail - the invite was created
+          console.error('Failed to send invite email:', emailError);
+        }
+      }
+
       toast.success(`Invitation sent to ${email}`);
       resetForm();
       onOpenChange(false);

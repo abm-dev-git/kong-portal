@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>You're invited to join {{organizationName}} on abm.dev</title>
+  <title>You're invited to join {{{organizationName}}} on abm.dev</title>
 </head>
 <body style="margin: 0; padding: 0; background-color: #0A1F3D; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
 
@@ -38,7 +38,7 @@
                   <td style="padding: 40px 40px 24px 40px;">
                     <h1 style="margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: 28px; font-weight: 400; color: #FAEBD7; line-height: 1.3;">
                       You've been invited to join<br>
-                      <span style="color: #40E0D0;">{{organizationName}}</span>
+                      <span style="color: #40E0D0;">{{{organizationName}}}</span>
                     </h1>
                   </td>
                 </tr>
@@ -47,30 +47,30 @@
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
                     <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.7; color: #FAEBD7;">
-                      <strong style="color: #40E0D0;">{{inviterName}}</strong> has invited you to join their organization on abm.dev as {{roleArticle}} <strong style="color: #40E0D0;">{{role}}</strong>.
+                      <strong style="color: #40E0D0;">{{{inviterName}}}</strong> has invited you to join their organization on abm.dev as {{{roleArticle}}} <strong style="color: #40E0D0;">{{{role}}}</strong>.
                     </p>
                   </td>
                 </tr>
 
                 <!-- Personal Message (if provided) - hasPersonalMessage is "true" string when message exists -->
-                {{#if hasPersonalMessage}}
+                {{{#if hasPersonalMessage}}}
                 <tr>
                   <td style="padding: 0 40px 24px 40px;">
                     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: rgba(64, 224, 208, 0.05); border-left: 3px solid #40E0D0; border-radius: 0 8px 8px 0;">
                       <tr>
                         <td style="padding: 16px 20px;">
                           <p style="margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(250, 235, 215, 0.6);">
-                            Message from {{inviterName}}
+                            Message from {{{inviterName}}}
                           </p>
                           <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #FAEBD7; font-style: italic;">
-                            "{{personalMessage}}"
+                            "{{{personalMessage}}}"
                           </p>
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
-                {{/if}}
+                {{{/if}}}
 
                 <!-- Role Badge -->
                 <tr>
@@ -79,7 +79,7 @@
                       <tr>
                         <td style="background-color: rgba(64, 224, 208, 0.1); border: 1px solid rgba(64, 224, 208, 0.3); border-radius: 20px; padding: 8px 16px;">
                           <span style="font-size: 13px; font-weight: 500; color: #40E0D0;">
-                            Role: {{role}}
+                            Role: {{{role}}}
                           </span>
                         </td>
                       </tr>
@@ -93,7 +93,7 @@
                     <table role="presentation" cellspacing="0" cellpadding="0">
                       <tr>
                         <td style="border-radius: 8px; background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 100%);">
-                          <a href="{{acceptUrl}}" target="_blank" style="display: inline-block; padding: 16px 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #0A1F3D; text-decoration: none; border-radius: 8px;">
+                          <a href="{{{acceptUrl}}}" target="_blank" style="display: inline-block; padding: 16px 48px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #0A1F3D; text-decoration: none; border-radius: 8px;">
                             Accept Invitation
                           </a>
                         </td>
@@ -143,7 +143,7 @@
                       <a href="https://abm.dev" style="color: #40E0D0; text-decoration: none;">abm.dev</a> &middot; AI-powered data enrichment
                     </p>
                     <p style="margin: 8px 0 0 0; font-size: 12px; color: rgba(250, 235, 215, 0.3);">
-                      &copy; {{currentYear}} ABM.dev. All rights reserved.
+                      &copy; {{{currentYear}}} ABM.dev. All rights reserved.
                     </p>
                   </td>
                 </tr>

@@ -57,16 +57,16 @@ async function createTeamInviteTemplate() {
         name: 'Team Invite',
         description: 'Invitation email for new team members',
         html,
-        variables: {
-          organizationName: 'Acme Corp',
-          inviterName: 'John Smith',
-          role: 'Editor',
-          roleArticle: 'an',
-          personalMessage: 'Looking forward to working with you!',
-          hasPersonalMessage: true,
-          acceptUrl: 'https://dev.abm.dev/invite/abc123',
-          currentYear: new Date().getFullYear().toString(),
-        },
+        variables: [
+          { key: 'organizationName', type: 'string', default: 'Acme Corp' },
+          { key: 'inviterName', type: 'string', default: 'John Smith' },
+          { key: 'role', type: 'string', default: 'Editor' },
+          { key: 'roleArticle', type: 'string', default: 'an' },
+          { key: 'personalMessage', type: 'string', default: 'Looking forward to working with you!' },
+          { key: 'hasPersonalMessage', type: 'string', default: 'true' },
+          { key: 'acceptUrl', type: 'string', default: 'https://dev.abm.dev/invite/abc123' },
+          { key: 'currentYear', type: 'string', default: new Date().getFullYear().toString() },
+        ],
       }),
     });
 

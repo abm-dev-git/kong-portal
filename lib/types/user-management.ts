@@ -40,6 +40,10 @@ export interface OrganizationInvite {
   createdAt: string;
   expiresAt: string;
   sendCount: number;
+  /** Token for the invite link - only returned when creating a new invite */
+  token?: string;
+  /** Organization name - included in create response for email */
+  organizationName?: string;
 }
 
 export interface CreateInviteRequest {
