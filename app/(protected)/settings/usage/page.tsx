@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useAuth } from '@clerk/nextjs'
+import { useOrganization } from '@clerk/nextjs'
 import {
   BarChart3,
   RefreshCw,
@@ -14,6 +14,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { EmptyStateError, EmptyStateNoData } from '@/components/ui/empty-state'
 import { formatDate } from '@/lib/utils'
+import { useDevLoginAuth } from '@/lib/hooks/useDevLoginAuth'
 
 interface DailyUsage {
   date: string
@@ -30,24 +31,31 @@ interface Enrichment {
 }
 
 export default function UsagePage() {
-  const { getToken } = useAuth()
+  const { organization } = useOrganization()
+  const { token, orgId, isReady, devLoginKey, getAuthHeaders } = useDevLoginAuth()
   const [dailyUsage, setDailyUsage] = useState<DailyUsage[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Use effective org ID from Clerk or DevLogin
+  const effectiveOrgId = organization?.id || orgId
+
   useEffect(() => {
-    fetchUsage()
-  }, [])
+    if (isReady && effectiveOrgId) {
+      fetchUsage()
+    }
+  }, [isReady, effectiveOrgId])
 
   const fetchUsage = async () => {
     setLoading(true)
     setError(null)
     try {
-      const token = await getToken()
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrichments/jobs?limit=500`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const headers: Record<string, string> = {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      }
+      const response = await fetch('/api/v1/enrichments/jobs?limit=500', {
+        headers,
       })
       if (response.ok) {
         const data = await response.json()
