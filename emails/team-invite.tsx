@@ -12,21 +12,21 @@ import {
 } from '@react-email/components';
 import * as React from 'react';
 
-// Brand Colors
+// Light Theme Brand Colors
 const colors = {
-  primary: '#40E0D0',
-  background: '#0A1F3D',
-  cardBg: '#1a1a2e',
-  text: '#FAEBD7',
-  accent: '#2563eb',
-  muted: 'rgba(250, 235, 215, 0.6)',
-  mutedLight: 'rgba(250, 235, 215, 0.5)',
-  mutedLighter: 'rgba(250, 235, 215, 0.4)',
-  mutedLightest: 'rgba(250, 235, 215, 0.3)',
-  border: 'rgba(64, 224, 208, 0.2)',
-  borderLight: 'rgba(64, 224, 208, 0.3)',
-  primaryMuted: 'rgba(64, 224, 208, 0.1)',
-  primaryMutedLight: 'rgba(64, 224, 208, 0.05)',
+  primary: '#0d9488', // Teal-600 - darker for better contrast on light
+  background: '#f8fafc', // Slate-50
+  cardBg: '#ffffff',
+  text: '#1e293b', // Slate-800
+  accent: '#2563eb', // Blue-600
+  muted: '#64748b', // Slate-500
+  mutedLight: '#94a3b8', // Slate-400
+  mutedLighter: '#cbd5e1', // Slate-300
+  border: '#e2e8f0', // Slate-200
+  borderLight: '#f1f5f9', // Slate-100
+  primaryMuted: '#ccfbf1', // Teal-100
+  primaryMutedLight: '#f0fdfa', // Teal-50
+  buttonText: '#ffffff',
 };
 
 // Typography
@@ -177,6 +177,7 @@ const card: React.CSSProperties = {
   border: `1px solid ${colors.border}`,
   borderRadius: '12px',
   padding: '40px',
+  boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
 };
 
 const headline: React.CSSProperties = {
@@ -226,7 +227,7 @@ const badgeContainer: React.CSSProperties = {
 const roleBadge: React.CSSProperties = {
   display: 'inline-block',
   backgroundColor: colors.primaryMuted,
-  border: `1px solid ${colors.borderLight}`,
+  border: `1px solid ${colors.primary}`,
   borderRadius: '20px',
   padding: '8px 16px',
   fontSize: '13px',
@@ -245,7 +246,7 @@ const button: React.CSSProperties = {
   fontFamily: fonts.body,
   fontSize: '16px',
   fontWeight: 600,
-  color: colors.background,
+  color: colors.buttonText,
   backgroundColor: colors.primary,
   borderRadius: '8px',
   textDecoration: 'none',
@@ -263,10 +264,9 @@ const footer: React.CSSProperties = {
 };
 
 const divider: React.CSSProperties = {
-  borderColor: 'transparent',
+  borderColor: colors.border,
   borderTopWidth: '1px',
   borderTopStyle: 'solid',
-  borderImage: `linear-gradient(90deg, transparent, ${colors.borderLight}, transparent) 1`,
   marginBottom: '24px',
 };
 
@@ -281,7 +281,7 @@ const helpText: React.CSSProperties = {
 const companyInfo: React.CSSProperties = {
   margin: 0,
   fontSize: '13px',
-  color: colors.mutedLighter,
+  color: colors.muted,
   textAlign: 'center',
 };
 
@@ -293,7 +293,7 @@ const footerLink: React.CSSProperties = {
 const copyright: React.CSSProperties = {
   margin: '8px 0 0 0',
   fontSize: '12px',
-  color: colors.mutedLightest,
+  color: colors.mutedLight,
   textAlign: 'center',
 };
 
