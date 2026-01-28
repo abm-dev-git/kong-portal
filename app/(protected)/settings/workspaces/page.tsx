@@ -59,7 +59,7 @@ export default function WorkspacesSettingsPage() {
   const { data: workspacesData, isLoading: workspacesLoading, refetch } = useWorkspaces(token || undefined, effectiveOrgId, devLoginKey || undefined);
   const { createWorkspace, updateWorkspace, archiveWorkspace, isLoading: mutationLoading } = useWorkspaceMutations(token || undefined, effectiveOrgId, devLoginKey || undefined);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin';
   const isLoading = !isReady || userLoading;
 
   const handleCreateWorkspace = async () => {

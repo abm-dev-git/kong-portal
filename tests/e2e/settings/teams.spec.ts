@@ -103,23 +103,13 @@ test.describe('Teams Management', () => {
     await expect(teamCard).not.toBeVisible({ timeout: 10000 });
   });
 
-  test('should filter teams with My Teams and All Teams tabs', async ({ authedPage }) => {
-    // This test verifies the team filter tabs work correctly
-    const myTeamsButton = authedPage.locator('button:has-text("My Teams")');
-    const allTeamsButton = authedPage.locator('button:has-text("All Teams")');
+  test('should show teams or empty state', async ({ authedPage }) => {
+    // This test verifies the teams page shows either team cards or an empty state
+    // (My Teams/All Teams filter was removed)
 
-    // Verify filter buttons exist
-    await expect(myTeamsButton).toBeVisible();
-    await expect(allTeamsButton).toBeVisible();
-
-    // Click My Teams and verify page responds
-    await myTeamsButton.click();
-    await authedPage.waitForTimeout(500);
-
-    // Either empty state or team cards should be visible
-    // Use more flexible selectors that work with the actual UI
+    // Either team cards or empty state should be visible
     const teamCards = authedPage.locator('[class*="card"]:has-text("E2E"), [class*="card"]:has-text("Team")');
-    const emptyStateMessages = authedPage.locator('text=/no teams|not in any teams|not a member/i');
+    const emptyStateMessages = authedPage.locator('text=/no teams|not in any teams/i');
     const pageContent = authedPage.locator('main, [role="main"], .content');
 
     const hasTeamCards = await teamCards.first().isVisible().catch(() => false);
@@ -128,14 +118,5 @@ test.describe('Teams Management', () => {
 
     // Page should have some content (teams, empty state, or at least the main content area)
     expect(hasTeamCards || hasEmptyState || hasPageContent).toBeTruthy();
-
-    // Click All Teams and verify it switches
-    await allTeamsButton.click();
-    await authedPage.waitForTimeout(500);
-
-    // All Teams view should also show content
-    const hasAllTeamCards = await teamCards.first().isVisible().catch(() => false);
-    const hasAllEmptyState = await emptyStateMessages.first().isVisible().catch(() => false);
-    expect(hasAllTeamCards || hasAllEmptyState || hasPageContent).toBeTruthy();
   });
 });

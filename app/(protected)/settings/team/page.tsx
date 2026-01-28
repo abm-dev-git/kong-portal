@@ -26,7 +26,7 @@ export default function TeamSettingsPage() {
   const { data: membersData, isLoading: membersLoading, refetch: refetchMembers } = useMembers(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
   const { data: invitesData, isLoading: invitesLoading, refetch: refetchInvites } = useInvites(token || undefined, effectiveOrgId, 'pending', devLoginKey || undefined);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin';
   const isLoading = !isReady || userLoading;
 
   const handleInviteSuccess = () => {

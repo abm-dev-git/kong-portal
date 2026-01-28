@@ -40,7 +40,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { useTeams, useMyTeams, useTeamMutations, useTeamMembers } from '@/lib/hooks/useTeams';
+import { useTeams, useTeamMutations, useTeamMembers } from '@/lib/hooks/useTeams';
 import { useWorkspaces, useDefaultWorkspace } from '@/lib/hooks/useWorkspaces';
 import { useCurrentUser } from '@/lib/hooks/useCurrentUser';
 import { useMembers } from '@/lib/hooks/useMembers';
@@ -55,7 +55,6 @@ export default function TeamsSettingsPage() {
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [addMemberDialogOpen, setAddMemberDialogOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-  const [viewMode, setViewMode] = useState<'all' | 'my'>('all');
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -71,15 +70,14 @@ export default function TeamsSettingsPage() {
   const effectiveOrgId = organization?.id || orgId;
 
   const { data: currentUser, isLoading: userLoading } = useCurrentUser(token || undefined, effectiveOrgId, devLoginKey || undefined);
-  const { data: allTeamsData, isLoading: allTeamsLoading, refetch: refetchAllTeams } = useTeams(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
-  const { data: myTeamsData, isLoading: myTeamsLoading, refetch: refetchMyTeams } = useMyTeams(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
+  const { data: teamsData, isLoading: teamsLoading, refetch: refetchTeams } = useTeams(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
   const { data: workspacesData } = useWorkspaces(token || undefined, effectiveOrgId, devLoginKey || undefined);
   const { data: defaultWorkspace } = useDefaultWorkspace(token || undefined, effectiveOrgId, devLoginKey || undefined);
   const { data: membersData } = useMembers(token || undefined, effectiveOrgId, undefined, devLoginKey || undefined);
   const { data: teamMembersData, refetch: refetchTeamMembers } = useTeamMembers(selectedTeam?.id, token || undefined, effectiveOrgId, devLoginKey || undefined);
   const { createTeam, updateTeam, archiveTeam, addMember, isLoading: mutationLoading } = useTeamMutations(token || undefined, effectiveOrgId, devLoginKey || undefined);
 
-  const isAdmin = currentUser?.role === 'admin';
+  const isAdmin = currentUser?.role?.toLowerCase() === 'admin';
   // Show loading until auth is ready and user data is loaded
   const isLoading = !isReady || userLoading;
 
@@ -90,12 +88,8 @@ export default function TeamsSettingsPage() {
     }
   }, [defaultWorkspace, formWorkspaceId]);
 
-  const teamsData = viewMode === 'all' ? allTeamsData : myTeamsData;
-  const teamsLoading = viewMode === 'all' ? allTeamsLoading : myTeamsLoading;
-
   const refetch = () => {
-    refetchAllTeams();
-    refetchMyTeams();
+    refetchTeams();
   };
 
   const handleCreateTeam = async () => {
@@ -248,30 +242,12 @@ export default function TeamsSettingsPage() {
             Manage functional teams within your workspaces
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex rounded-lg border border-[var(--cream)]/20 p-1">
-            <Button
-              variant={viewMode === 'all' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('all')}
-            >
-              All Teams
-            </Button>
-            <Button
-              variant={viewMode === 'my' ? 'secondary' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('my')}
-            >
-              My Teams
-            </Button>
-          </div>
-          {isAdmin && (
-            <Button onClick={() => { resetForm(); setCreateDialogOpen(true); }}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Team
-            </Button>
-          )}
-        </div>
+        {isAdmin && (
+          <Button onClick={() => { resetForm(); setCreateDialogOpen(true); }}>
+            <Plus className="mr-2 h-4 w-4" />
+            New Team
+          </Button>
+        )}
       </div>
 
       {/* Teams Grid */}
@@ -286,14 +262,12 @@ export default function TeamsSettingsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <UsersRound className="h-12 w-12 text-[var(--cream)]/40 mb-4" />
             <h3 className="text-lg font-medium text-[var(--cream)] mb-2">
-              {viewMode === 'all' ? 'No teams yet' : 'You\'re not in any teams'}
+              No teams yet
             </h3>
             <p className="text-sm text-[var(--cream)]/60 text-center max-w-sm mb-4">
-              {viewMode === 'all'
-                ? 'Create your first team to organize your members by function.'
-                : 'Ask an administrator to add you to a team.'}
+              Create your first team to organize your members by function.
             </p>
-            {isAdmin && viewMode === 'all' && (
+            {isAdmin && (
               <Button onClick={() => { resetForm(); setCreateDialogOpen(true); }} variant="outline">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Team
