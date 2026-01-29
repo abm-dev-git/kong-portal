@@ -18,6 +18,18 @@ const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefi
 
 const WORKSPACE_STORAGE_KEY = 'abm-current-workspace-id'
 
+// SSR-safe localStorage wrapper to prevent hydration issues
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    if (typeof window === 'undefined') return null
+    try { return localStorage.getItem(key) } catch { return null }
+  },
+  setItem: (key: string, value: string): void => {
+    if (typeof window === 'undefined') return
+    try { localStorage.setItem(key, value) } catch { /* ignore */ }
+  },
+}
+
 // Helper to get DevLogin key from cookie
 function getDevLoginKey(): string | null {
   if (typeof document === 'undefined') return null
@@ -31,7 +43,13 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   const hasFetchedRef = useRef(false)
+
+  // Track mount state for SSR safety
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const fetchWorkspaces = useCallback(async () => {
     try {
@@ -60,7 +78,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         setWorkspaces(items)
 
         // Try to restore previously selected workspace
-        const storedId = localStorage.getItem(WORKSPACE_STORAGE_KEY)
+        const storedId = safeLocalStorage.getItem(WORKSPACE_STORAGE_KEY)
         const storedWorkspace = items.find(w => w.id === storedId)
 
         if (storedWorkspace) {
@@ -69,10 +87,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           // Default to first workspace (usually the default one)
           const defaultWs = items.find(w => w.isDefault) || items[0]
           setCurrentWorkspaceState(defaultWs)
-          localStorage.setItem(WORKSPACE_STORAGE_KEY, defaultWs.id)
+          safeLocalStorage.setItem(WORKSPACE_STORAGE_KEY, defaultWs.id)
         }
       } else if (!result.success) {
-        setError(result.error?.message || 'Failed to load workspaces')
+        // Log error but don't block the app - workspaces are optional for most pages
+        console.warn('Failed to load workspaces:', result.error?.message)
+        // Only set error for actual failures, not auth issues (which might resolve)
+        if (result.error?.code !== 'HTTP_401' && result.error?.code !== 'HTTP_403') {
+          setError(result.error?.message || 'Failed to load workspaces')
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load workspaces')
@@ -82,12 +105,21 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [getToken, orgId])
 
   useEffect(() => {
-    fetchWorkspaces()
-  }, [fetchWorkspaces])
+    // Wait for client-side mount (required for cookie access)
+    if (!isMounted) return
+
+    // Check for DevLogin mode (E2E testing)
+    const devLoginKey = getDevLoginKey()
+
+    // Fetch workspaces if orgId is available OR if DevLogin is active
+    if (orgId || devLoginKey) {
+      fetchWorkspaces()
+    }
+  }, [fetchWorkspaces, orgId, isMounted])
 
   const setCurrentWorkspace = useCallback((workspace: Workspace) => {
     setCurrentWorkspaceState(workspace)
-    localStorage.setItem(WORKSPACE_STORAGE_KEY, workspace.id)
+    safeLocalStorage.setItem(WORKSPACE_STORAGE_KEY, workspace.id)
   }, [])
 
   const refreshWorkspaces = useCallback(async () => {

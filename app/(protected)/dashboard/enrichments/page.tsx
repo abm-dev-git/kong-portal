@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useAuth } from '@clerk/nextjs'
+import { useOrganization } from '@clerk/nextjs'
+import { useDevLoginAuth } from '@/lib/hooks/useDevLoginAuth'
 import {
   Activity,
   RefreshCw,
@@ -40,32 +41,43 @@ interface Enrichment {
 }
 
 export default function EnrichmentsPage() {
-  const { getToken } = useAuth()
+  const { organization } = useOrganization()
+  const { orgId, isReady, getAuthHeaders } = useDevLoginAuth()
   const [enrichments, setEnrichments] = useState<Enrichment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
 
+  // Use effective org ID from Clerk or DevLogin
+  const effectiveOrgId = organization?.id || orgId
+
   useEffect(() => {
-    fetchEnrichments()
-  }, [])
+    if (isReady) {
+      fetchEnrichments()
+    }
+  }, [isReady])
 
   const fetchEnrichments = async () => {
     setLoading(true)
     setError(null)
     try {
-      const token = await getToken()
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/enrichments/jobs?limit=100`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const headers: Record<string, string> = {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      }
+      const response = await fetch('/api/v1/enrichments/jobs?limit=100', {
+        headers,
       })
       if (response.ok) {
         const data = await response.json()
-        setEnrichments(data.items || [])
+        // Handle both { items: [...] } and { jobs: [...] } response formats
+        setEnrichments(data.items || data.jobs || [])
       } else {
-        setError('Unable to load enrichments')
+        // Get error details from response
+        const errorData = await response.json().catch(() => ({}))
+        console.warn('Enrichments API error:', response.status, errorData)
+        setError(errorData.message || 'Unable to load enrichments')
       }
     } catch (err) {
       setError('Unable to load enrichments')

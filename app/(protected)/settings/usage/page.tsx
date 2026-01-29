@@ -41,10 +41,11 @@ export default function UsagePage() {
   const effectiveOrgId = organization?.id || orgId
 
   useEffect(() => {
-    if (isReady && effectiveOrgId) {
+    // Fetch usage when auth is ready - don't require orgId as DevLogin might not have one
+    if (isReady) {
       fetchUsage()
     }
-  }, [isReady, effectiveOrgId])
+  }, [isReady])
 
   const fetchUsage = async () => {
     setLoading(true)
@@ -59,7 +60,8 @@ export default function UsagePage() {
       })
       if (response.ok) {
         const data = await response.json()
-        const enrichments: Enrichment[] = data.items || []
+        // Handle both { items: [...] } and { jobs: [...] } response formats
+        const enrichments: Enrichment[] = data.items || data.jobs || []
 
         // Aggregate by day
         const usageByDay = new Map<string, DailyUsage>()
@@ -93,7 +95,10 @@ export default function UsagePage() {
 
         setDailyUsage(sorted)
       } else {
-        setError('Unable to load usage data')
+        // Get error details from response
+        const errorData = await response.json().catch(() => ({}))
+        console.warn('Usage API error:', response.status, errorData)
+        setError(errorData.message || `Unable to load usage data (${response.status})`)
       }
     } catch (err) {
       setError('Unable to load usage data')
